@@ -38,7 +38,7 @@ export default function Home() {
           </Link>
           <Link
             href="/sign-up"
-            className="text-sm px-4 py-2 rounded-full border border-white/10 hover:border-[#F5A623]/40 hover:bg-[#F5A623]/5 transition-all font-light tracking-wide"
+            className="text-sm px-4 py-2 rounded-full border border-white/10 hover:border-lume-amber/40 hover:bg-lume-amber/5 transition-all font-light tracking-wide"
           >
             Get started
           </Link>
@@ -108,7 +108,7 @@ export default function Home() {
         >
           <Link
             href="/sign-up"
-            className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-[#1A1410] transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-lume-ink transition-all hover:scale-[1.02] active:scale-[0.98]"
             style={{ background: "linear-gradient(135deg, #F7C948, #F5A623, #E8724A)" }}
           >
             Start for free
@@ -125,14 +125,14 @@ export default function Home() {
 
       {/* Features */}
       <section id="features" className="max-w-4xl mx-auto px-6 pb-32">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.04] border border-white/[0.04] rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/4 border border-white/4 rounded-2xl overflow-hidden">
           {features.map(({ icon: Icon, title, description }) => (
-            <div key={title} className="bg-[#0F0C09] p-8 hover:bg-white/[0.02] transition-colors">
+            <div key={title} className="bg-[#0F0C09] p-8 hover:bg-white/2 transition-colors">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center mb-5"
                 style={{ background: "linear-gradient(135deg, #F7C94818, #E8724A12)" }}
               >
-                <Icon size={15} className="text-[#F5A623]" />
+                <Icon size={15} className="text-lume-amber" />
               </div>
               <h3 className="font-medium text-white/85 mb-2 text-sm tracking-wide">{title}</h3>
               <p className="text-sm text-white/35 font-light leading-relaxed">{description}</p>
@@ -142,7 +142,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04] px-8 py-8 max-w-6xl mx-auto flex items-center justify-between">
+      <footer className="border-t border-white/4 px-8 py-8 max-w-6xl mx-auto flex items-center justify-between">
         <LumeLogo size="sm" variant="gradient" />
         <p className="text-[0.65rem] tracking-[0.15em] uppercase text-white/20">
           lumenotes.com
