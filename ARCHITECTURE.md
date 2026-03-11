@@ -215,7 +215,7 @@ AiGeneration
 - [x] Shared env/config setup
 - [x] `lib/prisma.ts` singleton
 - [x] Prisma schema
-- [ ] First migration
+- [x] First migration
 - [ ] TanStack Query provider
 - [ ] Clerk setup in root layout
 - [ ] Auth pages (sign-in / sign-up)
