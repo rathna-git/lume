@@ -1,5 +1,44 @@
 # Lume — Build Progress
 
+> **Architecture reference:** [ARCHITECTURE.md](./ARCHITECTURE.md) — full system design, route map, data models, and tradeoffs.
+
+---
+
+## 2026-03-11
+
+*(in progress)*
+
+---
+
+## 2026-03-10
+
+### Architecture & Planning
+- Reordered implementation checklist in `ARCHITECTURE.md` to a safer MVP workflow — webhook sync moved to post-MVP
+- Added Key Decision: server-side user bootstrap instead of webhook-first sync for local dev simplicity
+
+### Environment Setup
+- Created `.env.example` — committed template documenting all required environment variables
+- Created `.env.local` — git-ignored file for real secrets (placeholders, to be filled in)
+- Updated `.gitignore` — changed `.env*` wildcard to explicit entries so `.env.example` is committed
+- Created `lib/env.ts` — server-side config module that validates required env vars at boot time
+
+### Git
+- Renamed default branch from `master` to `main` (local + remote)
+
+### Files Created / Modified
+| File | Status | Notes |
+|---|---|---|
+| `.env.example` | Created | Template for DATABASE_URL, Clerk keys, OpenAI key, Clerk redirect URLs |
+| `.env.local` | Created | Git-ignored; real secrets go here |
+| `.gitignore` | Modified | Allow `.env.example` to be committed |
+| `lib/env.ts` | Created | Server-only env validation; import this instead of `process.env` directly |
+| `ARCHITECTURE.md` | Modified | Reordered implementation checklist; added bootstrap decision |
+
+### Decisions Made
+- Public landing page stays hardcoded dark (intentional brand statement) — not tied to theme system
+- Protected app interior will be built light-mode-first using semantic tokens (`bg-background`, `text-foreground`, etc.)
+- Dark mode infrastructure (`.dark` class, CSS vars) preserved for future theme toggle
+
 ---
 
 ## 2026-03-09
@@ -39,38 +78,6 @@
 - Using **Prisma v6** (not v7) due to Node.js 20.10 version constraint (v7 requires 20.19+)
 - **No `src/` directory** — `app/`, `components/`, `lib/` at root level
 - `@/*` import alias configured
-
----
-
-*See [ARCHITECTURE.md](./ARCHITECTURE.md) for full system design, route map, data models, and tradeoffs.*
-
----
-
-## 2026-03-10
-
-### Architecture & Planning
-- Reordered implementation checklist in `ARCHITECTURE.md` to a safer MVP workflow — webhook sync moved to post-MVP
-- Added Key Decision: server-side user bootstrap instead of webhook-first sync for local dev simplicity
-
-### Environment Setup
-- Created `.env.example` — committed template documenting all required environment variables
-- Created `.env.local` — git-ignored file for real secrets (placeholders, to be filled in)
-- Updated `.gitignore` — changed `.env*` wildcard to explicit entries so `.env.example` is committed
-- Created `lib/env.ts` — server-side config module that validates required env vars at boot time
-
-### Files Created / Modified
-| File | Status | Notes |
-|---|---|---|
-| `.env.example` | Created | Template for DATABASE_URL, Clerk keys, OpenAI key, Clerk redirect URLs |
-| `.env.local` | Created | Git-ignored; real secrets go here |
-| `.gitignore` | Modified | Allow `.env.example` to be committed |
-| `lib/env.ts` | Created | Server-only env validation; import this instead of `process.env` directly |
-| `ARCHITECTURE.md` | Modified | Reordered implementation checklist; added bootstrap decision |
-
-### Decisions Made
-- Public landing page stays hardcoded dark (intentional brand statement) — not tied to theme system
-- Protected app interior will be built light-mode-first using semantic tokens (`bg-background`, `text-foreground`, etc.)
-- Dark mode infrastructure (`.dark` class, CSS vars) preserved for future theme toggle
 
 ---
 

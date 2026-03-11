@@ -1,0 +1,72 @@
+Update the app so the public landing page stays exactly as it is, and the protected app interior uses light mode by default for MVP.
+
+Important constraints:
+- Do NOT delete any existing dark mode tokens, variants, CSS variables, or `dark:` utility classes.
+- Do NOT remove the existing dark-mode infrastructure.
+- Do NOT add a theme toggle yet.
+- Do NOT implement theme persistence yet.
+- The goal is only to make the protected app experience default to light mode for now, while preserving all dark-mode groundwork for later.
+
+Goals:
+- Keep `/` unchanged as a fixed dark marketing page.
+- Keep all existing dark-theme setup intact for future use.
+- Make authenticated app pages look polished in light mode now.
+- Avoid destructive refactors.
+
+Please make these changes carefully:
+
+1. Identify the protected app layout and shared app UI files, especially:
+- `app/(dashboard)/layout.tsx`
+- sidebar/header/app-shell components
+- any shared wrappers used by workspace/settings/document pages
+
+2. Update the protected app interior so light mode is the active/default presentation for MVP:
+- page background should use Lume warm/light styling
+- cards/panels should use white or light surfaces
+- primary text should use dark ink
+- borders should be soft and warm
+- muted text should be softer neutral/brown
+- accents should use gold/amber sparingly
+
+3. Preserve all existing dark-mode setup:
+- keep `.dark` CSS support
+- keep `dark:` utility classes already present
+- keep any theme-aware class structure
+- do not delete future-ready variants just because they are not being used right now
+
+4. Do NOT build:
+- theme toggle UI
+- theme switching logic
+- localStorage/cookie theme persistence
+- system theme detection behavior
+unless something minimal is already required by the current setup
+
+5. If the protected app currently uses hardcoded dark backgrounds or dark text combinations, adjust them so light mode is the default MVP presentation, but do this in a way that still allows dark mode to be enabled later with minimal work.
+
+6. Keep styling aligned with the Lume brand:
+- warm editorial workspace
+- serif for major headings only
+- sans for UI/body
+- generous spacing
+- soft borders
+- subtle shadows
+- calm, premium feel
+
+7. Do NOT touch:
+- landing page hero styling
+- homepage dark aesthetic
+- routes
+- business logic
+- unrelated files
+
+8. After editing, summarize:
+- which files were changed
+- what was adjusted to make light mode the MVP default
+- which dark-mode classes/variants were intentionally preserved
+- anything that should be revisited later when we add a theme toggle
+
+Important:
+- Minimal, non-destructive changes only
+- Preserve project structure
+- Do not do large refactors
+- Keep future dark mode support intact
