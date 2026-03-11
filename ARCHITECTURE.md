@@ -216,7 +216,7 @@ AiGeneration
 - [x] `lib/prisma.ts` singleton
 - [x] Prisma schema
 - [x] First migration
-- [ ] TanStack Query provider
+- [x] TanStack Query provider
 - [ ] Clerk setup in root layout
 - [ ] Auth pages (sign-in / sign-up)
 - [ ] Middleware — route protection

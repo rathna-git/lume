@@ -29,9 +29,14 @@
 - Many-to-many Tags ↔ Documents via Prisma implicit join table (`_DocumentTags`)
 - Using Neon (serverless Postgres on AWS US-West-2) — free tier, pairs well with Vercel for production
 
+### TanStack Query Provider
+- Created `components/providers.tsx` — `QueryClientProvider` + `ReactQueryDevtools` wrapper
+- Updated `app/layout.tsx` — wrapped `{children}` with `<Providers>`
+- Pattern: API routes + `useQuery`/`useMutation` hooks (not Server Component fetching) — better fit for autosave and mutations
+
 ### Up Next
-- TanStack Query provider
 - Clerk setup in root layout
+- Auth pages (sign-in / sign-up)
 
 ---
 
