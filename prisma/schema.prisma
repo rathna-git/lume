@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ──────────────────────────────────────────────────────────────────────
+
+enum AiActionType {
+  SUMMARIZE
+  REWRITE
+  EXPAND
+  GENERATE_QUESTIONS
+  EXTRACT_ACTION_ITEMS
+}
+
+enum AiGenerationStatus {
+  PENDING
+  SUCCESS
+  ERROR
+}
+
+// ── Models ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id         String      @id @default(cuid())
+  clerkId    String      @unique
+  email      String      @unique
+  name       String?
+  imageUrl   String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  workspaces Workspace[]
+}
+
+model Workspace {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  emoji       String?    @default("📝")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  documents   Document[]
+
+  @@index([userId])
+}
+
+model Document {
+  id          String    @id @default(cuid())
+  title       String
+  content     String?   @db.Text
+  summary     String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  tags          Tag[]           @relation("DocumentTags")
+  aiGenerations AiGeneration[]
+
+  @@index([workspaceId])
+}
+
+model Tag {
+  id        String     @id @default(cuid())
+  name      String
+  color     String?    @default("#F5A623")
+  createdAt DateTime   @default(now())
+
+  documents Document[] @relation("DocumentTags")
+}
+
+model AiGeneration {
+  id            String             @id @default(cuid())
+  type          AiActionType
+  status        AiGenerationStatus @default(PENDING)
+  prompt        String?            @db.Text
+  inputSnapshot String?            @db.Text
+  output        Json?
+  errorMessage  String?            @db.Text
+  model         String             @default("gpt-4o")
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  documentId    String
+  document      Document           @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([type])
+  @@index([status])
+}

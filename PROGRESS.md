@@ -6,7 +6,27 @@
 
 ## 2026-03-11
 
-*(in progress)*
+### Database Layer
+- Created `prisma/schema.prisma` — full data model with 5 models and 2 enums
+- Created `lib/prisma.ts` — singleton Prisma client (prevents connection exhaustion in dev)
+- Renamed git default branch from `master` to `main` (local + remote)
+- Fixed local branch upstream tracking to `origin/main`
+
+### Files Created / Modified
+| File | Status | Notes |
+|---|---|---|
+| `prisma/schema.prisma` | Created | User, Workspace, Document, Tag, AiGeneration models + enums |
+| `lib/prisma.ts` | Created | Singleton pattern via globalThis — safe for Next.js hot reload |
+| `ARCHITECTURE.md` | Modified | Marked shared env, prisma singleton, and prisma schema as done |
+
+### Decisions Made
+- `@db.Text` on all long text fields (content, summary, prompt, etc.) — avoids VARCHAR(191) length limit
+- `output Json?` on AiGeneration — flexible structure for different AI action result shapes
+- `inputSnapshot` on AiGeneration — captures document state at time of AI call for auditability
+- Many-to-many Tags ↔ Documents via Prisma implicit join table (`_DocumentTags`)
+
+### Up Next
+- First migration (requires real DATABASE_URL in `.env.local`)
 
 ---
 

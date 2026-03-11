@@ -212,9 +212,9 @@ AiGeneration
 - [x] Next.js scaffold + dependencies
 - [x] Brand system (fonts, colors, animations)
 - [x] Logo component + landing page
-- [ ] Shared env/config setup
-- [ ] `lib/prisma.ts` singleton
-- [ ] Prisma schema
+- [x] Shared env/config setup
+- [x] `lib/prisma.ts` singleton
+- [x] Prisma schema
 - [ ] First migration
 - [ ] TanStack Query provider
 - [ ] Clerk setup in root layout
