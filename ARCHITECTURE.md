@@ -217,9 +217,9 @@ AiGeneration
 - [x] Prisma schema
 - [x] First migration
 - [x] TanStack Query provider
-- [ ] Clerk setup in root layout
-- [ ] Auth pages (sign-in / sign-up)
-- [ ] Middleware — route protection
+- [x] Clerk setup in root layout
+- [x] Auth pages (sign-in / sign-up)
+- [x] Middleware — route protection
 - [ ] Protected app shell (sidebar + header)
 - [ ] Server-side user bootstrap (create DB user on first request)
 - [ ] Default workspace creation

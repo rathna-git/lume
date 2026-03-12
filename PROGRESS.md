@@ -4,6 +4,28 @@
 
 ---
 
+## 2026-03-12
+
+### Clerk Auth Setup
+- Added `ClerkProvider` to `app/layout.tsx` — outermost wrapper, makes session available everywhere
+- Created `app/(auth)/sign-in/[[...sign-in]]/page.tsx` — Clerk hosted sign-in UI
+- Created `app/(auth)/sign-up/[[...sign-up]]/page.tsx` — Clerk hosted sign-up UI
+- Created `middleware.ts` — route protection; public routes: `/`, `/sign-in`, `/sign-up`; all others require auth
+- Tested: landing loads freely, `/workspaces` redirects to sign-in, sign-in UI renders correctly
+
+### Files Created / Modified
+| File | Status | Notes |
+|---|---|---|
+| `app/layout.tsx` | Modified | Added `ClerkProvider` as outermost wrapper |
+| `app/(auth)/sign-in/[[...sign-in]]/page.tsx` | Created | Clerk `<SignIn />` component, centered layout |
+| `app/(auth)/sign-up/[[...sign-up]]/page.tsx` | Created | Clerk `<SignUp />` component, centered layout |
+| `middleware.ts` | Created | `clerkMiddleware` + `createRouteMatcher` for route protection |
+
+### Up Next
+- Protected app shell (sidebar + header)
+
+---
+
 ## 2026-03-11
 
 ### Database Layer
