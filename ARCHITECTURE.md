@@ -220,8 +220,8 @@ AiGeneration
 - [x] Clerk setup in root layout
 - [x] Auth pages (sign-in / sign-up)
 - [x] Middleware — route protection
-- [ ] Protected app shell (sidebar + header)
-- [ ] Server-side user bootstrap (create DB user on first request)
+- [x] Protected app shell (sidebar + header)
+- [x] Server-side user bootstrap (create DB user on first request)
 - [ ] Default workspace creation
 - [ ] Workspace API routes
 - [ ] Workspace pages

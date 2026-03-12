@@ -6,6 +6,34 @@
 
 ## 2026-03-12
 
+### App Shell + User Bootstrap
+- Created `app/(dashboard)/layout.tsx` — server component; calls `auth()` + `currentUser()`, upserts user into Neon DB on every request, renders sidebar + header shell
+- Created `app/(dashboard)/page.tsx` — redirects `/` inside dashboard to `/workspaces`
+- Created `app/(dashboard)/workspaces/page.tsx` — placeholder workspace list page
+- Created `components/layout/sidebar.tsx` — left nav with active link highlighting (`usePathname`), Clerk `UserButton` at bottom
+- Created `components/layout/header.tsx` — top bar, accepts optional `title` prop
+- Fixed `middleware.ts` — changed `export default` to `export const middleware` for Next.js 16 compatibility
+- Fixed `app/layout.tsx` — replaced deprecated `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` with `signInFallbackRedirectUrl`/`signUpFallbackRedirectUrl` props on `ClerkProvider` (Clerk v7 breaking change)
+- Tested: sign-in redirects to `/workspaces`, DB user row created in Neon on first visit, sign-out redirects to landing page
+
+### Files Created / Modified
+| File | Status | Notes |
+|---|---|---|
+| `app/(dashboard)/layout.tsx` | Created | Server component — user bootstrap + app shell |
+| `app/(dashboard)/page.tsx` | Created | Redirects to `/workspaces` |
+| `app/(dashboard)/workspaces/page.tsx` | Created | Placeholder |
+| `components/layout/sidebar.tsx` | Created | Nav + active state + Clerk UserButton |
+| `components/layout/header.tsx` | Created | Top bar with optional title |
+| `middleware.ts` | Modified | `export const middleware` (Next.js 16 named export requirement) |
+| `app/layout.tsx` | Modified | Clerk v7 redirect props on `ClerkProvider` |
+
+### Up Next
+- Workspace API routes (GET list, POST create)
+- Default workspace auto-creation
+- Workspace list page with cards
+
+---
+
 ### Clerk Auth Setup
 - Added `ClerkProvider` to `app/layout.tsx` — outermost wrapper, makes session available everywhere
 - Created `app/(auth)/sign-in/[[...sign-in]]/page.tsx` — Clerk hosted sign-in UI
