@@ -4,7 +4,7 @@
 
 ---
 
-## 2026-03-12
+## 2026-03-13
 
 ### Document Layer (API + Frontend)
 
@@ -36,6 +36,8 @@
 - `hooks/use-document.ts` — single document fetch + autosave mutation
 
 ---
+
+## 2026-03-12
 
 ### Workspace Layer (API + Frontend)
 
