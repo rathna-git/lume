@@ -112,9 +112,6 @@ export default function WorkspacesPage() {
             {/* Page header */}
             <div className="flex items-start justify-between mb-10">
                 <div>
-                    <p className="text-[0.65rem] tracking-[0.2em] uppercase text-muted-foreground/60 mb-2">
-                        Lume
-                    </p>
                     <h1 className="font-serif text-3xl text-foreground tracking-tight mb-1.5">
                         Workspaces
                     </h1>

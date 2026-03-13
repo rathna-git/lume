@@ -6,6 +6,37 @@
 
 ## 2026-03-12
 
+### Document Layer (API + Frontend)
+
+#### Workspace detail API (`app/api/workspaces/[workspaceId]/route.ts`)
+- `GET /api/workspaces/[workspaceId]` — returns workspace only if owned by authenticated user; 401 if unauth, 404 if not found/not owned
+
+#### Document API (`app/api/documents/route.ts`)
+- `GET /api/documents?workspaceId=` — returns documents for a workspace; verifies workspace ownership before returning
+- `POST /api/documents` — Zod-validated body (`workspaceId`, `title?`); defaults title to `"Untitled"`, content to `""`; verifies workspace ownership before creating
+
+#### Frontend
+- `hooks/use-documents.ts` — `useDocuments(workspaceId)` (GET) + `useCreateDocument()` (POST); per-workspace cache key `["documents", workspaceId]`; invalidates on successful create
+- `components/document/document-card.tsx` — clickable card linking to `/workspaces/[id]/documents/[documentId]`; shows title, summary, last updated date
+- `app/(dashboard)/workspaces/[workspaceId]/page.tsx` — workspace detail page: header with emoji + workspace name, "New Document" button, loading skeletons, empty state, error state, responsive 1→2→3 grid
+- "New Document" creates immediately with defaults and redirects to future editor route
+
+### Files Created / Modified
+| File | Status | Notes |
+|---|---|---|
+| `app/api/workspaces/[workspaceId]/route.ts` | Created | GET single workspace with ownership check |
+| `app/api/documents/route.ts` | Created | GET list + POST create with Zod validation |
+| `hooks/use-documents.ts` | Created | TanStack Query hooks for document CRUD |
+| `components/document/document-card.tsx` | Created | Clickable card with title, summary, date |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Created | Workspace detail page with document list |
+
+### Up Next
+- Document editor page (`/workspaces/[id]/documents/[documentId]`)
+- `app/api/documents/[documentId]/route.ts` — GET + PATCH + DELETE
+- `hooks/use-document.ts` — single document fetch + autosave mutation
+
+---
+
 ### Workspace Layer (API + Frontend)
 
 #### Bootstrap optimization
