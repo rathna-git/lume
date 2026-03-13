@@ -222,9 +222,9 @@ AiGeneration
 - [x] Middleware — route protection
 - [x] Protected app shell (sidebar + header)
 - [x] Server-side user bootstrap (create DB user on first request)
-- [ ] Default workspace creation
-- [ ] Workspace API routes
-- [ ] Workspace pages
+- [x] Default workspace creation
+- [x] Workspace API routes
+- [x] Workspace pages
 - [ ] Document API routes
 - [ ] Document editor + autosave
 - [ ] AI route

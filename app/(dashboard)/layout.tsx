@@ -15,21 +15,26 @@ export default async function DashboardLayout({
     const clerkUser = await currentUser()
     if (!clerkUser) redirect("/sign-in")
 
-    // Bootstrap: upsert DB user on first request, keep in sync on subsequent ones
-    await prisma.user.upsert({
+    // Bootstrap: create user + default workspace on first request only
+    const existing = await prisma.user.findUnique({
         where: { clerkId: userId },
-        update: {
-            email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
-            name: `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || null,
-            imageUrl: clerkUser.imageUrl ?? null,
-        },
-        create: {
-            clerkId: userId,
-            email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
-            name: `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || null,
-            imageUrl: clerkUser.imageUrl ?? null,
-        },
+        select: { id: true },
     })
+
+    if (!existing) {
+        const email = clerkUser.emailAddresses[0]?.emailAddress ?? ""
+        const name = `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim() || null
+        const imageUrl = clerkUser.imageUrl ?? null
+
+        await prisma.$transaction(async (tx) => {
+            const user = await tx.user.create({
+                data: { clerkId: userId, email, name, imageUrl },
+            })
+            await tx.workspace.create({
+                data: { name: "My Workspace", emoji: "📝", userId: user.id },
+            })
+        })
+    }
 
     return (
         <div className="flex h-screen bg-background">

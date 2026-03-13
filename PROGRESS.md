@@ -6,6 +6,42 @@
 
 ## 2026-03-12
 
+### Workspace Layer (API + Frontend)
+
+#### Bootstrap optimization
+- Replaced `prisma.user.upsert` (ran on every request) with `findUnique` + conditional create — returning users now hit one fast SELECT, no write
+- New user bootstrap uses `prisma.$transaction` to atomically create the `User` row + a default `"My Workspace"` — both succeed or both fail
+
+#### Workspace API (`app/api/workspaces/route.ts`)
+- `GET /api/workspaces` — returns `{ workspaces: [...] }` ordered by `updatedAt desc`
+- `POST /api/workspaces` — Zod-validated body (`name`, `description?`, `emoji?`), returns `{ workspace }` with 201
+- `lib/auth.ts` — `requireCurrentDbUser()` helper: bridges Clerk session → Neon DB user; reused by all API routes
+
+#### Frontend
+- `hooks/use-workspaces.ts` — `useWorkspaces()` (GET) + `useCreateWorkspace()` (POST); invalidates list on successful create
+- `components/workspace/workspace-card.tsx` — whole-card `<Link>` to `/workspaces/[id]`; emoji, name, description; minimal premium styling
+- `app/(dashboard)/workspaces/page.tsx` — real workspace list with loading skeletons, empty state, error state, responsive 1→2→3 grid, "New Workspace" button
+- Create workspace dialog — modal form with name (required), description, emoji; closes and refetches on success
+
+### Files Created / Modified
+| File | Status | Notes |
+|---|---|---|
+| `app/(dashboard)/layout.tsx` | Modified | Bootstrap optimized: findUnique + conditional create with transaction |
+| `lib/auth.ts` | Created | `requireCurrentDbUser()` — Clerk → DB user bridge |
+| `app/api/workspaces/route.ts` | Created | GET + POST with Zod validation |
+| `hooks/use-workspaces.ts` | Created | TanStack Query hooks for workspace CRUD |
+| `components/workspace/workspace-card.tsx` | Created | Whole-card link, minimal styling |
+| `app/(dashboard)/workspaces/page.tsx` | Modified | Real page replacing placeholder |
+| `components/ui/dialog.tsx` | Created | shadcn dialog (base-ui) |
+| `components/ui/input.tsx` | Created | shadcn input (base-ui) |
+
+### Up Next
+- Workspace detail page (`/workspaces/[workspaceId]`) — document list inside a workspace
+- Document API routes (GET list, POST create)
+- Document editor + autosave
+
+---
+
 ### App Shell + User Bootstrap
 - Created `app/(dashboard)/layout.tsx` — server component; calls `auth()` + `currentUser()`, upserts user into Neon DB on every request, renders sidebar + header shell
 - Created `app/(dashboard)/page.tsx` — redirects `/` inside dashboard to `/workspaces`
