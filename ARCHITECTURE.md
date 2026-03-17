@@ -228,5 +228,5 @@ AiGeneration
 - [x] Document API routes (GET list, POST create)
 - [x] Workspace detail page (document list)
 - [x] Document editor + autosave
-- [ ] AI route
+- [x] AI route
 - [ ] Clerk webhook — sync hardening (post-MVP)

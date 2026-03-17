@@ -4,6 +4,48 @@
 
 ---
 
+## 2026-03-17
+
+### AI Generation Layer (API + Frontend)
+
+#### OpenAI client (`lib/openai.ts`)
+- Singleton pattern via `globalThis` — safe for Next.js hot reload
+
+#### AI API (`app/api/ai/generate/route.ts`)
+- `POST /api/ai/generate` — Zod-validated body (`documentId`, `action`, `content`, `instructions?`)
+- Actions: `summarize`, `rewrite`, `expand`
+- Ownership check: document must belong to a workspace owned by the authenticated user
+- Creates `AiGeneration` row as `PENDING` → calls GPT-4o → updates to `SUCCESS` or `ERROR`
+- Returns `{ generation: { id, type, status, output } }`
+- Output shape: `{ text: string }` stored in `output` JSON field
+
+#### Hook (`hooks/use-ai.ts`)
+- `useGenerateAi()` — mutation hook for `POST /api/ai/generate`
+- Types: `AiAction`, `GenerateAiInput`, `AiGenerationResult`
+
+#### Editor AI toolbar (`app/(dashboard)/workspaces/.../documents/.../page.tsx`)
+- Three action buttons above the textarea: Summarize, Rewrite, Expand
+- Buttons disabled when content is empty or a request is in flight
+- Active button shows "Running…" during request
+- Result panel appears below the textarea with: Replace content, Insert below, Copy
+- Replace and Insert below both trigger autosave immediately
+- Dismissible result panel
+
+### Files Created / Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `lib/openai.ts` | Created | Singleton OpenAI client |
+| `app/api/ai/generate/route.ts` | Created | POST AI actions with Zod + ownership check + AiGeneration persistence |
+| `hooks/use-ai.ts` | Created | `useGenerateAi()` mutation hook |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | AI toolbar + result panel with apply/copy actions |
+
+### Up Next
+
+- Clerk webhook — sync hardening (post-MVP)
+
+---
+
 ## 2026-03-13
 
 ### Document Layer (API + Frontend)
