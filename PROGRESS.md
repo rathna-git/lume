@@ -4,6 +4,38 @@
 
 ---
 
+## 2026-03-18
+
+### Document Delete Feature
+
+#### What was already in place
+- `DELETE /api/documents/[documentId]` was fully implemented (auth + ownership check + hard delete)
+- `deleteDocument` fetch function and `useDeleteDocument` mutation hook existed in `hooks/use-document.ts`
+
+#### What was added
+- Wired up `useDeleteDocument` and `useRouter` in the `DocumentEditor` component
+- Added `handleDelete` — calls `confirm()` for confirmation, then fires the mutation; on success redirects to `/workspaces/[workspaceId]`
+- Added a low-prominence "Delete" button in the top-right header (beside the save status); shows "Deleting…" and disables during in-flight request
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Added delete handler + button; no API or hook changes needed |
+
+### Up Next
+
+1. Workspace PATCH route (rename + description update)
+2. Workspace rename UI flow
+3. Workspace DELETE route
+4. Workspace delete UI flow
+5. AI generations read route (`GET /api/documents/[id]/generations`)
+6. `useAiGenerations(documentId)` hook
+7. Surface latest persisted AI generation in the editor / AI panel
+8. Invalidate AI generations query after successful AI mutation
+
+---
+
 ## 2026-03-17
 
 ### AI Generation Layer (API + Frontend)
@@ -67,35 +99,7 @@
 
 ### Up Next
 
-- ~~Add document delete feature~~ ✓ Done
-- Add workspace rename + delete feature
-- Add AI generations read route + `useAiGenerations` hook
-- Surface persisted AI generation in the editor
-
----
-
-## 2026-03-18
-
-### Document Delete Feature
-
-#### What was already in place
-- `DELETE /api/documents/[documentId]` was fully implemented (auth + ownership check + hard delete)
-- `deleteDocument` fetch function and `useDeleteDocument` mutation hook existed in `hooks/use-document.ts`
-
-#### What was added
-- Wired up `useDeleteDocument` and `useRouter` in the `DocumentEditor` component
-- Added `handleDelete` — calls `confirm()` for confirmation, then fires the mutation; on success redirects to `/workspaces/[workspaceId]`
-- Added a low-prominence "Delete" button in the top-right header (beside the save status); shows "Deleting…" and disables during in-flight request
-
-### Files Modified
-
-| File | Status | Notes |
-|---|---|---|
-| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Added delete handler + button; no API or hook changes needed |
-
-### Up Next
-
-- Add workspace rename + delete feature
+- Add document delete feature
 - Add AI generations read route + `useAiGenerations` hook
 - Surface persisted AI generation in the editor
 
