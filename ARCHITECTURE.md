@@ -253,6 +253,7 @@ AiGeneration
 - [x] Workspace detail page (document list)
 - [x] Document editor + autosave
 - [x] AI route
+- [x] Document delete
 
 ---
 
@@ -260,7 +261,7 @@ AiGeneration
 
 ### High Priority
 
-- [ ] Add document delete feature
+- [x] Add document delete feature
 - [ ] Add AI generations read route (`GET /api/documents/[id]/generations`)
 - [ ] Add `useAiGenerations(documentId)` TanStack Query hook
 - [ ] Surface latest persisted AI generation in the document editor / AI panel

@@ -1,9 +1,10 @@
 "use client"
 
 import { use, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-import { useDocument, useUpdateDocument } from "@/hooks/use-document"
+import { useDocument, useUpdateDocument, useDeleteDocument } from "@/hooks/use-document"
 import { useGenerateAi, type AiAction, type AiGenerationResult } from "@/hooks/use-ai"
 
 type SaveStatus = "idle" | "saving" | "saved" | "error"
@@ -23,7 +24,9 @@ function DocumentEditor({
     documentId: string
     workspaceId: string
 }) {
+    const router = useRouter()
     const { mutate: updateDocument } = useUpdateDocument()
+    const { mutate: deleteDocument, isPending: deletePending } = useDeleteDocument()
     const { mutate: generateAi, isPending: aiPending } = useGenerateAi()
 
     const [title, setTitle] = useState(doc.title)
@@ -90,6 +93,13 @@ function DocumentEditor({
         navigator.clipboard.writeText(text)
     }
 
+    function handleDelete() {
+        if (!confirm("Delete this document? This cannot be undone.")) return
+        deleteDocument(documentId, {
+            onSuccess: () => router.push(`/workspaces/${workspaceId}`),
+        })
+    }
+
     return (
         <div className="max-w-3xl mx-auto px-6 py-10">
             {/* Back + save status */}
@@ -101,11 +111,20 @@ function DocumentEditor({
                     <ArrowLeft size={12} />
                     Back to workspace
                 </Link>
-                <span className="text-xs text-muted-foreground/60">
-                    {saveStatus === "saving" && "Saving…"}
-                    {saveStatus === "saved" && "Saved"}
-                    {saveStatus === "error" && "Error saving"}
-                </span>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted-foreground/60">
+                        {saveStatus === "saving" && "Saving…"}
+                        {saveStatus === "saved" && "Saved"}
+                        {saveStatus === "error" && "Error saving"}
+                    </span>
+                    <button
+                        onClick={handleDelete}
+                        disabled={deletePending}
+                        className="text-xs text-muted-foreground/50 hover:text-destructive transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        {deletePending ? "Deleting…" : "Delete"}
+                    </button>
+                </div>
             </div>
 
             {/* Title */}
