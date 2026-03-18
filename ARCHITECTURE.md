@@ -157,7 +157,8 @@ AiGeneration
 | Active workspace | TanStack Query | `useWorkspace(id)` |
 | Documents list | TanStack Query | `useDocuments(workspaceId)` |
 | Document content | Local `useState` | Debounced auto-save via `useMutation` |
-| AI result | Local `useState` | Cleared after applying to editor |
+| AI generations (persisted) | Prisma AiGeneration | Written by `POST /api/ai/generate`; read flow not yet implemented |
+| AI panel result (ephemeral) | Local `useState` | Immediate mutation response shown in UI until dismissed |
 
 ---
 
@@ -178,6 +179,7 @@ AiGeneration
 | `GET/POST /api/documents` | API | List / create documents |
 | `GET/PATCH/DELETE /api/documents/[id]` | API | Single document |
 | `POST /api/ai/generate` | API | AI content actions |
+| `GET /api/documents/[id]/generations` | API | Fetch saved AI generations for a document (planned) |
 
 ---
 
@@ -189,6 +191,26 @@ AiGeneration
 | Document list | Skeleton rows | Toast + retry | "No documents yet" with create button |
 | Document editor | Spinner overlay | Inline error banner | Blank editor ready to type |
 | AI generate | Button spinner | Inline error below toolbar | — |
+| AI history (planned) | Skeleton panel | Toast + retry | "No generations yet" message |
+
+---
+
+## AI Generation Flow
+
+### Current
+
+- `POST /api/ai/generate` creates an `AiGeneration` row with `PENDING`
+- OpenAI is called with the requested action
+- The row is updated to `SUCCESS` or `ERROR`
+- The immediate response is shown in the UI
+- Saved generations are not yet read back from the database
+
+### Planned
+
+- Fetch saved generations per document
+- Show latest saved generation by default
+- Support history and explicit regenerate behavior
+- Refresh persisted generations after successful mutation
 
 ---
 
@@ -204,6 +226,7 @@ AiGeneration
 | Tags as many-to-many | Proper relational model | Join table adds complexity; simplify to string[] if needed |
 | No `src/` directory | Flatter, cleaner root | Personal preference — consistent across team |
 | Use server-side user bootstrap for MVP instead of webhook-first sync | Simplifies local development and avoids ngrok/webhook setup during early build phase | Webhook still required later for production-grade sync guarantees |
+| Persist AI generations before building read flow | Preserves outputs and avoids schema churn later | UI currently behaves as if AI results are temporary |
 
 ---
 
@@ -230,3 +253,28 @@ AiGeneration
 - [x] Document editor + autosave
 - [x] AI route
 - [ ] Clerk webhook — sync hardening (post-MVP)
+
+---
+
+## Pending Work (Ordered by Importance)
+
+### High Priority
+
+- [ ] Add document delete feature
+- [ ] Add AI generations read route (`GET /api/documents/[id]/generations`)
+- [ ] Add `useAiGenerations(documentId)` TanStack Query hook
+- [ ] Surface latest persisted AI generation in the document editor / AI panel
+- [ ] Invalidate AI generations query after successful AI mutation
+
+### Medium Priority
+
+- [ ] Add AI history panel per document
+- [ ] Add explicit regenerate flow separate from viewing existing results
+- [ ] Add loading / empty / error states for AI history retrieval
+- [ ] Audit persisted server data currently held only in local UI state
+
+### Lower Priority
+
+- [ ] Add filtering / sorting for AI generations
+- [ ] Define retention / versioning strategy for AI outputs
+- [ ] Harden Clerk webhook sync flow post-MVP

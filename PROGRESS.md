@@ -40,9 +40,17 @@
 | `hooks/use-ai.ts` | Created | `useGenerateAi()` mutation hook |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | AI toolbar + result panel with apply/copy actions |
 
+### AI Persistence Behavior
+
+- Every generation is written to `AiGeneration` (PENDING → SUCCESS/ERROR) as an audit trail
+- The UI surfaces the immediate mutation response via local `useState`; no read path exists yet
+- `ARCHITECTURE.md` updated: Type & State Ownership, Route Map, Loading/Error/Empty States, Key Decisions, AI Generation Flow section, and Pending Work section
+
 ### Up Next
 
-- Clerk webhook — sync hardening (post-MVP)
+- Add document delete feature
+- Add AI generations read route + `useAiGenerations` hook
+- Surface persisted AI generation in the editor
 
 ---
 
