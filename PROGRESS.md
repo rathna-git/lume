@@ -46,6 +46,25 @@
 - The UI surfaces the immediate mutation response via local `useState`; no read path exists yet
 - `ARCHITECTURE.md` updated: Type & State Ownership, Route Map, Loading/Error/Empty States, Key Decisions, AI Generation Flow section, and Pending Work section
 
+### Document Editor — Bug Fix & Refactor
+
+#### Problem
+`document` was used as the variable name for the TanStack Query result, shadowing the global DOM `Document` type. TypeScript resolved `document.content` against the DOM type (which has no `content` property), causing a type error. A secondary lint error (`react-hooks/set-state-in-effect`) fired because local state was seeded inside a `useEffect`.
+
+#### Fix
+- Renamed `data: document` → `data: doc` to avoid the global shadow
+- Removed `useEffect` + `initialized` state entirely
+- Split the page into two components:
+  - `DocumentEditorPage` — handles loading/error states, renders nothing until `doc` is ready
+  - `DocumentEditor` — receives `doc` as a prop, initializes `title` and `content` directly from props at mount time (no effect needed)
+- Added `key={documentId}` so navigating between documents remounts the editor cleanly
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Split into two components; removed useEffect state seeding; fixed document variable shadow |
+
 ### Up Next
 
 - Add document delete feature

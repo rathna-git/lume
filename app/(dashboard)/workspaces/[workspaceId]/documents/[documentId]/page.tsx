@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useRef, useState } from "react"
+import { use, useRef, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { useDocument, useUpdateDocument } from "@/hooks/use-document"
@@ -8,34 +8,31 @@ import { useGenerateAi, type AiAction, type AiGenerationResult } from "@/hooks/u
 
 type SaveStatus = "idle" | "saving" | "saved" | "error"
 
-export default function DocumentEditorPage({
-    params,
-}: {
-    params: Promise<{ workspaceId: string; documentId: string }>
-}) {
-    const { workspaceId, documentId } = use(params)
+type Doc = {
+    id: string
+    title: string
+    content: string | null
+}
 
-    const { data: document, isLoading, isError } = useDocument(documentId)
+function DocumentEditor({
+    doc,
+    documentId,
+    workspaceId,
+}: {
+    doc: Doc
+    documentId: string
+    workspaceId: string
+}) {
     const { mutate: updateDocument } = useUpdateDocument()
     const { mutate: generateAi, isPending: aiPending } = useGenerateAi()
 
-    const [title, setTitle] = useState("")
-    const [content, setContent] = useState("")
+    const [title, setTitle] = useState(doc.title)
+    const [content, setContent] = useState(doc.content ?? "")
     const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle")
-    const [initialized, setInitialized] = useState(false)
     const [activeAction, setActiveAction] = useState<AiAction | null>(null)
     const [aiResult, setAiResult] = useState<AiGenerationResult | null>(null)
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-    // Seed local state once document loads
-    useEffect(() => {
-        if (document && !initialized) {
-            setTitle(document.title)
-            setContent(document.content ?? "")
-            setInitialized(true)
-        }
-    }, [document, initialized])
 
     function save(nextTitle: string, nextContent: string) {
         if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -91,39 +88,6 @@ export default function DocumentEditorPage({
 
     function handleCopy(text: string) {
         navigator.clipboard.writeText(text)
-    }
-
-    // Loading
-    if (isLoading) {
-        return (
-            <div className="max-w-3xl mx-auto px-6 py-10 animate-pulse">
-                <div className="h-3 bg-muted rounded w-24 mb-10" />
-                <div className="h-8 bg-muted rounded w-1/2 mb-6" />
-                <div className="space-y-2">
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} className="h-4 bg-muted rounded" style={{ width: `${85 - i * 5}%` }} />
-                    ))}
-                </div>
-            </div>
-        )
-    }
-
-    // Error / not found
-    if (isError || !document) {
-        return (
-            <div className="max-w-3xl mx-auto px-6 py-10">
-                <Link
-                    href={`/workspaces/${workspaceId}`}
-                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
-                >
-                    <ArrowLeft size={12} />
-                    Back to workspace
-                </Link>
-                <p className="text-sm text-muted-foreground py-16 text-center">
-                    Document not found.
-                </p>
-            </div>
-        )
     }
 
     return (
@@ -220,5 +184,54 @@ export default function DocumentEditorPage({
                 </div>
             )}
         </div>
+    )
+}
+
+export default function DocumentEditorPage({
+    params,
+}: {
+    params: Promise<{ workspaceId: string; documentId: string }>
+}) {
+    const { workspaceId, documentId } = use(params)
+    const { data: doc, isLoading, isError } = useDocument(documentId)
+
+    if (isLoading) {
+        return (
+            <div className="max-w-3xl mx-auto px-6 py-10 animate-pulse">
+                <div className="h-3 bg-muted rounded w-24 mb-10" />
+                <div className="h-8 bg-muted rounded w-1/2 mb-6" />
+                <div className="space-y-2">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="h-4 bg-muted rounded" style={{ width: `${85 - i * 5}%` }} />
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
+    if (isError || !doc) {
+        return (
+            <div className="max-w-3xl mx-auto px-6 py-10">
+                <Link
+                    href={`/workspaces/${workspaceId}`}
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+                >
+                    <ArrowLeft size={12} />
+                    Back to workspace
+                </Link>
+                <p className="text-sm text-muted-foreground py-16 text-center">
+                    Document not found.
+                </p>
+            </div>
+        )
+    }
+
+    return (
+        <DocumentEditor
+            key={documentId}
+            doc={doc}
+            documentId={documentId}
+            workspaceId={workspaceId}
+        />
     )
 }
