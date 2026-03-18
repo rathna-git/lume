@@ -252,7 +252,6 @@ AiGeneration
 - [x] Workspace detail page (document list)
 - [x] Document editor + autosave
 - [x] AI route
-- [ ] Clerk webhook — sync hardening (post-MVP)
 
 ---
 
