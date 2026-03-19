@@ -6,6 +6,28 @@
 
 ## 2026-03-19
 
+### AI Generations Read Route
+
+#### Route (`app/api/documents/[documentId]/generations/route.ts`)
+- Created new route file at `GET /api/documents/[documentId]/generations`
+- Auth via `requireCurrentDbUser()`; returns 401 if unauthenticated
+- Ownership verified by `prisma.document.findFirst({ where: { id, workspace: { userId } } })`; returns 404 if not found or not owned
+- Queries `AiGeneration` rows for the document, ordered `createdAt desc`
+- Returns `{ generations: [{ id, type, status, model, output, createdAt }] }` — no internal fields exposed
+
+### Files Created
+
+| File | Status | Notes |
+|---|---|---|
+| `app/api/documents/[documentId]/generations/route.ts` | Created | GET handler only — no POST/PATCH/DELETE |
+
+### Up Next
+
+1. **Hook** — `useAiGenerations(documentId)` TanStack Query hook: fetches from above route; invalidated after successful AI mutation
+2. **Frontend** — Surface latest `SUCCESS` generation in the document editor AI panel on load
+
+---
+
 ### Workspace DELETE Route + Delete UI
 
 #### Workspace DELETE API (`app/api/workspaces/[workspaceId]/route.ts`)

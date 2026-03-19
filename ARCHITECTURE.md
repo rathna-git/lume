@@ -266,7 +266,7 @@ AiGeneration
 - [x] Add workspace rename UI flow
 - [x] Add workspace DELETE route
 - [x] Add workspace delete UI flow
-- [ ] Add AI generations read route (`GET /api/documents/[id]/generations`) — returns all generations for a document, newest first; auth via document ownership
+- [x] Add AI generations read route (`GET /api/documents/[id]/generations`) — returns all generations for a document, newest first; auth via document ownership
 - [ ] Add `useAiGenerations(documentId)` TanStack Query hook — fetches from the above route; invalidated after successful AI mutation
 - [ ] Surface latest persisted AI generation in the document editor — show most recent SUCCESS generation output in the AI panel on load
 - [ ] Invalidate AI generations query after successful AI mutation
