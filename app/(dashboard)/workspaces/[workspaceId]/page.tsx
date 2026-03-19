@@ -2,10 +2,10 @@
 
 import { use, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, ArrowLeft, Pencil } from "lucide-react"
+import { Plus, ArrowLeft, Pencil, Trash2 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { useDocuments, useCreateDocument, type Document } from "@/hooks/use-documents"
-import { useUpdateWorkspace } from "@/hooks/use-workspaces"
+import { useUpdateWorkspace, useDeleteWorkspace } from "@/hooks/use-workspaces"
 import { DocumentCard } from "@/components/document/document-card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -54,8 +54,11 @@ export default function WorkspaceDetailPage({
     const { data: documents, isLoading: docsLoading, isError: docsError } = useDocuments(workspaceId)
     const { mutate: createDocument, isPending: isCreating } = useCreateDocument()
     const { mutate: updateWorkspace, isPending: isSaving } = useUpdateWorkspace()
+    const { mutate: deleteWorkspace, isPending: isDeleting } = useDeleteWorkspace()
 
     const [editOpen, setEditOpen] = useState(false)
+    const [deleteOpen, setDeleteOpen] = useState(false)
+    const [deleteError, setDeleteError] = useState<string | null>(null)
     const [editName, setEditName] = useState("")
     const [editDescription, setEditDescription] = useState("")
     const [editEmoji, setEditEmoji] = useState("")
@@ -75,6 +78,14 @@ export default function WorkspaceDetailPage({
             { workspaceId, name: editName.trim(), description: editDescription.trim(), emoji: editEmoji },
             { onSuccess: () => setEditOpen(false) }
         )
+    }
+
+    function handleDelete() {
+        setDeleteError(null)
+        deleteWorkspace(workspaceId, {
+            onSuccess: () => router.push("/workspaces"),
+            onError: (err) => setDeleteError(err instanceof Error ? err.message : "Something went wrong."),
+        })
     }
 
     function handleNewDocument() {
@@ -124,6 +135,13 @@ export default function WorkspaceDetailPage({
                                     aria-label="Edit workspace"
                                 >
                                     <Pencil size={14} />
+                                </button>
+                                <button
+                                    onClick={() => setDeleteOpen(true)}
+                                    className="text-muted-foreground/40 hover:text-destructive transition-colors mt-1"
+                                    aria-label="Delete workspace"
+                                >
+                                    <Trash2 size={14} />
                                 </button>
                             </div>
 
@@ -179,6 +197,30 @@ export default function WorkspaceDetailPage({
                     ))}
                 </div>
             )}
+
+            {/* Delete workspace dialog */}
+            <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                <DialogContent showCloseButton={false}>
+                    <DialogHeader>
+                        <DialogTitle>Delete workspace?</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-muted-foreground">
+                        This will permanently delete this workspace and all documents inside it. This action cannot be undone.
+                    </p>
+                    {deleteError && (
+                        <p className="text-sm text-destructive">{deleteError}</p>
+                    )}
+                    <DialogFooter showCloseButton>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting…" : "Delete workspace"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Edit workspace dialog */}
             <Dialog open={editOpen} onOpenChange={setEditOpen}>

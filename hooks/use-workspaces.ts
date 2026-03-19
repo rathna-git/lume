@@ -47,6 +47,14 @@ async function createWorkspace(input: CreateWorkspaceInput): Promise<Workspace> 
     return data.workspace
 }
 
+async function deleteWorkspace(workspaceId: string): Promise<void> {
+    const res = await fetch(`/api/workspaces/${workspaceId}`, { method: "DELETE" })
+    if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error ?? "Failed to delete workspace")
+    }
+}
+
 async function updateWorkspace({ workspaceId, ...body }: UpdateWorkspaceInput): Promise<Workspace> {
     const res = await fetch(`/api/workspaces/${workspaceId}`, {
         method: "PATCH",
@@ -84,6 +92,17 @@ export function useUpdateWorkspace() {
         mutationFn: updateWorkspace,
         onSuccess: (updated) => {
             queryClient.setQueryData(["workspace", updated.id], updated)
+            queryClient.invalidateQueries({ queryKey: WORKSPACES_KEY })
+        },
+    })
+}
+
+export function useDeleteWorkspace() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: deleteWorkspace,
+        onSuccess: (_data, workspaceId) => {
+            queryClient.removeQueries({ queryKey: ["workspace", workspaceId] })
             queryClient.invalidateQueries({ queryKey: WORKSPACES_KEY })
         },
     })

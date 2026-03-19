@@ -4,6 +4,44 @@
 
 ---
 
+## 2026-03-19
+
+### Workspace DELETE Route + Delete UI
+
+#### Workspace DELETE API (`app/api/workspaces/[workspaceId]/route.ts`)
+- Added `DELETE` handler — auth + ownership check, then `prisma.workspace.delete`
+- Returns 204 No Content on success; 401/404 as appropriate
+- Cascade deletes all documents and their AI generations via Prisma schema relations
+
+#### Hook (`hooks/use-workspaces.ts`)
+- Added `deleteWorkspace` fetch function
+- Added `useDeleteWorkspace()` mutation — on success removes `["workspace", id]` from cache and invalidates `["workspaces"]` list
+
+#### Workspace delete UI (`app/(dashboard)/workspaces/[workspaceId]/page.tsx`)
+- Trash2 icon (14px, muted → destructive on hover) beside pencil icon in workspace header
+- Clicking opens a confirmation dialog — no accidental deletes
+- Warning copy: "This will permanently delete this workspace and all documents inside it. This action cannot be undone."
+- "Delete workspace" button disabled while deleting; shows "Deleting…" during in-flight
+- On success: redirects to `/workspaces`, cache cleaned up
+- On error: inline error message shown in dialog
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `app/api/workspaces/[workspaceId]/route.ts` | Modified | Added DELETE handler with auth + ownership check |
+| `hooks/use-workspaces.ts` | Modified | Added `useDeleteWorkspace` mutation hook |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Modified | Added trash icon trigger + confirmation dialog |
+
+### Up Next
+
+1. AI generations read route (`GET /api/documents/[id]/generations`)
+2. `useAiGenerations(documentId)` hook
+3. Surface latest persisted AI generation in the editor / AI panel
+4. Invalidate AI generations query after successful AI mutation
+
+---
+
 ## 2026-03-18
 
 ### Workspace PATCH Route + Rename UI
@@ -434,3 +472,35 @@
 - [ ] TanStack Query provider
 - [ ] Clerk setup in root layout + auth pages
 - [ ] Middleware — route protection
+
+---
+
+## Manual Test Checklist
+
+### Auth
+
+- [ ] Sign in → redirects to `/workspaces`
+- [ ] Sign out → redirects to landing page
+- [ ] Unauthorized access to protected route → redirected to `/sign-in`
+
+### Workspace
+
+- [ ] New user → default "My Workspace" created
+- [ ] Create workspace → appears in list
+- [ ] Rename workspace → updates correctly
+- [ ] Delete workspace → cascades documents and redirects to `/workspaces`
+
+### Document
+
+- [ ] Create document → redirects to editor
+- [ ] Autosave works (title + content)
+- [ ] Delete document → redirects to workspace page
+
+### AI
+
+- [ ] Summarize works
+- [ ] Rewrite works
+- [ ] Expand works
+- [ ] Replace content updates editor and autosaves
+- [ ] Insert below works
+- [ ] AI failure handled gracefully

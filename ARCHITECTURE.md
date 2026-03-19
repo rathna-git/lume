@@ -264,8 +264,8 @@ AiGeneration
 - [x] Add document delete feature
 - [x] Add workspace PATCH route (rename + description update)
 - [x] Add workspace rename UI flow
-- [ ] Add workspace DELETE route
-- [ ] Add workspace delete UI flow
+- [x] Add workspace DELETE route
+- [x] Add workspace delete UI flow
 - [ ] Add AI generations read route (`GET /api/documents/[id]/generations`)
 - [ ] Add `useAiGenerations(documentId)` TanStack Query hook
 - [ ] Surface latest persisted AI generation in the document editor / AI panel

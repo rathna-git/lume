@@ -39,6 +39,24 @@ export async function GET(
     return NextResponse.json({ workspace })
 }
 
+export async function DELETE(
+    _req: Request,
+    { params }: { params: Promise<{ workspaceId: string }> }
+) {
+    const user = await requireCurrentDbUser()
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const { workspaceId } = await params
+    const existing = await prisma.workspace.findFirst({
+        where: { id: workspaceId, userId: user.id },
+    })
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+    await prisma.workspace.delete({ where: { id: workspaceId } })
+
+    return new NextResponse(null, { status: 204 })
+}
+
 export async function PATCH(
     req: Request,
     { params }: { params: Promise<{ workspaceId: string }> }
