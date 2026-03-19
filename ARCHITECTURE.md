@@ -232,6 +232,9 @@ AiGeneration
 | Persist AI generations before building read flow | Preserves outputs and avoids schema churn later | UI currently behaves as if AI results are temporary |
 | Split page into shell + editor components for async data init | Avoids `useEffect` state seeding; state initialized directly from props at mount | Adds one level of component nesting |
 | `staleTime: Infinity` on `useAiGenerations` | Generations only change when the user explicitly runs a new action — no background source can mutate them | Must ensure `invalidateQueries` is always called after successful mutation or cache will be stale |
+| AI panel action tabs select view, not trigger generation | Separates navigation from side effects — user can browse results without accidentally firing API calls | Generate/Regenerate must be a deliberate explicit action |
+| `inputSnapshot` staleness over timestamp-based staleness | Content drift is the relevant signal, not time; comparing snapshots directly tells us whether the result is still valid for the current document | Simple string equality — no diffing, no normalization; whitespace differences will mark as stale |
+| Single `pendingAction` state gates all generate buttons | Prevents overlapping mutations and keeps panel state predictable | Only one action can run at a time; users cannot queue multiple generations |
 
 ---
 
