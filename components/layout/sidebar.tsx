@@ -18,7 +18,7 @@ export function Sidebar() {
     return (
         <aside className="w-56 flex flex-col border-r border-border bg-sidebar shrink-0">
             {/* Logo */}
-            <div className="px-5 py-4 border-b border-border">
+            <div className="px-5 h-14 flex items-center border-b border-border">
                 <LumeLogo size="sm" variant="light" />
             </div>
 

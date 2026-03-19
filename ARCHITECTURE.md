@@ -157,8 +157,8 @@ AiGeneration
 | Active workspace | TanStack Query | `useWorkspace(id)` |
 | Documents list | TanStack Query | `useDocuments(workspaceId)` |
 | Document content | Local `useState` | Debounced auto-save via `useMutation` |
-| AI generations (persisted) | Prisma AiGeneration | Written by `POST /api/ai/generate`; read flow not yet implemented |
-| AI panel result (ephemeral) | Local `useState` | Immediate mutation response shown in UI until dismissed |
+| AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; invalidated after successful mutation |
+| AI panel result (ephemeral) | Local `useState` | Immediate mutation response shown in persistent right-side panel until dismissed |
 
 ---
 
@@ -179,7 +179,7 @@ AiGeneration
 | `GET/POST /api/documents` | API | List / create documents |
 | `GET/PATCH/DELETE /api/documents/[id]` | API | Single document |
 | `POST /api/ai/generate` | API | AI content actions |
-| `GET /api/documents/[id]/generations` | API | Fetch saved AI generations for a document (planned) |
+| `GET /api/documents/[id]/generations` | API | Fetch saved AI generations for a document, newest first |
 
 ---
 
@@ -202,15 +202,16 @@ AiGeneration
 - `POST /api/ai/generate` creates an `AiGeneration` row with `PENDING`
 - OpenAI is called with the requested action
 - The row is updated to `SUCCESS` or `ERROR`
-- The immediate response is shown in the UI
-- Saved generations are not yet read back from the database
+- The immediate response is shown in the persistent right-side AI panel
+- `GET /api/documents/[id]/generations` returns all saved generations newest-first
+- `useAiGenerations(documentId)` fetches and caches saved generations; invalidated after each successful mutation
+- Editor uses a two-surface layout: editor card (left) + AI panel (right, sticky)
 
 ### Planned
 
-- Fetch saved generations per document
-- Show latest saved generation by default
-- Support history and explicit regenerate behavior
-- Refresh persisted generations after successful mutation
+- Surface AI generation history list in the panel (past runs per action type)
+- Explicit regenerate flow per action type
+- Loading / empty / error states for `useAiGenerations` within the panel
 
 ---
 
@@ -267,9 +268,9 @@ AiGeneration
 - [x] Add workspace DELETE route
 - [x] Add workspace delete UI flow
 - [x] Add AI generations read route (`GET /api/documents/[id]/generations`) — returns all generations for a document, newest first; auth via document ownership
-- [ ] Add `useAiGenerations(documentId)` TanStack Query hook — fetches from the above route; invalidated after successful AI mutation
-- [ ] Surface latest persisted AI generation in the document editor — show most recent SUCCESS generation output in the AI panel on load
-- [ ] Invalidate AI generations query after successful AI mutation
+- [x] Add `useAiGenerations(documentId)` TanStack Query hook — fetches from the above route; invalidated after successful AI mutation
+- [x] Surface latest persisted AI generation in the document editor — persistent right-side AI panel replaces below-fold result block
+- [x] Invalidate AI generations query after successful AI mutation
 
 ### Medium Priority
 

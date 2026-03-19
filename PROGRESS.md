@@ -6,6 +6,44 @@
 
 ## 2026-03-19
 
+### AI Generations Hook + Editor Layout Refactor
+
+#### Hook (`hooks/use-ai.ts`)
+- Added `AiGeneration` interface (`id`, `type`, `status`, `model`, `output`, `createdAt`)
+- Added `fetchAiGenerations` fetch function → `GET /api/documents/[documentId]/generations`
+- Added `useAiGenerations(documentId)` — `useQuery` with key `["aiGenerations", documentId]`; disabled when `documentId` is falsy
+- Updated `useGenerateAi()` to call `queryClient.invalidateQueries({ queryKey: ["aiGenerations", documentId] })` on success via `variables.documentId`
+
+#### Editor layout refactor (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+- Replaced single-column layout with a desktop-first two-surface layout
+- Page background: `bg-muted` (`#F2EDE8` Lume mist) with `p-4 md:p-6`
+- Editor surface: `bg-card` (white), `rounded-2xl`, `border-border`, `shadow-sm` — primary writing sheet
+- AI panel: `w-[380px]`, `bg-background` (`#FFF8F0` Lume warm), `rounded-2xl`, `border-border`, `shadow-sm`, `sticky top-6` — persistent right column
+- AI result no longer renders below the fold; lives in the panel at all times
+- Panel includes: action buttons, scrollable result area (`max-h-[40vh]`), apply actions (Replace / Insert below / Copy), idle empty state
+- Extracted `AiPanel` as a small internal component; all existing business logic unchanged
+- Responsive: `flex-col` on mobile, `flex-row` on `lg:` breakpoint
+- Added `Sparkles` icon (Lume amber) beside "AI Assistant" panel heading
+
+#### Sidebar fix (`components/layout/sidebar.tsx`)
+- Logo section changed from `py-4` to `h-14 flex items-center` to match the header's `h-14` — aligns the horizontal dividers across sidebar and main content area
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `hooks/use-ai.ts` | Modified | Added `useAiGenerations` hook + invalidation in `useGenerateAi` |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Two-surface layout: editor card + persistent AI panel |
+| `components/layout/sidebar.tsx` | Modified | Logo section height fixed to `h-14` to align with header |
+
+### Up Next
+
+1. **AI history** — surface previous generations in the AI panel (generation list / history tab)
+2. **Regenerate flow** — explicit re-run button per generation type
+3. **Loading / empty / error states** for `useAiGenerations` in the panel
+
+---
+
 ### AI Generations Read Route
 
 #### Route (`app/api/documents/[documentId]/generations/route.ts`)

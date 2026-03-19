@@ -3,7 +3,7 @@
 import { use, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Sparkles } from "lucide-react"
 import { useDocument, useUpdateDocument, useDeleteDocument } from "@/hooks/use-document"
 import { useGenerateAi, type AiAction, type AiGenerationResult } from "@/hooks/use-ai"
 
@@ -13,6 +13,103 @@ type Doc = {
     id: string
     title: string
     content: string | null
+}
+
+function AiPanel({
+    content,
+    activeAction,
+    aiResult,
+    aiPending,
+    onAction,
+    onReplace,
+    onInsertBelow,
+    onCopy,
+    onDismiss,
+}: {
+    content: string
+    activeAction: AiAction | null
+    aiResult: AiGenerationResult | null
+    aiPending: boolean
+    onAction: (action: AiAction) => void
+    onReplace: (text: string) => void
+    onInsertBelow: (text: string) => void
+    onCopy: (text: string) => void
+    onDismiss: () => void
+}) {
+    return (
+        <div className="flex flex-col gap-5">
+            <div>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-2">
+                    Actions
+                </p>
+                <div className="flex flex-col gap-1.5">
+                    {(["summarize", "rewrite", "expand"] as const).map((action) => (
+                        <button
+                            key={action}
+                            onClick={() => onAction(action)}
+                            disabled={aiPending || !content.trim()}
+                            className={`text-xs rounded-lg px-3 py-2 text-left transition-colors border disabled:opacity-40 disabled:cursor-not-allowed ${
+                                activeAction === action && aiPending
+                                    ? "border-border bg-muted text-foreground"
+                                    : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                            }`}
+                        >
+                            {aiPending && activeAction === action
+                                ? `Running…`
+                                : action.charAt(0).toUpperCase() + action.slice(1)}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {aiResult?.output?.text && (
+                <div className="flex flex-col gap-3 pt-4 border-t border-border">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
+                            {aiResult.type.charAt(0) + aiResult.type.slice(1).toLowerCase()}
+                        </span>
+                        <button
+                            onClick={onDismiss}
+                            className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                        >
+                            Dismiss
+                        </button>
+                    </div>
+                    <div className="max-h-[40vh] overflow-y-auto">
+                        <p className="text-[0.875rem] leading-relaxed text-foreground whitespace-pre-wrap">
+                            {aiResult.output.text}
+                        </p>
+                    </div>
+                    <div className="flex flex-col gap-1.5 pt-3 border-t border-border">
+                        <button
+                            onClick={() => onReplace(aiResult.output!.text)}
+                            className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                        >
+                            Replace content
+                        </button>
+                        <button
+                            onClick={() => onInsertBelow(aiResult.output!.text)}
+                            className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                        >
+                            Insert below
+                        </button>
+                        <button
+                            onClick={() => onCopy(aiResult.output!.text)}
+                            className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {!aiResult && !aiPending && (
+                <p className="text-xs text-muted-foreground/50 leading-relaxed">
+                    Select an action to generate AI output for this document.
+                </p>
+            )}
+        </div>
+    )
 }
 
 function DocumentEditor({
@@ -101,107 +198,76 @@ function DocumentEditor({
     }
 
     return (
-        <div className="max-w-3xl mx-auto px-6 py-10">
-            {/* Back + save status */}
-            <div className="flex items-center justify-between mb-10">
-                <Link
-                    href={`/workspaces/${workspaceId}`}
-                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                    <ArrowLeft size={12} />
-                    Back to workspace
-                </Link>
-                <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground/60">
-                        {saveStatus === "saving" && "Saving…"}
-                        {saveStatus === "saved" && "Saved"}
-                        {saveStatus === "error" && "Error saving"}
-                    </span>
-                    <button
-                        onClick={handleDelete}
-                        disabled={deletePending}
-                        className="text-xs text-muted-foreground/50 hover:text-destructive transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                        {deletePending ? "Deleting…" : "Delete"}
-                    </button>
+        <div className="min-h-full bg-muted p-4 md:p-6">
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start max-w-[1400px] mx-auto">
+
+                {/* Editor surface */}
+                <div className="flex-1 min-w-0 bg-card rounded-2xl border border-border shadow-sm px-8 py-8">
+                    {/* Back + save status */}
+                    <div className="flex items-center justify-between mb-10">
+                        <Link
+                            href={`/workspaces/${workspaceId}`}
+                            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            <ArrowLeft size={12} />
+                            Back to workspace
+                        </Link>
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs text-muted-foreground/60">
+                                {saveStatus === "saving" && "Saving…"}
+                                {saveStatus === "saved" && "Saved"}
+                                {saveStatus === "error" && "Error saving"}
+                            </span>
+                            <button
+                                onClick={handleDelete}
+                                disabled={deletePending}
+                                className="text-xs text-muted-foreground/50 hover:text-destructive transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                {deletePending ? "Deleting…" : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Title */}
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={handleTitleChange}
+                        placeholder="Untitled"
+                        className="w-full font-serif text-3xl text-foreground tracking-tight placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none mb-8"
+                    />
+
+                    {/* Divider */}
+                    <div className="border-t border-border mb-8" />
+
+                    {/* Content */}
+                    <textarea
+                        value={content}
+                        onChange={handleContentChange}
+                        placeholder="Start writing…"
+                        className="w-full min-h-[60vh] text-[0.95rem] leading-relaxed text-foreground placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none font-light"
+                    />
+                </div>
+
+                {/* AI panel surface */}
+                <div className="w-full lg:w-[380px] lg:shrink-0 bg-background rounded-2xl border border-border shadow-sm p-6 lg:sticky lg:top-6">
+                    <div className="flex items-center gap-1.5 mb-5">
+                        <Sparkles size={13} className="text-lume-amber" />
+                        <p className="text-xs font-medium text-foreground">AI Assistant</p>
+                    </div>
+                    <AiPanel
+                        content={content}
+                        activeAction={activeAction}
+                        aiResult={aiResult}
+                        aiPending={aiPending}
+                        onAction={handleAiAction}
+                        onReplace={handleReplace}
+                        onInsertBelow={handleInsertBelow}
+                        onCopy={handleCopy}
+                        onDismiss={() => setAiResult(null)}
+                    />
                 </div>
             </div>
-
-            {/* Title */}
-            <input
-                type="text"
-                value={title}
-                onChange={handleTitleChange}
-                placeholder="Untitled"
-                className="w-full font-serif text-3xl text-foreground tracking-tight placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none mb-8"
-            />
-
-            {/* Divider */}
-            <div className="border-t border-border mb-8" />
-
-            {/* AI toolbar */}
-            <div className="flex items-center justify-end gap-1.5 mb-5">
-                {(["summarize", "rewrite", "expand"] as const).map((action) => (
-                    <button
-                        key={action}
-                        onClick={() => handleAiAction(action)}
-                        disabled={aiPending || !content.trim()}
-                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1 transition-colors disabled:opacity-40 disabled:cursor-not-allowed capitalize"
-                    >
-                        {aiPending && activeAction === action
-                            ? "Running…"
-                            : action.charAt(0).toUpperCase() + action.slice(1)}
-                    </button>
-                ))}
-            </div>
-
-            {/* Content */}
-            <textarea
-                value={content}
-                onChange={handleContentChange}
-                placeholder="Start writing…"
-                className="w-full min-h-[60vh] text-[0.95rem] leading-relaxed text-foreground placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none font-light"
-            />
-
-            {/* AI result */}
-            {aiResult?.output?.text && (
-                <div className="mt-8 border border-border rounded-xl p-5">
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
-                            {aiResult.type.charAt(0) + aiResult.type.slice(1).toLowerCase()}
-                        </span>
-                        <button
-                            onClick={() => setAiResult(null)}
-                            className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-                        >
-                            Dismiss
-                        </button>
-                    </div>
-                    <p className="text-[0.95rem] leading-relaxed text-foreground whitespace-pre-wrap">
-                        {aiResult.output.text}
-                    </p>
-                    <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
-                        <button
-                            onClick={() => handleReplace(aiResult.output!.text)}
-                            className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1 transition-colors"
-                        >
-                            Replace content
-                        </button>
-                        <button
-                            onClick={() => handleInsertBelow(aiResult.output!.text)}
-                            className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1 transition-colors"
-                        >
-                            Insert below
-                        </button>
-                        <button
-                            onClick={() => handleCopy(aiResult.output!.text)}
-                            className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2.5 py-1 transition-colors"
-                        >
-                            Copy
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     )
 }
@@ -216,13 +282,15 @@ export default function DocumentEditorPage({
 
     if (isLoading) {
         return (
-            <div className="max-w-3xl mx-auto px-6 py-10 animate-pulse">
-                <div className="h-3 bg-muted rounded w-24 mb-10" />
-                <div className="h-8 bg-muted rounded w-1/2 mb-6" />
-                <div className="space-y-2">
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} className="h-4 bg-muted rounded" style={{ width: `${85 - i * 5}%` }} />
-                    ))}
+            <div className="min-h-full bg-muted p-4 md:p-6">
+                <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border shadow-sm px-8 py-8 animate-pulse">
+                    <div className="h-3 bg-muted rounded w-24 mb-10" />
+                    <div className="h-8 bg-muted rounded w-1/2 mb-6" />
+                    <div className="space-y-2">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="h-4 bg-muted rounded" style={{ width: `${85 - i * 5}%` }} />
+                        ))}
+                    </div>
                 </div>
             </div>
         )
@@ -230,17 +298,19 @@ export default function DocumentEditorPage({
 
     if (isError || !doc) {
         return (
-            <div className="max-w-3xl mx-auto px-6 py-10">
-                <Link
-                    href={`/workspaces/${workspaceId}`}
-                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
-                >
-                    <ArrowLeft size={12} />
-                    Back to workspace
-                </Link>
-                <p className="text-sm text-muted-foreground py-16 text-center">
-                    Document not found.
-                </p>
+            <div className="min-h-full bg-muted p-4 md:p-6">
+                <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border shadow-sm px-8 py-8">
+                    <Link
+                        href={`/workspaces/${workspaceId}`}
+                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+                    >
+                        <ArrowLeft size={12} />
+                        Back to workspace
+                    </Link>
+                    <p className="text-sm text-muted-foreground py-16 text-center">
+                        Document not found.
+                    </p>
+                </div>
             </div>
         )
     }
