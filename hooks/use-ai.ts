@@ -66,5 +66,6 @@ export function useAiGenerations(documentId: string | undefined) {
         queryKey: ["aiGenerations", documentId],
         queryFn: () => fetchAiGenerations(documentId!),
         enabled: !!documentId,
+        staleTime: Infinity,
     })
 }

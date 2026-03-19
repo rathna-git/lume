@@ -157,7 +157,7 @@ AiGeneration
 | Active workspace | TanStack Query | `useWorkspace(id)` |
 | Documents list | TanStack Query | `useDocuments(workspaceId)` |
 | Document content | Local `useState` | Debounced auto-save via `useMutation` |
-| AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; invalidated after successful mutation |
+| AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; `staleTime: Infinity`; invalidated after successful mutation |
 | AI panel result (ephemeral) | Local `useState` | Immediate mutation response shown in persistent right-side panel until dismissed |
 
 ---
@@ -229,6 +229,7 @@ AiGeneration
 | Use server-side user bootstrap for MVP instead of webhook-first sync | Simplifies local development and avoids ngrok/webhook setup during early build phase | Webhook still required later for production-grade sync guarantees |
 | Persist AI generations before building read flow | Preserves outputs and avoids schema churn later | UI currently behaves as if AI results are temporary |
 | Split page into shell + editor components for async data init | Avoids `useEffect` state seeding; state initialized directly from props at mount | Adds one level of component nesting |
+| `staleTime: Infinity` on `useAiGenerations` | Generations only change when the user explicitly runs a new action — no background source can mutate them | Must ensure `invalidateQueries` is always called after successful mutation or cache will be stale |
 
 ---
 

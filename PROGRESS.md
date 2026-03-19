@@ -11,7 +11,7 @@
 #### Hook (`hooks/use-ai.ts`)
 - Added `AiGeneration` interface (`id`, `type`, `status`, `model`, `output`, `createdAt`)
 - Added `fetchAiGenerations` fetch function → `GET /api/documents/[documentId]/generations`
-- Added `useAiGenerations(documentId)` — `useQuery` with key `["aiGenerations", documentId]`; disabled when `documentId` is falsy
+- Added `useAiGenerations(documentId)` — `useQuery` with key `["aiGenerations", documentId]`; disabled when `documentId` is falsy; `staleTime: Infinity` — fetches once on mount, never refetches on window focus or remount, only refreshed via explicit `invalidateQueries` after mutation
 - Updated `useGenerateAi()` to call `queryClient.invalidateQueries({ queryKey: ["aiGenerations", documentId] })` on success via `variables.documentId`
 
 #### Editor layout refactor (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
