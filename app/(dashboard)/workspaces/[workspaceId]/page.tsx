@@ -1,12 +1,15 @@
 "use client"
 
-import { use } from "react"
+import { use, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, ArrowLeft } from "lucide-react"
+import { Plus, ArrowLeft, Pencil } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { useDocuments, useCreateDocument, type Document } from "@/hooks/use-documents"
+import { useUpdateWorkspace } from "@/hooks/use-workspaces"
 import { DocumentCard } from "@/components/document/document-card"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import Link from "next/link"
 
 interface Workspace {
@@ -50,6 +53,29 @@ export default function WorkspaceDetailPage({
     const { data: workspace, isLoading: workspaceLoading, isError: workspaceError } = useWorkspace(workspaceId)
     const { data: documents, isLoading: docsLoading, isError: docsError } = useDocuments(workspaceId)
     const { mutate: createDocument, isPending: isCreating } = useCreateDocument()
+    const { mutate: updateWorkspace, isPending: isSaving } = useUpdateWorkspace()
+
+    const [editOpen, setEditOpen] = useState(false)
+    const [editName, setEditName] = useState("")
+    const [editDescription, setEditDescription] = useState("")
+    const [editEmoji, setEditEmoji] = useState("")
+
+    function handleOpenEdit() {
+        if (!workspace) return
+        setEditName(workspace.name)
+        setEditDescription(workspace.description ?? "")
+        setEditEmoji(workspace.emoji ?? "")
+        setEditOpen(true)
+    }
+
+    function handleSaveEdit(e: { preventDefault(): void }) {
+        e.preventDefault()
+        if (!editName.trim()) return
+        updateWorkspace(
+            { workspaceId, name: editName.trim(), description: editDescription.trim(), emoji: editEmoji },
+            { onSuccess: () => setEditOpen(false) }
+        )
+    }
 
     function handleNewDocument() {
         createDocument(
@@ -92,8 +118,15 @@ export default function WorkspaceDetailPage({
                                 <h1 className="font-serif text-3xl text-foreground tracking-tight leading-none">
                                     {workspace.name}
                                 </h1>
+                                <button
+                                    onClick={handleOpenEdit}
+                                    className="text-muted-foreground/40 hover:text-muted-foreground transition-colors mt-1"
+                                    aria-label="Edit workspace"
+                                >
+                                    <Pencil size={14} />
+                                </button>
                             </div>
-                            
+
                             {workspace.description && (
                                 <p className="text-sm text-muted-foreground font-light">
                                     {workspace.description}
@@ -146,6 +179,43 @@ export default function WorkspaceDetailPage({
                     ))}
                 </div>
             )}
+
+            {/* Edit workspace dialog */}
+            <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit workspace</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSaveEdit} className="flex flex-col gap-4 pt-1">
+                        <div className="flex gap-3">
+                            <Input
+                                value={editEmoji}
+                                onChange={(e) => setEditEmoji(e.target.value)}
+                                placeholder="📝"
+                                className="w-16 text-center text-lg"
+                                maxLength={2}
+                            />
+                            <Input
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                placeholder="Workspace name"
+                                required
+                                className="flex-1"
+                            />
+                        </div>
+                        <Input
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            placeholder="Description (optional)"
+                        />
+                        <DialogFooter>
+                            <Button type="submit" disabled={isSaving || !editName.trim()}>
+                                {isSaving ? "Saving…" : "Save"}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

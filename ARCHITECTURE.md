@@ -262,8 +262,8 @@ AiGeneration
 ### High Priority
 
 - [x] Add document delete feature
-- [ ] Add workspace PATCH route (rename + description update)
-- [ ] Add workspace rename UI flow
+- [x] Add workspace PATCH route (rename + description update)
+- [x] Add workspace rename UI flow
 - [ ] Add workspace DELETE route
 - [ ] Add workspace delete UI flow
 - [ ] Add AI generations read route (`GET /api/documents/[id]/generations`)

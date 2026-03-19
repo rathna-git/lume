@@ -17,6 +17,13 @@ interface CreateWorkspaceInput {
     emoji?: string
 }
 
+interface UpdateWorkspaceInput {
+    workspaceId: string
+    name?: string
+    description?: string
+    emoji?: string
+}
+
 const WORKSPACES_KEY = ["workspaces"] as const
 
 async function fetchWorkspaces(): Promise<Workspace[]> {
@@ -40,6 +47,20 @@ async function createWorkspace(input: CreateWorkspaceInput): Promise<Workspace> 
     return data.workspace
 }
 
+async function updateWorkspace({ workspaceId, ...body }: UpdateWorkspaceInput): Promise<Workspace> {
+    const res = await fetch(`/api/workspaces/${workspaceId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    })
+    if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error ?? "Failed to update workspace")
+    }
+    const data = await res.json()
+    return data.workspace
+}
+
 export function useWorkspaces() {
     return useQuery({
         queryKey: WORKSPACES_KEY,
@@ -52,6 +73,17 @@ export function useCreateWorkspace() {
     return useMutation({
         mutationFn: createWorkspace,
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: WORKSPACES_KEY })
+        },
+    })
+}
+
+export function useUpdateWorkspace() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: updateWorkspace,
+        onSuccess: (updated) => {
+            queryClient.setQueryData(["workspace", updated.id], updated)
             queryClient.invalidateQueries({ queryKey: WORKSPACES_KEY })
         },
     })

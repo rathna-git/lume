@@ -6,6 +6,44 @@
 
 ## 2026-03-18
 
+### Workspace PATCH Route + Rename UI
+
+#### Workspace PATCH API (`app/api/workspaces/[workspaceId]/route.ts`)
+- Added `PATCH` handler — Zod-validated body (`name`, `description`, `emoji`); at least one field required
+- Auth + ownership check before update; returns 401/404/400 as appropriate
+- Partial update — only provided fields written to DB
+- Returns updated workspace shape consistent with `GET`
+
+#### Hook (`hooks/use-workspaces.ts`)
+- Added `UpdateWorkspaceInput` interface and `updateWorkspace` fetch function
+- Added `useUpdateWorkspace()` mutation — on success sets `["workspace", id]` cache directly and invalidates `["workspaces"]` list
+
+#### Workspace rename UI (`app/(dashboard)/workspaces/[workspaceId]/page.tsx`)
+- Pencil icon (14px, muted) beside the workspace name — visible but low-prominence
+- Clicking pre-fills a dialog with current name, description, and emoji
+- Dialog fields: emoji (small input), name (required), description (optional)
+- Save button disabled while saving or name is empty; shows "Saving…" during in-flight
+- On success: cache updated immediately, dialog closes, workspace list also refreshed
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `app/api/workspaces/[workspaceId]/route.ts` | Modified | Added PATCH handler with Zod validation + ownership check |
+| `hooks/use-workspaces.ts` | Modified | Added `useUpdateWorkspace` mutation hook |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Modified | Added edit dialog + pencil trigger |
+
+### Up Next
+
+1. Workspace DELETE route
+2. Workspace delete UI flow
+3. AI generations read route (`GET /api/documents/[id]/generations`)
+4. `useAiGenerations(documentId)` hook
+5. Surface latest persisted AI generation in the editor / AI panel
+6. Invalidate AI generations query after successful AI mutation
+
+---
+
 ### Document Delete Feature
 
 #### What was already in place
