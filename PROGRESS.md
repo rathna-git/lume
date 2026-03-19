@@ -35,10 +35,11 @@
 
 ### Up Next
 
-1. AI generations read route (`GET /api/documents/[id]/generations`)
-2. `useAiGenerations(documentId)` hook
-3. Surface latest persisted AI generation in the editor / AI panel
-4. Invalidate AI generations query after successful AI mutation
+**AI Generations feature — 3 sequential tasks, each committed separately:**
+
+1. **Backend** — `GET /api/documents/[documentId]/generations` route: auth + document ownership check, returns all generations newest-first
+2. **Hook** — `useAiGenerations(documentId)` TanStack Query hook: fetches from above route; invalidated after successful AI mutation
+3. **Frontend** — Surface latest `SUCCESS` generation in the document editor AI panel on load
 
 ---
 
