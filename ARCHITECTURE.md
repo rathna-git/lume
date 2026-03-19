@@ -158,7 +158,8 @@ AiGeneration
 | Documents list | TanStack Query | `useDocuments(workspaceId)` |
 | Document content | Local `useState` | Debounced auto-save via `useMutation` |
 | AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; `staleTime: Infinity`; invalidated after successful mutation |
-| AI panel result (ephemeral) | Local `useState` | Immediate mutation response shown in persistent right-side panel until dismissed |
+| AI panel selected action | Local `useState` | `selectedAction` — which action tab is active; drives what persisted result is shown |
+| AI panel pending action | Local `useState` | `pendingAction` — in-flight action; clears on success/error; all generate buttons disabled while set |
 
 ---
 
@@ -201,17 +202,18 @@ AiGeneration
 
 - `POST /api/ai/generate` creates an `AiGeneration` row with `PENDING`
 - OpenAI is called with the requested action
-- The row is updated to `SUCCESS` or `ERROR`
-- The immediate response is shown in the persistent right-side AI panel
-- `GET /api/documents/[id]/generations` returns all saved generations newest-first
-- `useAiGenerations(documentId)` fetches and caches saved generations; invalidated after each successful mutation
+- The row is updated to `SUCCESS` or `ERROR` with `inputSnapshot` capturing document content at call time
+- `GET /api/documents/[id]/generations` returns all saved generations newest-first, including `inputSnapshot`
+- `useAiGenerations(documentId)` fetches and caches saved generations (`staleTime: Infinity`); invalidated after each successful mutation
 - Editor uses a two-surface layout: editor card (left) + AI panel (right, sticky)
+- AI panel is action-driven: selecting a tab shows the latest `SUCCESS` generation for that type
+- Staleness: `persisted.inputSnapshot !== content` — if content has changed since generation, a subtle note is shown
+- Regenerate always available when a result exists; fires the same mutation, creates a new row, invalidation refreshes the panel
 
 ### Planned
 
-- Surface AI generation history list in the panel (past runs per action type)
-- Explicit regenerate flow per action type
-- Loading / empty / error states for `useAiGenerations` within the panel
+- AI generation history list per action (all past runs, not just latest)
+- Loading / error states for `useAiGenerations` within the panel
 
 ---
 
@@ -275,8 +277,8 @@ AiGeneration
 
 ### Medium Priority
 
-- [ ] Add AI history panel per document
-- [ ] Add explicit regenerate flow separate from viewing existing results
+- [x] Add AI history panel per document — action-driven panel shows latest persisted result per action type
+- [x] Add explicit regenerate flow separate from viewing existing results
 - [ ] Add loading / empty / error states for AI history retrieval
 - [ ] Audit persisted server data currently held only in local UI state
 

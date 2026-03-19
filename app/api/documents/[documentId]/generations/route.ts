@@ -26,6 +26,7 @@ export async function GET(
             status: true,
             model: true,
             output: true,
+            inputSnapshot: true,
             createdAt: true,
         },
     })

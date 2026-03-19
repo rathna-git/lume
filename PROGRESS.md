@@ -6,6 +6,40 @@
 
 ## 2026-03-19
 
+### AI Panel — Action-Driven + Persistence-Aware
+
+#### Generations route (`app/api/documents/[documentId]/generations/route.ts`)
+- Added `inputSnapshot` to the select — required for client-side staleness detection
+
+#### Hook (`hooks/use-ai.ts`)
+- Added `inputSnapshot: string | null` to the `AiGeneration` interface
+
+#### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+- Action tabs now select the view (no longer trigger generation directly)
+- Panel reads from `useAiGenerations(documentId)` — all results are persistence-driven
+- Looks up latest `SUCCESS` generation per selected action via `type === action.toUpperCase()`
+- Staleness: `persisted.inputSnapshot !== content` — direct string comparison; shows a subtle italic note
+- Regenerate: always available when a result exists; fires the existing `generateAi` mutation
+- Generate: shown in empty state when no result exists for the selected action
+- `pendingAction` state tracks the in-flight action; all generate/regenerate buttons disabled while any action is pending
+- Removed `aiResult` ephemeral state — panel is fully driven by persisted data
+- Removed `activeAction` state — replaced by `selectedAction` (tab) and `pendingAction` (in-flight)
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `app/api/documents/[documentId]/generations/route.ts` | Modified | Added `inputSnapshot` to select |
+| `hooks/use-ai.ts` | Modified | Added `inputSnapshot` to `AiGeneration` interface |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Action-driven panel with persistence + staleness + regenerate |
+
+### Up Next
+
+- AI history list per action (show all past runs, not just latest)
+- Loading / error states for `useAiGenerations` in the panel
+
+---
+
 ### AI Generations Hook + Editor Layout Refactor
 
 #### Hook (`hooks/use-ai.ts`)
@@ -565,3 +599,20 @@
 - [ ] Replace content updates editor and autosaves
 - [ ] Insert below works
 - [ ] AI failure handled gracefully
+
+### AI Panel — Action-Driven + Persistence-Aware
+
+- [ ] Clicking an action tab (Summarize / Rewrite / Expand) selects it without triggering generation
+- [ ] Empty state shown when no generation exists for the selected action
+- [ ] "Generate" button triggers generation for the selected action
+- [ ] Result appears in the panel after generation (driven by persisted data, not ephemeral state)
+- [ ] Switching tabs shows the correct persisted result for each action independently
+- [ ] Reload the page — previously generated results are still shown for each action
+- [ ] Edit the document content after generating → stale note appears
+- [ ] Stale note reads: "This result may be outdated. It was generated from an earlier version of this document."
+- [ ] No stale note shown when content matches the snapshot exactly
+- [ ] "Regenerate" button appears when a result exists; clicking it creates a new generation
+- [ ] While generating (pending): Regenerate shows "Running…" and is disabled
+- [ ] While generating with no existing result: "Running…" text shown in panel
+- [ ] Replace content, Insert below, Copy all work on persisted results
+- [ ] Only one action can be pending at a time (Generate/Regenerate disabled while any action runs)

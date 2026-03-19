@@ -24,6 +24,7 @@ export interface AiGeneration {
     status: string
     model: string
     output: { text: string } | null
+    inputSnapshot: string | null
     createdAt: string
 }
 
