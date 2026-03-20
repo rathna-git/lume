@@ -29,6 +29,8 @@
 
 ### Manual Test Checklist — AI History List
 
+> All tests performed and passed on 2026-03-19.
+
 - [x] Generate a result — latest shown in main result area, no "Previous" section yet
 - [x] Regenerate once or twice — "Previous" section appears below with older items
 - [x] Click an older history item — result area updates to that item, "Back to latest" appears in header, "Regenerate" hides
@@ -42,6 +44,7 @@
 
 ### Up Next
 
+- **Deployment pass** — deploy to Vercel, wire production env vars, verify all features in prod
 - Replace `confirm()` on document delete with a proper confirmation dialog
 - Audit persisted server data currently held only in local UI state
 - Markdown rendering in AI panel (react-markdown) — lower priority
