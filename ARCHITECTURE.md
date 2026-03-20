@@ -295,6 +295,8 @@ AiGeneration
 
 - [ ] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
 - [ ] Replace `<textarea>` editor with Tiptap rich text editor — enables formatting toolbar, and allows markdown-to-rich-text insert from AI panel
+- [ ] Replace `confirm()` on document delete with a proper confirmation dialog (same pattern as workspace delete)
+- [ ] Conditionally adjust workspace delete dialog copy — omit "and all documents inside it" when workspace is empty
 - [ ] Add filtering / sorting for AI generations
 - [ ] Define retention / versioning strategy for AI outputs
 - [ ] Harden Clerk webhook sync flow post-MVP

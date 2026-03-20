@@ -9,6 +9,7 @@
 ### AI Panel — History List per Action
 
 #### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
 - Added `relativeTime` inline helper — formats `createdAt` as `Xm ago / Xh ago / Xd ago`
 - Added `selectedGenerationId: string | null` state to `DocumentEditor` — `null` means show latest
 - Added `handleSelectAction` — wraps `setSelectedAction`, also resets `selectedGenerationId` to `null` on tab switch
@@ -22,25 +23,26 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
+| File                                                                       | Status   | Notes                                                         |
+| -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------- |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | History list, selectedGenerationId state, relativeTime helper |
 
 ### Manual Test Checklist — AI History List
 
-- [ ] Generate a result — latest shown in main result area, no "Previous" section yet
-- [ ] Regenerate once or twice — "Previous" section appears below with older items
-- [ ] Click an older history item — result area updates to that item, "Back to latest" appears in header, "Regenerate" hides
-- [ ] Click "Back to latest" — panel returns to newest result, "Regenerate" reappears
-- [ ] Switch action tabs — selection resets, no stale `selectedGenerationId` carries across actions
-- [ ] Generate a new result while viewing an older item — panel resets to the new latest
-- [ ] Staleness note only appears when viewing the latest result, not older items
-- [ ] Replace content / Insert below / Copy all work on whichever result is currently displayed
-- [ ] History item timestamps display correctly (e.g. "2m ago", "1h ago")
-- [ ] History item snippet shows first ~80 chars of output text
+- [x] Generate a result — latest shown in main result area, no "Previous" section yet
+- [x] Regenerate once or twice — "Previous" section appears below with older items
+- [x] Click an older history item — result area updates to that item, "Back to latest" appears in header, "Regenerate" hides
+- [x] Click "Back to latest" — panel returns to newest result, "Regenerate" reappears
+- [x] Switch action tabs — selection resets, no stale `selectedGenerationId` carries across actions
+- [x] Generate a new result while viewing an older item — panel resets to the new latest
+- [x] Staleness note only appears when viewing the latest result, not older items
+- [x] Replace content / Insert below / Copy all work on whichever result is currently displayed
+- [x] History item timestamps display correctly (e.g. "2m ago", "1h ago")
+- [x] History item snippet shows first ~80 chars of output text
 
 ### Up Next
 
+- Replace `confirm()` on document delete with a proper confirmation dialog
 - Audit persisted server data currently held only in local UI state
 - Markdown rendering in AI panel (react-markdown) — lower priority
 - Rich text editor with formatting toolbar (Tiptap) — lower priority
@@ -49,8 +51,8 @@
 
 ### AI Panel — Loading / Empty / Error States
 
-
 #### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
 - Added `generationsLoading`, `generationsError`, `onRetry` props to `AiPanel`
 - Loading state: animated skeleton (4 rows, `animate-pulse`) shown below action tabs when `useAiGenerations` is in-flight; only appears on first mount since `staleTime: Infinity`
 - Error state: "Couldn't load your previous results." + "Try again" button that calls `refetch`; shown when query fails
@@ -60,8 +62,8 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
+| File                                                                       | Status   | Notes                                                         |
+| -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------- |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Loading skeleton, error state with retry, guarded result area |
 
 ### Up Next
@@ -75,12 +77,15 @@
 ### AI Panel — Action-Driven + Persistence-Aware
 
 #### Generations route (`app/api/documents/[documentId]/generations/route.ts`)
+
 - Added `inputSnapshot` to the select — required for client-side staleness detection
 
 #### Hook (`hooks/use-ai.ts`)
+
 - Added `inputSnapshot: string | null` to the `AiGeneration` interface
 
 #### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
 - Action tabs now select the view (no longer trigger generation directly)
 - Panel reads from `useAiGenerations(documentId)` — all results are persistence-driven
 - Looks up latest `SUCCESS` generation per selected action via `type === action.toUpperCase()`
@@ -93,10 +98,10 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
-| `app/api/documents/[documentId]/generations/route.ts` | Modified | Added `inputSnapshot` to select |
-| `hooks/use-ai.ts` | Modified | Added `inputSnapshot` to `AiGeneration` interface |
+| File                                                                       | Status   | Notes                                                         |
+| -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------- |
+| `app/api/documents/[documentId]/generations/route.ts`                      | Modified | Added `inputSnapshot` to select                               |
+| `hooks/use-ai.ts`                                                          | Modified | Added `inputSnapshot` to `AiGeneration` interface             |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Action-driven panel with persistence + staleness + regenerate |
 
 ### Up Next
@@ -109,12 +114,14 @@
 ### AI Generations Hook + Editor Layout Refactor
 
 #### Hook (`hooks/use-ai.ts`)
+
 - Added `AiGeneration` interface (`id`, `type`, `status`, `model`, `output`, `createdAt`)
 - Added `fetchAiGenerations` fetch function → `GET /api/documents/[documentId]/generations`
 - Added `useAiGenerations(documentId)` — `useQuery` with key `["aiGenerations", documentId]`; disabled when `documentId` is falsy; `staleTime: Infinity` — fetches once on mount, never refetches on window focus or remount, only refreshed via explicit `invalidateQueries` after mutation
 - Updated `useGenerateAi()` to call `queryClient.invalidateQueries({ queryKey: ["aiGenerations", documentId] })` on success via `variables.documentId`
 
 #### Editor layout refactor (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
 - Replaced single-column layout with a desktop-first two-surface layout
 - Page background: `bg-muted` (`#F2EDE8` Lume mist) with `p-4 md:p-6`
 - Editor surface: `bg-card` (white), `rounded-2xl`, `border-border`, `shadow-sm` — primary writing sheet
@@ -126,15 +133,16 @@
 - Added `Sparkles` icon (Lume amber) beside "AI Assistant" panel heading
 
 #### Sidebar fix (`components/layout/sidebar.tsx`)
+
 - Logo section changed from `py-4` to `h-14 flex items-center` to match the header's `h-14` — aligns the horizontal dividers across sidebar and main content area
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
-| `hooks/use-ai.ts` | Modified | Added `useAiGenerations` hook + invalidation in `useGenerateAi` |
-| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Two-surface layout: editor card + persistent AI panel |
-| `components/layout/sidebar.tsx` | Modified | Logo section height fixed to `h-14` to align with header |
+| File                                                                       | Status   | Notes                                                           |
+| -------------------------------------------------------------------------- | -------- | --------------------------------------------------------------- |
+| `hooks/use-ai.ts`                                                          | Modified | Added `useAiGenerations` hook + invalidation in `useGenerateAi` |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Two-surface layout: editor card + persistent AI panel           |
+| `components/layout/sidebar.tsx`                                            | Modified | Logo section height fixed to `h-14` to align with header        |
 
 ### Up Next
 
@@ -147,6 +155,7 @@
 ### AI Generations Read Route
 
 #### Route (`app/api/documents/[documentId]/generations/route.ts`)
+
 - Created new route file at `GET /api/documents/[documentId]/generations`
 - Auth via `requireCurrentDbUser()`; returns 401 if unauthenticated
 - Ownership verified by `prisma.document.findFirst({ where: { id, workspace: { userId } } })`; returns 404 if not found or not owned
@@ -155,8 +164,8 @@
 
 ### Files Created
 
-| File | Status | Notes |
-|---|---|---|
+| File                                                  | Status  | Notes                                   |
+| ----------------------------------------------------- | ------- | --------------------------------------- |
 | `app/api/documents/[documentId]/generations/route.ts` | Created | GET handler only — no POST/PATCH/DELETE |
 
 ### Up Next
@@ -169,15 +178,18 @@
 ### Workspace DELETE Route + Delete UI
 
 #### Workspace DELETE API (`app/api/workspaces/[workspaceId]/route.ts`)
+
 - Added `DELETE` handler — auth + ownership check, then `prisma.workspace.delete`
 - Returns 204 No Content on success; 401/404 as appropriate
 - Cascade deletes all documents and their AI generations via Prisma schema relations
 
 #### Hook (`hooks/use-workspaces.ts`)
+
 - Added `deleteWorkspace` fetch function
 - Added `useDeleteWorkspace()` mutation — on success removes `["workspace", id]` from cache and invalidates `["workspaces"]` list
 
 #### Workspace delete UI (`app/(dashboard)/workspaces/[workspaceId]/page.tsx`)
+
 - Trash2 icon (14px, muted → destructive on hover) beside pencil icon in workspace header
 - Clicking opens a confirmation dialog — no accidental deletes
 - Warning copy: "This will permanently delete this workspace and all documents inside it. This action cannot be undone."
@@ -187,11 +199,11 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
-| `app/api/workspaces/[workspaceId]/route.ts` | Modified | Added DELETE handler with auth + ownership check |
-| `hooks/use-workspaces.ts` | Modified | Added `useDeleteWorkspace` mutation hook |
-| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Modified | Added trash icon trigger + confirmation dialog |
+| File                                                | Status   | Notes                                            |
+| --------------------------------------------------- | -------- | ------------------------------------------------ |
+| `app/api/workspaces/[workspaceId]/route.ts`         | Modified | Added DELETE handler with auth + ownership check |
+| `hooks/use-workspaces.ts`                           | Modified | Added `useDeleteWorkspace` mutation hook         |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Modified | Added trash icon trigger + confirmation dialog   |
 
 ### Up Next
 
@@ -208,16 +220,19 @@
 ### Workspace PATCH Route + Rename UI
 
 #### Workspace PATCH API (`app/api/workspaces/[workspaceId]/route.ts`)
+
 - Added `PATCH` handler — Zod-validated body (`name`, `description`, `emoji`); at least one field required
 - Auth + ownership check before update; returns 401/404/400 as appropriate
 - Partial update — only provided fields written to DB
 - Returns updated workspace shape consistent with `GET`
 
 #### Hook (`hooks/use-workspaces.ts`)
+
 - Added `UpdateWorkspaceInput` interface and `updateWorkspace` fetch function
 - Added `useUpdateWorkspace()` mutation — on success sets `["workspace", id]` cache directly and invalidates `["workspaces"]` list
 
 #### Workspace rename UI (`app/(dashboard)/workspaces/[workspaceId]/page.tsx`)
+
 - Pencil icon (14px, muted) beside the workspace name — visible but low-prominence
 - Clicking pre-fills a dialog with current name, description, and emoji
 - Dialog fields: emoji (small input), name (required), description (optional)
@@ -226,11 +241,11 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
-| `app/api/workspaces/[workspaceId]/route.ts` | Modified | Added PATCH handler with Zod validation + ownership check |
-| `hooks/use-workspaces.ts` | Modified | Added `useUpdateWorkspace` mutation hook |
-| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Modified | Added edit dialog + pencil trigger |
+| File                                                | Status   | Notes                                                     |
+| --------------------------------------------------- | -------- | --------------------------------------------------------- |
+| `app/api/workspaces/[workspaceId]/route.ts`         | Modified | Added PATCH handler with Zod validation + ownership check |
+| `hooks/use-workspaces.ts`                           | Modified | Added `useUpdateWorkspace` mutation hook                  |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Modified | Added edit dialog + pencil trigger                        |
 
 ### Up Next
 
@@ -246,18 +261,20 @@
 ### Document Delete Feature
 
 #### What was already in place
+
 - `DELETE /api/documents/[documentId]` was fully implemented (auth + ownership check + hard delete)
 - `deleteDocument` fetch function and `useDeleteDocument` mutation hook existed in `hooks/use-document.ts`
 
 #### What was added
+
 - Wired up `useDeleteDocument` and `useRouter` in the `DocumentEditor` component
 - Added `handleDelete` — calls `confirm()` for confirmation, then fires the mutation; on success redirects to `/workspaces/[workspaceId]`
 - Added a low-prominence "Delete" button in the top-right header (beside the save status); shows "Deleting…" and disables during in-flight request
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
+| File                                                                       | Status   | Notes                                                        |
+| -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------ |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Added delete handler + button; no API or hook changes needed |
 
 ### Up Next
@@ -278,9 +295,11 @@
 ### AI Generation Layer (API + Frontend)
 
 #### OpenAI client (`lib/openai.ts`)
+
 - Singleton pattern via `globalThis` — safe for Next.js hot reload
 
 #### AI API (`app/api/ai/generate/route.ts`)
+
 - `POST /api/ai/generate` — Zod-validated body (`documentId`, `action`, `content`, `instructions?`)
 - Actions: `summarize`, `rewrite`, `expand`
 - Ownership check: document must belong to a workspace owned by the authenticated user
@@ -289,10 +308,12 @@
 - Output shape: `{ text: string }` stored in `output` JSON field
 
 #### Hook (`hooks/use-ai.ts`)
+
 - `useGenerateAi()` — mutation hook for `POST /api/ai/generate`
 - Types: `AiAction`, `GenerateAiInput`, `AiGenerationResult`
 
 #### Editor AI toolbar (`app/(dashboard)/workspaces/.../documents/.../page.tsx`)
+
 - Three action buttons above the textarea: Summarize, Rewrite, Expand
 - Buttons disabled when content is empty or a request is in flight
 - Active button shows "Running…" during request
@@ -302,12 +323,12 @@
 
 ### Files Created / Modified
 
-| File | Status | Notes |
-|---|---|---|
-| `lib/openai.ts` | Created | Singleton OpenAI client |
-| `app/api/ai/generate/route.ts` | Created | POST AI actions with Zod + ownership check + AiGeneration persistence |
-| `hooks/use-ai.ts` | Created | `useGenerateAi()` mutation hook |
-| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | AI toolbar + result panel with apply/copy actions |
+| File                                                                       | Status   | Notes                                                                 |
+| -------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------- |
+| `lib/openai.ts`                                                            | Created  | Singleton OpenAI client                                               |
+| `app/api/ai/generate/route.ts`                                             | Created  | POST AI actions with Zod + ownership check + AiGeneration persistence |
+| `hooks/use-ai.ts`                                                          | Created  | `useGenerateAi()` mutation hook                                       |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | AI toolbar + result panel with apply/copy actions                     |
 
 ### AI Persistence Behavior
 
@@ -318,9 +339,11 @@
 ### Document Editor — Bug Fix & Refactor
 
 #### Problem
+
 `document` was used as the variable name for the TanStack Query result, shadowing the global DOM `Document` type. TypeScript resolved `document.content` against the DOM type (which has no `content` property), causing a type error. A secondary lint error (`react-hooks/set-state-in-effect`) fired because local state was seeded inside a `useEffect`.
 
 #### Fix
+
 - Renamed `data: document` → `data: doc` to avoid the global shadow
 - Removed `useEffect` + `initialized` state entirely
 - Split the page into two components:
@@ -330,8 +353,8 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-|---|---|---|
+| File                                                                       | Status   | Notes                                                                                      |
+| -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Split into two components; removed useEffect state seeding; fixed document variable shadow |
 
 ### Up Next
@@ -375,28 +398,31 @@
 ### Document Editor (API + Frontend)
 
 #### Document API (`app/api/documents/[documentId]/route.ts`)
+
 - `GET /api/documents/[id]` — returns full document including content; 401/404 with ownership check
 - `PATCH /api/documents/[id]` — Zod-validated body (`title?`, `content?`); updates only fields provided; returns updated document
 - `DELETE /api/documents/[id]` — deletes document; 401/404 with ownership check
 - Ownership verified via `workspace.userId` join — can't access documents in workspaces you don't own
 
 #### Hooks (`hooks/use-document.ts`)
+
 - `useDocument(documentId)` — fetches single document with content; cache key `["document", id]`
 - `useUpdateDocument()` — PATCHes document; writes result directly into cache (no extra refetch)
 - `useDeleteDocument()` — DELETEs document; caller handles redirect
 
 #### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
 - Back link to workspace, title input (serif, large), content textarea (full height, light)
 - Debounced autosave: 800ms after last keystroke → PATCH → status shows `Saving…` / `Saved` / `Error`
 - Loading skeleton, not-found/error state
 
 ### Files Created / Modified
 
-| File | Status | Notes |
-|---|---|---|
-| `app/api/documents/[documentId]/route.ts` | Created | GET + PATCH + DELETE with Zod + ownership check |
-| `hooks/use-document.ts` | Created | Single document fetch + update + delete hooks |
-| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Created | Editor with debounced autosave |
+| File                                                                       | Status  | Notes                                           |
+| -------------------------------------------------------------------------- | ------- | ----------------------------------------------- |
+| `app/api/documents/[documentId]/route.ts`                                  | Created | GET + PATCH + DELETE with Zod + ownership check |
+| `hooks/use-document.ts`                                                    | Created | Single document fetch + update + delete hooks   |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Created | Editor with debounced autosave                  |
 
 ### Up Next
 
@@ -628,45 +654,67 @@
 
 ### Auth
 
-- [ ] Sign in → redirects to `/workspaces`
-- [ ] Sign out → redirects to landing page
-- [ ] Unauthorized access to protected route → redirected to `/sign-in`
+- [x] Sign in → redirects to `/workspaces`
+- [x] Sign out → redirects to landing page
+- [x] Unauthorized access to protected route → redirected to `/sign-in`
 
 ### Workspace
 
-- [ ] New user → default "My Workspace" created
-- [ ] Create workspace → appears in list
-- [ ] Rename workspace → updates correctly
-- [ ] Delete workspace → cascades documents and redirects to `/workspaces`
+- [x] New user → default "My Workspace" created _(new signups only — existing accounts unaffected; bootstrap logic verified in code)_
+- [x] Create workspace → appears in list
+- [x] Rename workspace → updates correctly
+- [x] Delete workspace → cascades documents and redirects to `/workspaces`
 
 ### Document
 
-- [ ] Create document → redirects to editor
-- [ ] Autosave works (title + content)
-- [ ] Delete document → redirects to workspace page
+- [x] Create document → redirects to editor
+- [x] Autosave works (title + content)
+- [x] Delete document → redirects to workspace page
 
 ### AI
 
-- [ ] Summarize works
-- [ ] Rewrite works
-- [ ] Expand works
-- [ ] Replace content updates editor and autosaves
-- [ ] Insert below works
-- [ ] AI failure handled gracefully
+- [x] Summarize works
+- [x] Rewrite works
+- [x] Expand works
+- [x] Replace content updates editor and autosaves
+- [x] Insert below works
+- [x] AI failure handled gracefully
 
 ### AI Panel — Action-Driven + Persistence-Aware
 
-- [ ] Clicking an action tab (Summarize / Rewrite / Expand) selects it without triggering generation
-- [ ] Empty state shown when no generation exists for the selected action
-- [ ] "Generate" button triggers generation for the selected action
-- [ ] Result appears in the panel after generation (driven by persisted data, not ephemeral state)
-- [ ] Switching tabs shows the correct persisted result for each action independently
-- [ ] Reload the page — previously generated results are still shown for each action
-- [ ] Edit the document content after generating → stale note appears
-- [ ] Stale note reads: "This result may be outdated. It was generated from an earlier version of this document."
-- [ ] No stale note shown when content matches the snapshot exactly
-- [ ] "Regenerate" button appears when a result exists; clicking it creates a new generation
-- [ ] While generating (pending): Regenerate shows "Running…" and is disabled
-- [ ] While generating with no existing result: "Running…" text shown in panel
-- [ ] Replace content, Insert below, Copy all work on persisted results
-- [ ] Only one action can be pending at a time (Generate/Regenerate disabled while any action runs)
+- [x] Clicking an action tab (Summarize / Rewrite / Expand) selects it without triggering generation
+- [x] Empty state shown when no generation exists for the selected action
+- [x] "Generate" button triggers generation for the selected action
+- [x] Result appears in the panel after generation (driven by persisted data, not ephemeral state)
+- [x] Switching tabs shows the correct persisted result for each action independently
+- [x] Reload the page — previously generated results are still shown for each action
+- [x] Edit the document content after generating → stale note appears
+- [x] Stale note reads: "This result may be outdated. It was generated from an earlier version of this document."
+- [x] No stale note shown when content matches the snapshot exactly
+- [x] "Regenerate" button appears when viewing the latest result; clicking it creates a new generation
+- [x] "Regenerate" is hidden when viewing an older history item — "Back to latest" shown instead
+- [x] While generating (pending): Regenerate shows "Running…" and is disabled
+- [x] While generating with no existing result: "Running…" text shown in panel
+- [x] Replace content, Insert below, Copy all work on persisted results
+- [x] Only one action can be pending at a time (Generate/Regenerate disabled while any action runs)
+
+### AI Panel — Loading / Error States
+
+- [x] On first page load, skeleton appears in panel while generations are fetching
+- [x] Skeleton only shows when an action tab is selected
+- [x] Error state shows "Couldn't load your previous results." with "Try again" button if fetch fails
+- [x] "Try again" refetches successfully and restores the panel
+- [x] Action tabs remain clickable during loading and error states
+
+### AI Panel — History List
+
+- [x] Generate a result — latest shown in main result area, no "Previous" section yet
+- [x] Regenerate once or twice — "Previous" section appears below with older items
+- [x] Click an older history item — result area updates, "Back to latest" appears, "Regenerate" hides
+- [x] Click "Back to latest" — panel returns to newest result, "Regenerate" reappears
+- [x] Switch action tabs — selection resets, no stale history selection carries across actions
+- [x] Generate a new result while viewing an older item — panel resets to the new latest
+- [x] Staleness note only appears when viewing the latest result, not older items
+- [x] Replace content / Insert below / Copy all work on whichever result is currently displayed
+- [x] History item timestamps display correctly (e.g. "2m ago", "1h ago")
+- [x] History item snippet shows first ~80 chars of output text
