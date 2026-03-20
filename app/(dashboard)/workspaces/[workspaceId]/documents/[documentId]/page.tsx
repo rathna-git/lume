@@ -25,22 +25,28 @@ function AiPanel({
     content,
     selectedAction,
     generations,
+    generationsLoading,
+    generationsError,
     pendingAction,
     onSelectAction,
     onGenerate,
     onReplace,
     onInsertBelow,
     onCopy,
+    onRetry,
 }: {
     content: string
     selectedAction: AiAction | null
     generations: AiGeneration[]
+    generationsLoading: boolean
+    generationsError: boolean
     pendingAction: AiAction | null
     onSelectAction: (action: AiAction) => void
     onGenerate: (action: AiAction) => void
     onReplace: (text: string) => void
     onInsertBelow: (text: string) => void
     onCopy: (text: string) => void
+    onRetry: () => void
 }) {
     const persisted = selectedAction
         ? (generations.find(
@@ -78,8 +84,33 @@ function AiPanel({
                 </div>
             </div>
 
+            {/* Generations loading state */}
+            {generationsLoading && selectedAction && (
+                <div className="flex flex-col gap-2 pt-4 border-t border-border animate-pulse">
+                    <div className="h-2.5 bg-muted rounded w-1/3" />
+                    <div className="h-2.5 bg-muted rounded w-full mt-1" />
+                    <div className="h-2.5 bg-muted rounded w-5/6" />
+                    <div className="h-2.5 bg-muted rounded w-4/6" />
+                </div>
+            )}
+
+            {/* Generations error state */}
+            {generationsError && !generationsLoading && (
+                <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground/60 leading-relaxed">
+                        Couldn&apos;t load your previous results.
+                    </p>
+                    <button
+                        onClick={onRetry}
+                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                    >
+                        Try again
+                    </button>
+                </div>
+            )}
+
             {/* Result area for selected action */}
-            {selectedAction && (
+            {selectedAction && !generationsLoading && !generationsError && (
                 <div className="flex flex-col gap-3 pt-4 border-t border-border">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
@@ -177,7 +208,7 @@ function DocumentEditor({
     const { mutate: updateDocument } = useUpdateDocument()
     const { mutate: deleteDocument, isPending: deletePending } = useDeleteDocument()
     const { mutate: generateAi } = useGenerateAi()
-    const { data: generationsData } = useAiGenerations(documentId)
+    const { data: generationsData, isLoading: generationsLoading, isError: generationsError, refetch: retryGenerations } = useAiGenerations(documentId)
 
     const generations = generationsData ?? []
 
@@ -308,12 +339,15 @@ function DocumentEditor({
                         content={content}
                         selectedAction={selectedAction}
                         generations={generations}
+                        generationsLoading={generationsLoading}
+                        generationsError={generationsError}
                         pendingAction={pendingAction}
                         onSelectAction={setSelectedAction}
                         onGenerate={handleGenerate}
                         onReplace={handleReplace}
                         onInsertBelow={handleInsertBelow}
                         onCopy={handleCopy}
+                        onRetry={retryGenerations}
                     />
                 </div>
             </div>

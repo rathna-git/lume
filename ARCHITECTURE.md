@@ -288,11 +288,13 @@ AiGeneration
 
 - [x] Add AI history panel per document — action-driven panel shows latest persisted result per action type
 - [x] Add explicit regenerate flow separate from viewing existing results
-- [ ] Add loading / empty / error states for AI history retrieval
+- [x] Add loading / empty / error states for AI history retrieval
 - [ ] Audit persisted server data currently held only in local UI state
 
 ### Lower Priority
 
+- [ ] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
+- [ ] Replace `<textarea>` editor with Tiptap rich text editor — enables formatting toolbar, and allows markdown-to-rich-text insert from AI panel
 - [ ] Add filtering / sorting for AI generations
 - [ ] Define retention / versioning strategy for AI outputs
 - [ ] Harden Clerk webhook sync flow post-MVP

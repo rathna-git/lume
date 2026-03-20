@@ -6,6 +6,30 @@
 
 ## 2026-03-19
 
+### AI Panel — Loading / Empty / Error States
+
+#### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+- Added `generationsLoading`, `generationsError`, `onRetry` props to `AiPanel`
+- Loading state: animated skeleton (4 rows, `animate-pulse`) shown below action tabs when `useAiGenerations` is in-flight; only appears on first mount since `staleTime: Infinity`
+- Error state: "Couldn't load your previous results." + "Try again" button that calls `refetch`; shown when query fails
+- Result area (empty state, persisted result, pending) now guarded by `!generationsLoading && !generationsError` — three states are mutually exclusive
+- Action tabs remain visible and interactive in all states
+- `DocumentEditor` now destructures `isLoading`, `isError`, `refetch` from `useAiGenerations` and passes them down
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Loading skeleton, error state with retry, guarded result area |
+
+### Up Next
+
+- Audit persisted server data currently held only in local UI state
+- Markdown rendering in AI panel (react-markdown) — lower priority
+- Rich text editor with formatting toolbar (Tiptap) — lower priority
+
+---
+
 ### AI Panel — Action-Driven + Persistence-Aware
 
 #### Generations route (`app/api/documents/[documentId]/generations/route.ts`)
