@@ -6,7 +6,49 @@
 
 ## 2026-03-19
 
+### AI Panel — History List per Action
+
+#### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+- Added `relativeTime` inline helper — formats `createdAt` as `Xm ago / Xh ago / Xd ago`
+- Added `selectedGenerationId: string | null` state to `DocumentEditor` — `null` means show latest
+- Added `handleSelectAction` — wraps `setSelectedAction`, also resets `selectedGenerationId` to `null` on tab switch
+- `handleGenerate` `onSuccess` now also resets `selectedGenerationId` to `null` — panel snaps to newest after regenerate
+- `AiPanel` derives `actionGenerations` (all SUCCESS for selected action), `latest` (index 0), `displayed` (by id or latest), `isViewingLatest`, `olderGenerations` (slice(1))
+- Staleness detection now only applies when `isViewingLatest` — older items never show the stale note
+- Regenerate button only shown when `isViewingLatest` — replaced by "Back to latest" when viewing an older item
+- "Previous" section rendered below result area when `olderGenerations.length > 0` — compact list with relative timestamp + 80-char text snippet
+- Clicking a history item sets `selectedGenerationId` and updates the displayed result
+- Selected history item has a subtle `bg-muted` + `border-border` highlight
+
+### Files Modified
+
+| File | Status | Notes |
+|---|---|---|
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | History list, selectedGenerationId state, relativeTime helper |
+
+### Manual Test Checklist — AI History List
+
+- [ ] Generate a result — latest shown in main result area, no "Previous" section yet
+- [ ] Regenerate once or twice — "Previous" section appears below with older items
+- [ ] Click an older history item — result area updates to that item, "Back to latest" appears in header, "Regenerate" hides
+- [ ] Click "Back to latest" — panel returns to newest result, "Regenerate" reappears
+- [ ] Switch action tabs — selection resets, no stale `selectedGenerationId` carries across actions
+- [ ] Generate a new result while viewing an older item — panel resets to the new latest
+- [ ] Staleness note only appears when viewing the latest result, not older items
+- [ ] Replace content / Insert below / Copy all work on whichever result is currently displayed
+- [ ] History item timestamps display correctly (e.g. "2m ago", "1h ago")
+- [ ] History item snippet shows first ~80 chars of output text
+
+### Up Next
+
+- Audit persisted server data currently held only in local UI state
+- Markdown rendering in AI panel (react-markdown) — lower priority
+- Rich text editor with formatting toolbar (Tiptap) — lower priority
+
+---
+
 ### AI Panel — Loading / Empty / Error States
+
 
 #### Editor page (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
 - Added `generationsLoading`, `generationsError`, `onRetry` props to `AiPanel`

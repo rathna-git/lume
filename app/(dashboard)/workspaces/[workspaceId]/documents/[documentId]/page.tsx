@@ -21,14 +21,25 @@ const ACTION_LABEL: Record<AiAction, string> = {
     expand: "Expand",
 }
 
+function relativeTime(dateStr: string) {
+    const mins = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000)
+    if (mins < 1) return "just now"
+    if (mins < 60) return `${mins}m ago`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs}h ago`
+    return `${Math.floor(hrs / 24)}d ago`
+}
+
 function AiPanel({
     content,
     selectedAction,
     generations,
     generationsLoading,
     generationsError,
+    selectedGenerationId,
     pendingAction,
     onSelectAction,
+    onSelectGeneration,
     onGenerate,
     onReplace,
     onInsertBelow,
@@ -40,22 +51,31 @@ function AiPanel({
     generations: AiGeneration[]
     generationsLoading: boolean
     generationsError: boolean
+    selectedGenerationId: string | null
     pendingAction: AiAction | null
     onSelectAction: (action: AiAction) => void
+    onSelectGeneration: (id: string | null) => void
     onGenerate: (action: AiAction) => void
     onReplace: (text: string) => void
     onInsertBelow: (text: string) => void
     onCopy: (text: string) => void
     onRetry: () => void
 }) {
-    const persisted = selectedAction
-        ? (generations.find(
+    const actionGenerations = selectedAction
+        ? generations.filter(
               (g) => g.type === selectedAction.toUpperCase() && g.status === "SUCCESS"
-          ) ?? null)
-        : null
+          )
+        : []
 
-    const isStale = !!(
-        persisted?.inputSnapshot != null && persisted.inputSnapshot !== content
+    const latest = actionGenerations[0] ?? null
+    const displayed = selectedGenerationId
+        ? (actionGenerations.find((g) => g.id === selectedGenerationId) ?? latest)
+        : latest
+    const isViewingLatest = displayed?.id === latest?.id
+    const olderGenerations = actionGenerations.slice(1)
+
+    const isStale = isViewingLatest && !!(
+        displayed?.inputSnapshot != null && displayed.inputSnapshot !== content
     )
     const isPending = pendingAction === selectedAction && selectedAction !== null
     const anyPending = pendingAction !== null
@@ -116,24 +136,34 @@ function AiPanel({
                         <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
                             {ACTION_LABEL[selectedAction]}
                         </span>
-                        {persisted && (
-                            <button
-                                onClick={() => onGenerate(selectedAction)}
-                                disabled={anyPending || !content.trim()}
-                                className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                                {isPending ? "Running…" : "Regenerate"}
-                            </button>
-                        )}
+                        <div className="flex items-center gap-3">
+                            {!isViewingLatest && (
+                                <button
+                                    onClick={() => onSelectGeneration(null)}
+                                    className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors"
+                                >
+                                    Back to latest
+                                </button>
+                            )}
+                            {displayed && isViewingLatest && (
+                                <button
+                                    onClick={() => onGenerate(selectedAction)}
+                                    disabled={anyPending || !content.trim()}
+                                    className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    {isPending ? "Running…" : "Regenerate"}
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Pending, no existing result */}
-                    {isPending && !persisted && (
+                    {isPending && !displayed && (
                         <p className="text-xs text-muted-foreground/50">Running…</p>
                     )}
 
                     {/* Empty state */}
-                    {!persisted && !isPending && (
+                    {!displayed && !isPending && (
                         <div className="flex flex-col gap-3">
                             <p className="text-xs text-muted-foreground/50 leading-relaxed">
                                 No {ACTION_LABEL[selectedAction].toLowerCase()} yet.
@@ -148,8 +178,8 @@ function AiPanel({
                         </div>
                     )}
 
-                    {/* Persisted result */}
-                    {persisted?.output?.text && (
+                    {/* Displayed result */}
+                    {displayed?.output?.text && (
                         <>
                             {isStale && (
                                 <p className="text-xs text-muted-foreground/60 italic leading-relaxed">
@@ -158,30 +188,57 @@ function AiPanel({
                             )}
                             <div className="max-h-[40vh] overflow-y-auto">
                                 <p className="text-[0.875rem] leading-relaxed text-foreground whitespace-pre-wrap">
-                                    {persisted.output.text}
+                                    {displayed.output.text}
                                 </p>
                             </div>
                             <div className="flex flex-col gap-1.5 pt-3 border-t border-border">
                                 <button
-                                    onClick={() => onReplace(persisted.output!.text)}
+                                    onClick={() => onReplace(displayed.output!.text)}
                                     className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
                                 >
                                     Replace content
                                 </button>
                                 <button
-                                    onClick={() => onInsertBelow(persisted.output!.text)}
+                                    onClick={() => onInsertBelow(displayed.output!.text)}
                                     className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
                                 >
                                     Insert below
                                 </button>
                                 <button
-                                    onClick={() => onCopy(persisted.output!.text)}
+                                    onClick={() => onCopy(displayed.output!.text)}
                                     className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
                                 >
                                     Copy
                                 </button>
                             </div>
                         </>
+                    )}
+
+                    {/* Previous results */}
+                    {olderGenerations.length > 0 && (
+                        <div className="flex flex-col gap-1 pt-3 border-t border-border">
+                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-1">
+                                Previous
+                            </p>
+                            {olderGenerations.map((g) => (
+                                <button
+                                    key={g.id}
+                                    onClick={() => onSelectGeneration(g.id)}
+                                    className={`text-left rounded-lg px-2.5 py-2 transition-colors border ${
+                                        displayed?.id === g.id
+                                            ? "border-border bg-muted"
+                                            : "border-transparent hover:bg-muted/60"
+                                    }`}
+                                >
+                                    <span className="text-[10px] text-muted-foreground/50 block mb-0.5">
+                                        {relativeTime(g.createdAt)}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground line-clamp-1">
+                                        {g.output?.text?.slice(0, 80) ?? "—"}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
                     )}
                 </div>
             )}
@@ -216,7 +273,13 @@ function DocumentEditor({
     const [content, setContent] = useState(doc.content ?? "")
     const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle")
     const [selectedAction, setSelectedAction] = useState<AiAction | null>(null)
+    const [selectedGenerationId, setSelectedGenerationId] = useState<string | null>(null)
     const [pendingAction, setPendingAction] = useState<AiAction | null>(null)
+
+    function handleSelectAction(action: AiAction) {
+        setSelectedAction(action)
+        setSelectedGenerationId(null)
+    }
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -249,7 +312,7 @@ function DocumentEditor({
         generateAi(
             { documentId, action, content },
             {
-                onSuccess: () => setPendingAction(null),
+                onSuccess: () => { setPendingAction(null); setSelectedGenerationId(null) },
                 onError: () => setPendingAction(null),
             }
         )
@@ -341,8 +404,10 @@ function DocumentEditor({
                         generations={generations}
                         generationsLoading={generationsLoading}
                         generationsError={generationsError}
+                        selectedGenerationId={selectedGenerationId}
                         pendingAction={pendingAction}
-                        onSelectAction={setSelectedAction}
+                        onSelectAction={handleSelectAction}
+                        onSelectGeneration={setSelectedGenerationId}
                         onGenerate={handleGenerate}
                         onReplace={handleReplace}
                         onInsertBelow={handleInsertBelow}

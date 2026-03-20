@@ -286,7 +286,7 @@ AiGeneration
 
 ### Medium Priority
 
-- [x] Add AI history panel per document — action-driven panel shows latest persisted result per action type
+- [x] Add AI history panel per document — action-driven panel shows latest persisted result per action type; history list shows older results per action with relative timestamps and snippet previews
 - [x] Add explicit regenerate flow separate from viewing existing results
 - [x] Add loading / empty / error states for AI history retrieval
 - [ ] Audit persisted server data currently held only in local UI state
