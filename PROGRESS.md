@@ -558,18 +558,6 @@
 
 ---
 
-## Backlog / Up Next
-
-- [ ] Fill in `.env.local` with real DATABASE_URL, Clerk keys, OpenAI key
-- [ ] `lib/prisma.ts` — Prisma singleton client
-- [ ] `prisma/schema.prisma` — data models
-- [ ] First database migration
-- [ ] TanStack Query provider
-- [ ] Clerk setup in root layout + auth pages
-- [ ] Middleware — route protection
-
----
-
 ## Manual Test Checklist
 
 ### Auth
