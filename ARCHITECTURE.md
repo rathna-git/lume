@@ -29,55 +29,55 @@ app/
 │   ├── sign-in/[[...sign-in]]/page.tsx
 │   └── sign-up/[[...sign-up]]/page.tsx
 ├── (dashboard)/
-│   ├── layout.tsx                  ← app shell (sidebar + header)
+│   ├── layout.tsx                  ← app shell + user bootstrap
 │   ├── page.tsx                    ← redirects to /workspaces
 │   ├── workspaces/
-│   │   ├── page.tsx                ← workspace list
+│   │   ├── page.tsx                ← workspace list + create dialog
 │   │   └── [workspaceId]/
-│   │       ├── page.tsx            ← workspace overview + doc list
+│   │       ├── page.tsx            ← workspace detail + doc list + rename/delete
 │   │       └── documents/
 │   │           └── [documentId]/
-│   │               └── page.tsx    ← document editor
+│   │               └── page.tsx    ← document editor + AI panel
 │   └── settings/
 │       └── page.tsx
 ├── api/
-│   ├── webhooks/clerk/route.ts     ← sync Clerk user → DB
 │   ├── workspaces/
 │   │   ├── route.ts                ← GET list, POST create
 │   │   └── [workspaceId]/route.ts  ← GET, PATCH, DELETE
 │   ├── documents/
 │   │   ├── route.ts                ← GET list, POST create
-│   │   └── [documentId]/route.ts   ← GET, PATCH, DELETE
+│   │   └── [documentId]/
+│   │       ├── route.ts            ← GET, PATCH, DELETE
+│   │       └── generations/route.ts← GET — AI generations for document
 │   └── ai/
-│       └── generate/route.ts       ← POST — AI actions
+│       └── generate/route.ts       ← POST — AI actions (summarize/rewrite/expand)
 ├── layout.tsx                      ← root layout, fonts, metadata
 └── page.tsx                        ← public landing page
 
 components/
-├── ui/                             ← shadcn (auto-generated, do not edit)
+├── ui/                             ← shadcn primitives (button, dialog, input)
 ├── logo.tsx                        ← LumeMark + LumeLogo
+├── providers.tsx                   ← TanStack Query provider + devtools
 ├── layout/
-│   ├── sidebar.tsx
-│   ├── header.tsx
-│   └── app-shell.tsx
+│   ├── sidebar.tsx                 ← nav + active state + Clerk UserButton
+│   └── header.tsx                  ← top bar with optional title
 ├── workspace/
-│   ├── workspace-card.tsx
-│   └── workspace-form.tsx
+│   └── workspace-card.tsx          ← clickable card linking to workspace
 └── document/
-    ├── document-card.tsx
-    └── document-editor.tsx
+    └── document-card.tsx           ← clickable card linking to document editor
 
 lib/
 ├── prisma.ts                       ← Prisma singleton client
 ├── openai.ts                       ← OpenAI singleton client
+├── auth.ts                         ← requireCurrentDbUser() — Clerk → DB bridge
+├── env.ts                          ← server-side env validation
 └── utils.ts                        ← cn() utility (shadcn)
 
 hooks/
-├── use-workspaces.ts               ← TanStack Query hooks
-└── use-documents.ts
-
-types/
-└── index.ts                        ← shared TypeScript types
+├── use-workspaces.ts               ← useWorkspaces, useCreateWorkspace, useUpdateWorkspace, useDeleteWorkspace
+├── use-documents.ts                ← useDocuments, useCreateDocument
+├── use-document.ts                 ← useDocument, useUpdateDocument, useDeleteDocument
+└── use-ai.ts                       ← useGenerateAi, useAiGenerations
 
 prisma/
 └── schema.prisma
@@ -190,9 +190,9 @@ AiGeneration
 |---|---|---|---|
 | Workspace list | Skeleton cards | Toast + retry | "Create your first workspace" CTA |
 | Document list | Skeleton rows | Toast + retry | "No documents yet" with create button |
-| Document editor | Spinner overlay | Inline error banner | Blank editor ready to type |
-| AI generate | Button spinner | Inline error below toolbar | — |
-| AI history (planned) | Skeleton panel | Toast + retry | "No generations yet" message |
+| Document editor | Pulse skeleton card | Inline "Document not found" | Blank editor ready to type |
+| AI generate | "Running…" on button, disabled state | — (error silently clears pendingAction) | "No {action} yet" + Generate button |
+| AI panel | — (uses cached data instantly) | — | Per-action empty state with Generate CTA |
 
 ---
 
@@ -259,8 +259,14 @@ AiGeneration
 - [x] Document API routes (GET list, POST create)
 - [x] Workspace detail page (document list)
 - [x] Document editor + autosave
-- [x] AI route
+- [x] AI route (POST generate — summarize / rewrite / expand)
 - [x] Document delete
+- [x] Workspace PATCH route + rename UI
+- [x] Workspace DELETE route + delete UI (cascade via Prisma)
+- [x] AI generations read route (GET — auth + ownership + newest-first)
+- [x] `useAiGenerations` hook (`staleTime: Infinity`, invalidated after mutation)
+- [x] Two-surface editor layout (editor card + persistent AI panel)
+- [x] Action-driven AI panel (tabs select view; Generate / Regenerate explicit; staleness via `inputSnapshot`)
 
 ---
 
