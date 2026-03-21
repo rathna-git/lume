@@ -4,6 +4,57 @@
 
 ---
 
+## 2026-03-21
+
+### Production Build Pass + Bug Fixes
+
+#### Build error — Clerk `UserButton` prop removed (`components/layout/sidebar.tsx`)
+
+- `afterSignOutUrl` was removed in Clerk v7 — prop no longer exists on `UserButton`
+- Removed the prop; Clerk v7 redirects to `/` after sign-out by default
+
+#### Build warning — conflicting lockfiles
+
+- Stray `package.json` + `package-lock.json` existed at `/Users/rathnac/` (leftover from a gsap/three.js experiment)
+- Deleted both files — Next.js no longer detects a conflicting lockfile above the project root
+- Added `outputFileTracingRoot: path.join(__dirname)` to `next.config.ts` to pin the tracing root to the project directory
+
+#### Build warning — deprecated `middleware` file convention
+
+- Next.js 16 deprecated `middleware.ts` in favour of `proxy.ts`
+- Renamed `middleware.ts` → `proxy.ts`; updated export name from `middleware` to `proxy`
+
+#### AI panel — staleness false positive after "Replace content"
+
+- **Bug:** clicking "Replace content" set the editor content to the AI output, but the panel still showed the stale warning because `inputSnapshot !== content`
+- **Fix:** staleness now clears when `content === outputText` (the generated result) in addition to `content === inputSnapshot`
+- Edge case preserved: if the user edits further after replacing, content drifts from both and the stale note reappears correctly
+- Only `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` changed
+
+#### Result
+
+- `pnpm build` compiles successfully with no TypeScript errors or warnings
+- `pnpm start` serves the production build correctly
+
+### Files Modified
+
+| File                                                                       | Status   | Notes                                                             |
+| -------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------- |
+| `components/layout/sidebar.tsx`                                            | Modified | Removed deprecated `afterSignOutUrl` prop from `UserButton`       |
+| `next.config.ts`                                                           | Modified | Added `outputFileTracingRoot` + `path` import                     |
+| `middleware.ts` → `proxy.ts`                                               | Renamed  | File renamed; export renamed from `middleware` to `proxy`         |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Staleness logic updated — not stale when content matches output   |
+
+### Up Next
+
+- **Deployment pass** — deploy to Vercel, wire production env vars, verify all features in prod
+- Replace `confirm()` on document delete with a proper confirmation dialog
+- Audit persisted server data currently held only in local UI state
+- Markdown rendering in AI panel (react-markdown) — lower priority
+- Rich text editor with formatting toolbar (Tiptap) — lower priority
+
+---
+
 ## 2026-03-19
 
 ### AI Panel — History List per Action

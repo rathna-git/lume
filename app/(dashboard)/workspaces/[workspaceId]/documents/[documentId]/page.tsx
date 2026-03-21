@@ -74,8 +74,13 @@ function AiPanel({
     const isViewingLatest = displayed?.id === latest?.id
     const olderGenerations = actionGenerations.slice(1)
 
+    const outputText = displayed?.output != null && typeof (displayed.output as { text?: string }).text === "string"
+        ? (displayed.output as { text: string }).text
+        : null
     const isStale = isViewingLatest && !!(
-        displayed?.inputSnapshot != null && displayed.inputSnapshot !== content
+        displayed?.inputSnapshot != null &&
+        displayed.inputSnapshot !== content &&
+        outputText !== content
     )
     const isPending = pendingAction === selectedAction && selectedAction !== null
     const anyPending = pendingAction !== null

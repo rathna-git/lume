@@ -46,7 +46,7 @@ export function Sidebar() {
 
             {/* User */}
             <div className="px-5 py-4 border-t border-border">
-                <UserButton afterSignOutUrl="/" />
+                <UserButton />
             </div>
         </aside>
     )

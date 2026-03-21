@@ -207,13 +207,12 @@ AiGeneration
 - `useAiGenerations(documentId)` fetches and caches saved generations (`staleTime: Infinity`); invalidated after each successful mutation
 - Editor uses a two-surface layout: editor card (left) + AI panel (right, sticky)
 - AI panel is action-driven: selecting a tab shows the latest `SUCCESS` generation for that type
-- Staleness: `persisted.inputSnapshot !== content` — if content has changed since generation, a subtle note is shown
+- Staleness: shown when `content !== inputSnapshot && content !== outputText` — clears after "Replace content" because content then matches the output exactly
 - Regenerate always available when a result exists; fires the same mutation, creates a new row, invalidation refreshes the panel
 
 ### Planned
 
-- AI generation history list per action (all past runs, not just latest)
-- Loading / error states for `useAiGenerations` within the panel
+_(none — all planned items shipped)_
 
 ---
 
@@ -234,6 +233,8 @@ AiGeneration
 | `staleTime: Infinity` on `useAiGenerations` | Generations only change when the user explicitly runs a new action — no background source can mutate them | Must ensure `invalidateQueries` is always called after successful mutation or cache will be stale |
 | AI panel action tabs select view, not trigger generation | Separates navigation from side effects — user can browse results without accidentally firing API calls | Generate/Regenerate must be a deliberate explicit action |
 | `inputSnapshot` staleness over timestamp-based staleness | Content drift is the relevant signal, not time; comparing snapshots directly tells us whether the result is still valid for the current document | Simple string equality — no diffing, no normalization; whitespace differences will mark as stale |
+| Staleness clears when `content === outputText` | "Replace content" sets editor to the AI output, so the result is immediately valid — stale note should not fire | Relies on exact string equality; any post-replace edit re-triggers stale correctly |
+| `proxy.ts` instead of `middleware.ts` | Next.js 16 deprecated the `middleware` file convention in favour of `proxy` | Rename required; export name also changed from `middleware` to `proxy` |
 | Single `pendingAction` state gates all generate buttons | Prevents overlapping mutations and keeps panel state predictable | Only one action can run at a time; users cannot queue multiple generations |
 
 ---
