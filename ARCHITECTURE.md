@@ -302,3 +302,8 @@ _(none — all planned items shipped)_
 - [ ] Add filtering / sorting for AI generations
 - [ ] Define retention / versioning strategy for AI outputs
 - [ ] Harden Clerk webhook sync flow post-MVP
+- [ ] Add rate limiting to `POST /api/ai/generate` — prevent cost abuse from repeated AI calls
+- [ ] Add timeout to OpenAI API call — prevent serverless function from hanging on slow/unresponsive OpenAI responses
+- [ ] Add error logging in API route catch blocks — currently errors fail silently with no observability
+- [ ] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
+- [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation

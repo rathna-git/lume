@@ -6,6 +6,22 @@
 
 ## 2026-03-21
 
+### Pre-Deploy Audit + ReactQueryDevtools Fix
+
+- Audited codebase for build-time issues, type issues, env assumptions, client/server boundaries, and production pitfalls
+- Fixed `ReactQueryDevtools` rendering unconditionally in production — now gated behind `process.env.NODE_ENV === "development"` in `components/providers.tsx`
+- Confirmed Prisma and OpenAI singleton patterns (`!== "production"` check) are correct per official recommendations — no change needed
+- Added 5 post-deploy improvement todos to ARCHITECTURE.md: rate limiting, OpenAI timeout, error logging, AI generations cache cleanup on document delete, debounce cleanup on unmount
+
+### Files Modified
+
+| File                        | Status   | Notes                                          |
+| --------------------------- | -------- | ---------------------------------------------- |
+| `components/providers.tsx`  | Modified | ReactQueryDevtools gated to development only   |
+| `ARCHITECTURE.md`           | Modified | 5 post-deploy improvement todos added          |
+
+---
+
 ### Settings Page (Placeholder)
 
 - Created `app/(dashboard)/settings/page.tsx` — resolves the 404 on the existing sidebar `/settings` link
