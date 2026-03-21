@@ -302,8 +302,10 @@ _(none — all planned items shipped)_
 - [ ] Add filtering / sorting for AI generations
 - [ ] Define retention / versioning strategy for AI outputs
 - [ ] Harden Clerk webhook sync flow post-MVP
+- [ ] Future: migrate document content storage to AWS S3 — store content as files in S3, save S3 URL in the Neon `Document` table instead of storing raw text in the DB; improves scalability for large documents
 - [ ] Add rate limiting to `POST /api/ai/generate` — prevent cost abuse from repeated AI calls
 - [ ] Add timeout to OpenAI API call — prevent serverless function from hanging on slow/unresponsive OpenAI responses
 - [ ] Add error logging in API route catch blocks — currently errors fail silently with no observability
 - [ ] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
 - [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation
+- [ ] Disable "Insert below" button after "Replace content" is clicked — prevents duplicate content when the displayed result is already the full editor content
