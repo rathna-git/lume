@@ -39,7 +39,7 @@ app/
 │   │           └── [documentId]/
 │   │               └── page.tsx    ← document editor + AI panel
 │   └── settings/
-│       └── page.tsx
+│       └── page.tsx                ← placeholder settings page
 ├── api/
 │   ├── workspaces/
 │   │   ├── route.ts                ← GET list, POST create

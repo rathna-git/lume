@@ -6,6 +6,22 @@
 
 ## 2026-03-21
 
+### Settings Page (Placeholder)
+
+- Created `app/(dashboard)/settings/page.tsx` — resolves the 404 on the existing sidebar `/settings` link
+- Page includes: `Account` section label, serif `Settings` heading, short description, and a "Coming soon" card
+- No forms or real settings functionality — intentional placeholder consistent with Lume styling
+
+### Files Created
+
+| File                                   | Status  | Notes                                   |
+| -------------------------------------- | ------- | --------------------------------------- |
+| `app/(dashboard)/settings/page.tsx`    | Created | Placeholder settings page, no 404       |
+
+---
+
+
+
 ### Production Build Pass + Bug Fixes
 
 #### Build error — Clerk `UserButton` prop removed (`components/layout/sidebar.tsx`)
