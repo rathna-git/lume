@@ -57,7 +57,7 @@ app/
 components/
 ├── ui/                             ← shadcn primitives (button, dialog, input)
 ├── logo.tsx                        ← LumeMark + LumeLogo
-├── providers.tsx                   ← TanStack Query provider + devtools
+├── providers.tsx                   ← TanStack Query provider + devtools (dev only)
 ├── layout/
 │   ├── sidebar.tsx                 ← nav + active state + Clerk UserButton
 │   └── header.tsx                  ← top bar with optional title
@@ -174,7 +174,7 @@ AiGeneration
 | `/workspaces/[id]` | Protected page | Workspace + document list |
 | `/workspaces/[id]/documents/[id]` | Protected page | Document editor |
 | `/settings` | Protected page | User settings |
-| `POST /api/webhooks/clerk` | API | Sync Clerk user to DB |
+| `POST /api/webhooks/clerk` | API | Sync Clerk user to DB _(not implemented — server-side bootstrap used instead)_ |
 | `GET/POST /api/workspaces` | API | List / create workspaces |
 | `GET/PATCH/DELETE /api/workspaces/[id]` | API | Single workspace |
 | `GET/POST /api/documents` | API | List / create documents |
@@ -188,11 +188,11 @@ AiGeneration
 
 | Screen | Loading | Error | Empty |
 |---|---|---|---|
-| Workspace list | Skeleton cards | Toast + retry | "Create your first workspace" CTA |
-| Document list | Skeleton rows | Toast + retry | "No documents yet" with create button |
+| Workspace list | Skeleton cards | Inline "Something went wrong" text | "No workspaces yet" CTA |
+| Document list | Skeleton rows | Inline "Something went wrong" text | "No documents yet" with create button |
 | Document editor | Pulse skeleton card | Inline "Document not found" | Blank editor ready to type |
-| AI generate | "Running…" on button, disabled state | — (error silently clears pendingAction) | "No {action} yet" + Generate button |
-| AI panel | — (uses cached data instantly) | — | Per-action empty state with Generate CTA |
+| AI generate | "Running…" on button, disabled state | Error silently clears `pendingAction` | "No {action} yet" + Generate button |
+| AI panel | Animated skeleton (4 rows, action tab must be selected) | "Couldn't load your previous results." + "Try again" | Per-action empty state with Generate CTA |
 
 ---
 
@@ -228,7 +228,7 @@ _(none — all planned items shipped)_
 | Tags as many-to-many | Proper relational model | Join table adds complexity; simplify to string[] if needed |
 | No `src/` directory | Flatter, cleaner root | Personal preference — consistent across team |
 | Use server-side user bootstrap for MVP instead of webhook-first sync | Simplifies local development and avoids ngrok/webhook setup during early build phase | Webhook still required later for production-grade sync guarantees |
-| Persist AI generations before building read flow | Preserves outputs and avoids schema churn later | UI currently behaves as if AI results are temporary |
+| Persist AI generations before building read flow | Preserves outputs and avoids schema churn later | AI panel is now fully persistence-driven via `useAiGenerations` |
 | Split page into shell + editor components for async data init | Avoids `useEffect` state seeding; state initialized directly from props at mount | Adds one level of component nesting |
 | `staleTime: Infinity` on `useAiGenerations` | Generations only change when the user explicitly runs a new action — no background source can mutate them | Must ensure `invalidateQueries` is always called after successful mutation or cache will be stale |
 | AI panel action tabs select view, not trigger generation | Separates navigation from side effects — user can browse results without accidentally firing API calls | Generate/Regenerate must be a deliberate explicit action |
