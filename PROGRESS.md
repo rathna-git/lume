@@ -189,21 +189,6 @@
 | -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------- |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | History list, selectedGenerationId state, relativeTime helper |
 
-### Manual Test Checklist — AI History List
-
-> All tests performed and passed on 2026-03-19.
-
-- [x] Generate a result — latest shown in main result area, no "Previous" section yet
-- [x] Regenerate once or twice — "Previous" section appears below with older items
-- [x] Click an older history item — result area updates to that item, "Back to latest" appears in header, "Regenerate" hides
-- [x] Click "Back to latest" — panel returns to newest result, "Regenerate" reappears
-- [x] Switch action tabs — selection resets, no stale `selectedGenerationId` carries across actions
-- [x] Generate a new result while viewing an older item — panel resets to the new latest
-- [x] Staleness note only appears when viewing the latest result, not older items
-- [x] Replace content / Insert below / Copy all work on whichever result is currently displayed
-- [x] History item timestamps display correctly (e.g. "2m ago", "1h ago")
-- [x] History item snippet shows first ~80 chars of output text
-
 ### Up Next
 
 - **Deployment pass** — deploy to Vercel, wire production env vars, verify all features in prod
