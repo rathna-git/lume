@@ -6,6 +6,16 @@
 
 ## 2026-03-21
 
+### Deployment Pass — Vercel
+
+- Deployed Lume to Vercel at https://lume-psi-teal.vercel.app/
+- Wired all production env vars: `DATABASE_URL`, `CLERK_SECRET_KEY`, `OPENAI_API_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `NEXT_PUBLIC_CLERK_SIGN_IN_URL`, `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
+- All features verified end-to-end in production: auth, workspaces, documents, autosave, AI panel (generate / regenerate / history / persistence), settings page
+
+---
+
+
+
 ### Pre-Deploy Audit + ReactQueryDevtools Fix
 
 - Audited codebase for build-time issues, type issues, env assumptions, client/server boundaries, and production pitfalls

@@ -287,7 +287,7 @@ _(none — all planned items shipped)_
 
 ### Medium Priority
 
-- [ ] Deployment pass — deploy to Vercel, wire production env vars, verify all features end-to-end in prod
+- [x] Deployment pass — deployed to https://lume-psi-teal.vercel.app/; all features verified end-to-end in prod
 - [x] Add AI history panel per document — action-driven panel shows latest persisted result per action type; history list shows older results per action with relative timestamps and snippet previews
 - [x] Add explicit regenerate flow separate from viewing existing results
 - [x] Add loading / empty / error states for AI history retrieval
