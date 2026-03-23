@@ -16,8 +16,8 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-| ---- | ------ | ----- |
+| File                                                                       | Status   | Notes                                                                                                           |
+| -------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Added `onRevert` prop to `AiPanel`; `handleRevert` in `DocumentEditor`; conditional "Revert to original" button |
 
 ---
@@ -32,15 +32,15 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-| ---- | ------ | ----- |
+| File                                                                       | Status   | Notes                                                                        |
+| -------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------- |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Replaced `<p>` plain-text output with `ReactMarkdown` + custom component map |
 
 ### Dependencies Added
 
-| Package | Version | Notes |
-| ------- | ------- | ----- |
-| `react-markdown` | latest | Lightweight markdown renderer; no remark plugins needed |
+| Package          | Version | Notes                                                   |
+| ---------------- | ------- | ------------------------------------------------------- |
+| `react-markdown` | latest  | Lightweight markdown renderer; no remark plugins needed |
 
 ---
 
@@ -55,8 +55,8 @@
 
 ### Files Modified
 
-| File | Status | Notes |
-| ---- | ------ | ----- |
+| File                                                                       | Status   | Notes                                                                                                      |
+| -------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
 | `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Replaced `confirm()` with Dialog; added `deleteOpen`, `deleteError` state; loading state on confirm button |
 
 ---
@@ -835,6 +835,10 @@
 - [x] Create document → redirects to editor
 - [x] Autosave works (title + content)
 - [x] Delete document → redirects to workspace page
+- [x] Delete document → confirm dialog appears before deleting
+- [x] Cancel delete dialog → document unchanged
+- [x] Confirm delete → spinner shows, redirected to workspace, document removed from list
+- [x] Delete error → dialog stays open with inline error message; button disabled while in-flight
 
 ### AI
 
@@ -884,25 +888,14 @@
 - [x] History item timestamps display correctly (e.g. "2m ago", "1h ago")
 - [x] History item snippet shows first ~80 chars of output text
 
-### Document Delete Confirmation Dialog
+### AI Panel — Markdown Rendering & Revert to Original
 
-- [ ] Open any document → click **Delete** in the top-right header → confirm dialog appears
-- [ ] Click **Cancel** in the dialog → dialog closes, document is unchanged
-- [ ] Click **Delete document** → spinner shows, dialog closes, redirected to workspace, document is gone from the list
-- [ ] Simulate error (e.g. bad network) → dialog stays open, error message appears below the warning text
-- [ ] Confirm the delete button is disabled while "Deleting…" is shown — cannot double-submit
-
-### Markdown Rendering in AI Panel
-
-- [ ] Run a Summarize / Rewrite / Expand action on a document with varied content → output renders with proper formatting (bold, lists, etc.)
-- [ ] AI output with a code block → monospace block with muted background, horizontal scroll for long lines
-- [ ] AI output with inline code → small muted pill
-- [ ] Panel layout, history list, stale note, and action buttons all unaffected
-
-### Revert to Original
-
-- [ ] Run any AI action → click **Replace content** → "Revert to original" button appears below Copy
-- [ ] Click **Revert to original** → editor content is restored to the pre-AI text; autosave fires
-- [ ] After reverting, "Revert to original" button disappears (content no longer matches AI output)
-- [ ] Edit the document after "Replace content" without reverting → button disappears
-- [ ] View an older generation → button appears only if that generation's output matches current content
+- [x] AI output with varied content (bold, lists, headings) renders with proper markdown formatting
+- [x] AI output with a code block → monospace block with muted background, horizontal scroll for long lines
+- [x] AI output with inline code → small muted pill
+- [x] Panel layout, history list, stale note, and action buttons unaffected by markdown rendering
+- [x] Click **Replace content** → "Revert to original" button appears below Copy
+- [x] Click **Revert to original** → editor content restored to pre-AI text; autosave fires
+- [x] After reverting, "Revert to original" button disappears (content no longer matches AI output)
+- [x] Editing after "Replace content" without reverting → button disappears
+- [x] Viewing an older generation → button only appears if that generation's output matches current content
