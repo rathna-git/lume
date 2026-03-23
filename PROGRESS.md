@@ -4,7 +4,33 @@
 
 ---
 
+## 2026-03-23
+
+### State Management Audit
+
+- Audited workspace list, workspace detail, document editor, AI panel, and all related hooks
+- No server-derived data incorrectly held in local state — TanStack Query is the source of truth throughout
+- Local state is correctly limited to: form inputs before submit, dialog open/close flags, transient editor typing state, and ephemeral AI panel UI (selected action, selected history item, pending flag)
+- Fix applied: `useDeleteDocument` now removes `["document", id]` and `["aiGenerations", id]` from the query cache on success — prevents stale entries if the user navigates back after deletion
+- Architecture consistent; audit marked complete
+
+### Files Modified
+
+| File                    | Status   | Notes                                                         |
+| ----------------------- | -------- | ------------------------------------------------------------- |
+| `hooks/use-document.ts` | Modified | `useDeleteDocument` cleans up document + AI generations cache |
+
+---
+
 ## 2026-03-21
+
+### Files Modified
+
+| File                       | Status   | Notes                                                        |
+| -------------------------- | -------- | ------------------------------------------------------------ |
+| `hooks/use-document.ts`    | Modified | `useDeleteDocument` cleans up document + AI generations cache |
+
+---
 
 ### Deployment Pass — Vercel
 

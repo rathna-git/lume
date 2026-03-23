@@ -66,7 +66,12 @@ export function useUpdateDocument() {
 }
 
 export function useDeleteDocument() {
+    const queryClient = useQueryClient()
     return useMutation({
         mutationFn: deleteDocument,
+        onSuccess: (_data, documentId) => {
+            queryClient.removeQueries({ queryKey: documentKey(documentId) })
+            queryClient.removeQueries({ queryKey: ["aiGenerations", documentId] })
+        },
     })
 }

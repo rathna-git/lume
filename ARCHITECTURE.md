@@ -291,7 +291,7 @@ _(none — all planned items shipped)_
 - [x] Add AI history panel per document — action-driven panel shows latest persisted result per action type; history list shows older results per action with relative timestamps and snippet previews
 - [x] Add explicit regenerate flow separate from viewing existing results
 - [x] Add loading / empty / error states for AI history retrieval
-- [ ] Audit persisted server data currently held only in local UI state
+- [x] Audit persisted server data currently held only in local UI state
 
 ### Lower Priority
 
@@ -306,6 +306,6 @@ _(none — all planned items shipped)_
 - [ ] Add rate limiting to `POST /api/ai/generate` — prevent cost abuse from repeated AI calls
 - [ ] Add timeout to OpenAI API call — prevent serverless function from hanging on slow/unresponsive OpenAI responses
 - [ ] Add error logging in API route catch blocks — currently errors fail silently with no observability
-- [ ] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
+- [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
 - [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation
 - [ ] Disable "Insert below" button after "Replace content" is clicked — prevents duplicate content when the displayed result is already the full editor content
