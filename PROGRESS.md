@@ -6,6 +6,14 @@
 
 ## 2026-03-23
 
+### Manual Testing Pass
+
+- Performed full manual test pass across all features built to date
+- All tests passed — results recorded in the consolidated checklist at the end of this file
+- Cleaned up duplicate test block (AI History List) that existed mid-file; consolidated checklist is now the single source of truth
+
+---
+
 ### Revert to Original (v1)
 
 - Added a "Revert to original" button to the AI panel action area
