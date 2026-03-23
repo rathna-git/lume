@@ -6,6 +6,59 @@
 
 ## 2026-03-23
 
+### Revert to Original (v1)
+
+- Added a "Revert to original" button to the AI panel action area
+- Button appears only after the user clicks "Replace content" — i.e. when `content === outputText` and `inputSnapshot` exists on the displayed generation
+- Clicking it restores the editor to the document content captured at generation time (`inputSnapshot`) and triggers autosave
+- Button disappears automatically if the user edits further — no extra state, purely derived condition
+- No schema, API, or hook changes — fully localized to the document editor page
+
+#### Manual Tests
+
+- [ ] Run any AI action → click **Replace content** → "Revert to original" button appears below Copy
+- [ ] Click **Revert to original** → editor content is restored to the pre-AI text; autosave fires
+- [ ] After reverting, "Revert to original" button disappears (content no longer matches AI output)
+- [ ] Edit the document after "Replace content" without reverting → button disappears
+- [ ] View an older generation → button appears only if that generation's output matches current content
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Added `onRevert` prop to `AiPanel`; `handleRevert` in `DocumentEditor`; conditional "Revert to original" button |
+
+---
+
+### Markdown Rendering in AI Panel
+
+- Replaced plain-text `<p>` output in the AI panel with `ReactMarkdown`
+- Supports: paragraphs, bold, italic, headings, bullet/numbered lists, inline code, code blocks, blockquotes
+- Headings rendered at body size (`font-semibold`) to stay restrained inside the narrow panel — not blog-like
+- Code blocks: monospace, muted background, horizontal scroll; inline code: muted background pill
+- All other panel behavior unchanged — history, staleness, action buttons, stale note
+
+#### Manual Tests
+
+- [ ] Run a Summarize / Rewrite / Expand action on a document with varied content → output renders with proper formatting (bold, lists, etc.)
+- [ ] AI output with a code block → monospace block with muted background, horizontal scroll for long lines
+- [ ] AI output with inline code → small muted pill
+- [ ] Panel layout, history list, stale note, and action buttons all unaffected
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Replaced `<p>` plain-text output with `ReactMarkdown` + custom component map |
+
+### Dependencies Added
+
+| Package | Version | Notes |
+| ------- | ------- | ----- |
+| `react-markdown` | latest | Lightweight markdown renderer; no remark plugins needed |
+
+---
+
 ### Document Delete Confirmation Dialog
 
 - Replaced `window.confirm()` on document delete with a proper shadcn/ui `Dialog` — matches the workspace delete pattern

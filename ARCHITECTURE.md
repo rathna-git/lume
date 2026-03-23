@@ -295,7 +295,7 @@ _(none — all planned items shipped)_
 
 ### Lower Priority
 
-- [ ] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
+- [x] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
 - [ ] Replace `<textarea>` editor with Tiptap rich text editor — enables formatting toolbar, and allows markdown-to-rich-text insert from AI panel
 - [x] Replace `confirm()` on document delete with a proper confirmation dialog (same pattern as workspace delete)
 - [ ] Conditionally adjust workspace delete dialog copy — omit "and all documents inside it" when workspace is empty
@@ -309,5 +309,5 @@ _(none — all planned items shipped)_
 - [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
 - [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation
 - [ ] Disable "Insert below" button after "Replace content" is clicked — prevents duplicate content when the displayed result is already the full editor content
-- [ ] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button in the AI panel that restores the editor to `inputSnapshot` (the document content captured at generation time); button only visible when `content === outputText` and `inputSnapshot` exists; disappears on further edits; triggers autosave on revert
+- [x] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button in the AI panel that restores the editor to `inputSnapshot` (the document content captured at generation time); button only visible when `content === outputText` and `inputSnapshot` exists; disappears on further edits; triggers autosave on revert
 - [ ] **Version history (v2)** — full document timeline across edits; allows users to browse and restore any prior state of the document, not just the last AI replace

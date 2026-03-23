@@ -8,6 +8,7 @@ import { useDocument, useUpdateDocument, useDeleteDocument } from "@/hooks/use-d
 import { useGenerateAi, useAiGenerations, type AiAction, type AiGeneration } from "@/hooks/use-ai"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import ReactMarkdown from "react-markdown"
 
 type SaveStatus = "idle" | "saving" | "saved" | "error"
 
@@ -46,6 +47,7 @@ function AiPanel({
     onReplace,
     onInsertBelow,
     onCopy,
+    onRevert,
     onRetry,
 }: {
     content: string
@@ -61,6 +63,7 @@ function AiPanel({
     onReplace: (text: string) => void
     onInsertBelow: (text: string) => void
     onCopy: (text: string) => void
+    onRevert: (text: string) => void
     onRetry: () => void
 }) {
     const actionGenerations = selectedAction
@@ -194,9 +197,31 @@ function AiPanel({
                                 </p>
                             )}
                             <div className="max-h-[40vh] overflow-y-auto">
-                                <p className="text-[0.875rem] leading-relaxed text-foreground whitespace-pre-wrap">
-                                    {displayed.output.text}
-                                </p>
+                                <div className="prose-ai text-[0.875rem] leading-relaxed text-foreground">
+                                    <ReactMarkdown
+                                        components={{
+                                            p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                                            h1: ({ children }) => <p className="font-semibold text-base mb-2">{children}</p>,
+                                            h2: ({ children }) => <p className="font-semibold text-sm mb-2">{children}</p>,
+                                            h3: ({ children }) => <p className="font-medium text-sm mb-1">{children}</p>,
+                                            ul: ({ children }) => <ul className="list-disc pl-4 mb-3 space-y-0.5">{children}</ul>,
+                                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-3 space-y-0.5">{children}</ol>,
+                                            li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                            em: ({ children }) => <em className="italic">{children}</em>,
+                                            blockquote: ({ children }) => <blockquote className="border-l-2 border-border pl-3 text-muted-foreground italic mb-3">{children}</blockquote>,
+                                            code: ({ children, className }) =>
+                                                className ? (
+                                                    <code className="block bg-muted rounded-md px-3 py-2 text-xs font-mono overflow-x-auto mb-3 whitespace-pre">{children}</code>
+                                                ) : (
+                                                    <code className="bg-muted rounded px-1 py-0.5 text-xs font-mono">{children}</code>
+                                                ),
+                                            pre: ({ children }) => <pre className="mb-3">{children}</pre>,
+                                        }}
+                                    >
+                                        {displayed.output.text}
+                                    </ReactMarkdown>
+                                </div>
                             </div>
                             <div className="flex flex-col gap-1.5 pt-3 border-t border-border">
                                 <button
@@ -217,6 +242,14 @@ function AiPanel({
                                 >
                                     Copy
                                 </button>
+                                {displayed.inputSnapshot && content === outputText && (
+                                    <button
+                                        onClick={() => onRevert(displayed.inputSnapshot!)}
+                                        className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                    >
+                                        Revert to original
+                                    </button>
+                                )}
                             </div>
                         </>
                     )}
@@ -342,6 +375,11 @@ function DocumentEditor({
         navigator.clipboard.writeText(text)
     }
 
+    function handleRevert(snapshot: string) {
+        setContent(snapshot)
+        save(title, snapshot)
+    }
+
     function handleDelete() {
         setDeleteError(null)
         deleteDocument(documentId, {
@@ -424,6 +462,7 @@ function DocumentEditor({
                         onReplace={handleReplace}
                         onInsertBelow={handleInsertBelow}
                         onCopy={handleCopy}
+                        onRevert={handleRevert}
                         onRetry={retryGenerations}
                     />
                 </div>
