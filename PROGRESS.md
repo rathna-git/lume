@@ -24,14 +24,6 @@
 
 ## 2026-03-21
 
-### Files Modified
-
-| File                       | Status   | Notes                                                        |
-| -------------------------- | -------- | ------------------------------------------------------------ |
-| `hooks/use-document.ts`    | Modified | `useDeleteDocument` cleans up document + AI generations cache |
-
----
-
 ### Deployment Pass — Vercel
 
 - Deployed Lume to Vercel at https://lume-psi-teal.vercel.app/
@@ -39,8 +31,6 @@
 - All features verified end-to-end in production: auth, workspaces, documents, autosave, AI panel (generate / regenerate / history / persistence), settings page
 
 ---
-
-
 
 ### Pre-Deploy Audit + ReactQueryDevtools Fix
 
@@ -51,10 +41,10 @@
 
 ### Files Modified
 
-| File                        | Status   | Notes                                          |
-| --------------------------- | -------- | ---------------------------------------------- |
-| `components/providers.tsx`  | Modified | ReactQueryDevtools gated to development only   |
-| `ARCHITECTURE.md`           | Modified | 5 post-deploy improvement todos added          |
+| File                       | Status   | Notes                                        |
+| -------------------------- | -------- | -------------------------------------------- |
+| `components/providers.tsx` | Modified | ReactQueryDevtools gated to development only |
+| `ARCHITECTURE.md`          | Modified | 5 post-deploy improvement todos added        |
 
 ---
 
@@ -66,13 +56,11 @@
 
 ### Files Created
 
-| File                                   | Status  | Notes                                   |
-| -------------------------------------- | ------- | --------------------------------------- |
-| `app/(dashboard)/settings/page.tsx`    | Created | Placeholder settings page, no 404       |
+| File                                | Status  | Notes                             |
+| ----------------------------------- | ------- | --------------------------------- |
+| `app/(dashboard)/settings/page.tsx` | Created | Placeholder settings page, no 404 |
 
 ---
-
-
 
 ### Production Build Pass + Bug Fixes
 
@@ -106,12 +94,12 @@
 
 ### Files Modified
 
-| File                                                                       | Status   | Notes                                                             |
-| -------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------- |
-| `components/layout/sidebar.tsx`                                            | Modified | Removed deprecated `afterSignOutUrl` prop from `UserButton`       |
-| `next.config.ts`                                                           | Modified | Added `outputFileTracingRoot` + `path` import                     |
-| `middleware.ts` → `proxy.ts`                                               | Renamed  | File renamed; export renamed from `middleware` to `proxy`         |
-| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Staleness logic updated — not stale when content matches output   |
+| File                                                                       | Status   | Notes                                                           |
+| -------------------------------------------------------------------------- | -------- | --------------------------------------------------------------- |
+| `components/layout/sidebar.tsx`                                            | Modified | Removed deprecated `afterSignOutUrl` prop from `UserButton`     |
+| `next.config.ts`                                                           | Modified | Added `outputFileTracingRoot` + `path` import                   |
+| `middleware.ts` → `proxy.ts`                                               | Renamed  | File renamed; export renamed from `middleware` to `proxy`       |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Staleness logic updated — not stale when content matches output |
 
 ### Up Next
 
