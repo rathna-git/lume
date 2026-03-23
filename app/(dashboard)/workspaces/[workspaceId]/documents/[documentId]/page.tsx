@@ -6,6 +6,8 @@ import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import { useDocument, useUpdateDocument, useDeleteDocument } from "@/hooks/use-document"
 import { useGenerateAi, useAiGenerations, type AiAction, type AiGeneration } from "@/hooks/use-ai"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 type SaveStatus = "idle" | "saving" | "saved" | "error"
 
@@ -268,7 +270,7 @@ function DocumentEditor({
 }) {
     const router = useRouter()
     const { mutate: updateDocument } = useUpdateDocument()
-    const { mutate: deleteDocument, isPending: deletePending } = useDeleteDocument()
+    const { mutate: deleteDocument, isPending: isDeleting } = useDeleteDocument()
     const { mutate: generateAi } = useGenerateAi()
     const { data: generationsData, isLoading: generationsLoading, isError: generationsError, refetch: retryGenerations } = useAiGenerations(documentId)
 
@@ -280,6 +282,8 @@ function DocumentEditor({
     const [selectedAction, setSelectedAction] = useState<AiAction | null>(null)
     const [selectedGenerationId, setSelectedGenerationId] = useState<string | null>(null)
     const [pendingAction, setPendingAction] = useState<AiAction | null>(null)
+    const [deleteOpen, setDeleteOpen] = useState(false)
+    const [deleteError, setDeleteError] = useState<string | null>(null)
 
     function handleSelectAction(action: AiAction) {
         setSelectedAction(action)
@@ -339,9 +343,13 @@ function DocumentEditor({
     }
 
     function handleDelete() {
-        if (!confirm("Delete this document? This cannot be undone.")) return
+        setDeleteError(null)
         deleteDocument(documentId, {
-            onSuccess: () => router.push(`/workspaces/${workspaceId}`),
+            onSuccess: () => {
+                setDeleteOpen(false)
+                router.push(`/workspaces/${workspaceId}`)
+            },
+            onError: (err) => setDeleteError(err instanceof Error ? err.message : "Something went wrong."),
         })
     }
 
@@ -367,11 +375,10 @@ function DocumentEditor({
                                 {saveStatus === "error" && "Error saving"}
                             </span>
                             <button
-                                onClick={handleDelete}
-                                disabled={deletePending}
-                                className="text-xs text-muted-foreground/50 hover:text-destructive transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                onClick={() => setDeleteOpen(true)}
+                                className="text-xs text-muted-foreground/50 hover:text-destructive transition-colors"
                             >
-                                {deletePending ? "Deleting…" : "Delete"}
+                                Delete
                             </button>
                         </div>
                     </div>
@@ -421,6 +428,30 @@ function DocumentEditor({
                     />
                 </div>
             </div>
+
+            {/* Delete document dialog */}
+            <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                <DialogContent showCloseButton={false}>
+                    <DialogHeader>
+                        <DialogTitle>Delete document?</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-muted-foreground">
+                        This will permanently delete this document. This action cannot be undone.
+                    </p>
+                    {deleteError && (
+                        <p className="text-sm text-destructive">{deleteError}</p>
+                    )}
+                    <DialogFooter showCloseButton>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting…" : "Delete document"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

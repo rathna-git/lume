@@ -6,6 +6,31 @@
 
 ## 2026-03-23
 
+### Document Delete Confirmation Dialog
+
+- Replaced `window.confirm()` on document delete with a proper shadcn/ui `Dialog` — matches the workspace delete pattern
+- Delete button in the editor header now opens the dialog instead of firing immediately
+- Dialog includes: title, warning message, inline error on failure, cancel button, and a destructive confirm button
+- Confirm button shows "Deleting…" and is disabled while the mutation is in flight — prevents duplicate submissions
+- On success: dialog closes and user is redirected back to the workspace
+- On error: dialog stays open and shows an inline error message
+
+#### Manual Tests
+
+- [ ] Open any document → click **Delete** in the top-right header → confirm dialog appears
+- [ ] Click **Cancel** in the dialog → dialog closes, document is unchanged
+- [ ] Click **Delete document** → spinner shows, dialog closes, redirected to workspace, document is gone from the list
+- [ ] Simulate error (e.g. bad network) → dialog stays open, error message appears below the warning text
+- [ ] Confirm the delete button is disabled while "Deleting…" is shown — cannot double-submit
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Replaced `confirm()` with Dialog; added `deleteOpen`, `deleteError` state; loading state on confirm button |
+
+---
+
 ### State Management Audit
 
 - Audited workspace list, workspace detail, document editor, AI panel, and all related hooks
