@@ -14,14 +14,6 @@
 - Button disappears automatically if the user edits further — no extra state, purely derived condition
 - No schema, API, or hook changes — fully localized to the document editor page
 
-#### Manual Tests
-
-- [ ] Run any AI action → click **Replace content** → "Revert to original" button appears below Copy
-- [ ] Click **Revert to original** → editor content is restored to the pre-AI text; autosave fires
-- [ ] After reverting, "Revert to original" button disappears (content no longer matches AI output)
-- [ ] Edit the document after "Replace content" without reverting → button disappears
-- [ ] View an older generation → button appears only if that generation's output matches current content
-
 ### Files Modified
 
 | File | Status | Notes |
@@ -37,13 +29,6 @@
 - Headings rendered at body size (`font-semibold`) to stay restrained inside the narrow panel — not blog-like
 - Code blocks: monospace, muted background, horizontal scroll; inline code: muted background pill
 - All other panel behavior unchanged — history, staleness, action buttons, stale note
-
-#### Manual Tests
-
-- [ ] Run a Summarize / Rewrite / Expand action on a document with varied content → output renders with proper formatting (bold, lists, etc.)
-- [ ] AI output with a code block → monospace block with muted background, horizontal scroll for long lines
-- [ ] AI output with inline code → small muted pill
-- [ ] Panel layout, history list, stale note, and action buttons all unaffected
 
 ### Files Modified
 
@@ -67,14 +52,6 @@
 - Confirm button shows "Deleting…" and is disabled while the mutation is in flight — prevents duplicate submissions
 - On success: dialog closes and user is redirected back to the workspace
 - On error: dialog stays open and shows an inline error message
-
-#### Manual Tests
-
-- [ ] Open any document → click **Delete** in the top-right header → confirm dialog appears
-- [ ] Click **Cancel** in the dialog → dialog closes, document is unchanged
-- [ ] Click **Delete document** → spinner shows, dialog closes, redirected to workspace, document is gone from the list
-- [ ] Simulate error (e.g. bad network) → dialog stays open, error message appears below the warning text
-- [ ] Confirm the delete button is disabled while "Deleting…" is shown — cannot double-submit
 
 ### Files Modified
 
@@ -906,3 +883,26 @@
 - [x] Replace content / Insert below / Copy all work on whichever result is currently displayed
 - [x] History item timestamps display correctly (e.g. "2m ago", "1h ago")
 - [x] History item snippet shows first ~80 chars of output text
+
+### Document Delete Confirmation Dialog
+
+- [ ] Open any document → click **Delete** in the top-right header → confirm dialog appears
+- [ ] Click **Cancel** in the dialog → dialog closes, document is unchanged
+- [ ] Click **Delete document** → spinner shows, dialog closes, redirected to workspace, document is gone from the list
+- [ ] Simulate error (e.g. bad network) → dialog stays open, error message appears below the warning text
+- [ ] Confirm the delete button is disabled while "Deleting…" is shown — cannot double-submit
+
+### Markdown Rendering in AI Panel
+
+- [ ] Run a Summarize / Rewrite / Expand action on a document with varied content → output renders with proper formatting (bold, lists, etc.)
+- [ ] AI output with a code block → monospace block with muted background, horizontal scroll for long lines
+- [ ] AI output with inline code → small muted pill
+- [ ] Panel layout, history list, stale note, and action buttons all unaffected
+
+### Revert to Original
+
+- [ ] Run any AI action → click **Replace content** → "Revert to original" button appears below Copy
+- [ ] Click **Revert to original** → editor content is restored to the pre-AI text; autosave fires
+- [ ] After reverting, "Revert to original" button disappears (content no longer matches AI output)
+- [ ] Edit the document after "Replace content" without reverting → button disappears
+- [ ] View an older generation → button appears only if that generation's output matches current content
