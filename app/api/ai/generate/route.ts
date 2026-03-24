@@ -70,7 +70,14 @@ export async function POST(req: Request) {
     try {
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
-            messages: [{ role: "user", content: prompt }],
+            messages: [
+                {
+                    role: "system",
+                    content:
+                        "You are a writing assistant. Always respond using Markdown formatting — use headings, bold, bullet lists, numbered lists, and other Markdown elements where they improve clarity and structure. Never return plain unformatted prose.",
+                },
+                { role: "user", content: prompt },
+            ],
             temperature: 0.7,
         })
 
