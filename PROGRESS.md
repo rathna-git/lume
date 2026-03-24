@@ -1032,3 +1032,24 @@
 - [x] After reverting, "Revert to original" button disappears (content no longer matches AI output)
 - [x] Editing after "Replace content" without reverting → button disappears
 - [x] Viewing an older generation → button only appears if that generation's output matches current content
+
+---
+
+## Pending / To-Do
+
+### Image Paste in Editor
+
+Two approaches identified — implement in order:
+
+**Phase 1 — Base64 (ship now, no infra required)**
+- [ ] Install `@tiptap/extension-image`
+- [ ] Add `Image` to `extensions` array in `useEditor`
+- [ ] Add `editorProps.handlePaste` to intercept clipboard image files, convert to base64 data URL via `FileReader`, and insert as an image node
+- [ ] Verify paste works from screenshots, browser copy, and design tools
+- [ ] Note: base64 bloats `Document.content` in the DB — acceptable short-term, migrate in Phase 2
+
+**Phase 2 — S3 Upload (production path)**
+- [ ] Add `POST /api/upload` route — accepts a file, returns a permanent URL (presigned upload or proxy)
+- [ ] Replace `FileReader.readAsDataURL` with a `fetch` to the upload endpoint
+- [ ] Insert image node using the returned URL instead of a data URL
+- [ ] Aligns with the planned migration of document content storage to AWS S3
