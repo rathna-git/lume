@@ -4,6 +4,31 @@
 
 ---
 
+## 2026-03-24 (continued)
+
+### UI Polish — Bubble Menu Visual Refinement
+
+- Removed `backdrop-blur-sm` and semi-transparent background — was causing a hazy/blurry visual artifact; replaced with solid `bg-card`
+- Pill shadow lightened: `shadow-lg` → custom `0 2px 12px rgba(0,0,0,0.08)` — floats without heaviness
+- Pill border softened: `border-border` → `border-border/60`
+- Pill padding/gap increased slightly: `px-1.5 py-1` → `px-2 py-1.5` for breathing room
+- Button shape changed from `rounded-full` to `rounded-md` — avoids pill-in-pill visual conflict
+- Active state softened: `bg-foreground text-background` (high contrast inversion) → `bg-foreground/10 text-foreground` (soft tint)
+- Inactive icon color changed to `text-foreground/80` — crisp and readable, small lift on hover
+- Overflow panel item text changed from `text-muted-foreground` → `text-foreground/70`; icon opacity modifier removed so icons inherit text color directly
+- Overflow panel matched to pill: solid `bg-card`, same soft border and shadow
+- Divider shortened and lightened: `h-4 bg-border` → `h-3 bg-border/50`
+- Entry animation added to both pill and overflow panel: `animate-in fade-in zoom-in-95 duration-150` — subtle scale + fade, no bounce
+- Button transition tightened: `transition-colors` → `transition-colors duration-100`
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `bubbleBtn` helper; pill container; divider; overflow panel |
+
+---
+
 ## 2026-03-24
 
 ### AI Panel — Toast Notifications + History Horizontal Scroll

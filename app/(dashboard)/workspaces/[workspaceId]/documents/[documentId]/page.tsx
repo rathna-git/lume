@@ -557,10 +557,10 @@ function DocumentEditor({
 
     const bubbleBtn = (active: boolean) =>
         cn(
-            "w-7 h-7 rounded-full flex items-center justify-center transition-colors",
+            "w-7 h-7 rounded-md flex items-center justify-center transition-colors duration-100",
             active
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "bg-foreground/10 text-foreground"
+                : "text-foreground/80 hover:text-foreground hover:bg-muted/60"
         )
 
     const overflowItems = editor
@@ -635,7 +635,7 @@ function DocumentEditor({
                                 {({ flipLeft }) => (
                                     <div style={{ position: "relative" }}>
                                         {/* Primary pill */}
-                                        <div className="flex items-center bg-popover border border-border shadow-lg rounded-full px-1.5 py-1 gap-0.5">
+                                        <div className="flex items-center bg-card border border-border/60 shadow-[0_2px_12px_rgba(0,0,0,0.08)] rounded-full px-2 py-1.5 gap-0.5 animate-in fade-in zoom-in-95 duration-150">
                                             <button
                                                 onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run() }}
                                                 className={bubbleBtn(editor.isActive("bold"))}
@@ -664,7 +664,7 @@ function DocumentEditor({
                                             >
                                                 <Code size={12} />
                                             </button>
-                                            <div className="w-px h-4 bg-border mx-0.5" />
+                                            <div className="w-px h-3 bg-border/50 mx-0.5" />
                                             <button
                                                 onMouseDown={(e) => { e.preventDefault(); setOverflowOpen((v) => !v) }}
                                                 className={bubbleBtn(overflowOpen)}
@@ -685,7 +685,7 @@ function DocumentEditor({
                                                     top: "50%",
                                                     transform: "translateY(-50%)",
                                                 }}
-                                                className="bg-popover border border-border shadow-lg rounded-xl overflow-hidden py-1 min-w-[148px]"
+                                                className="bg-card border border-border/60 shadow-[0_2px_12px_rgba(0,0,0,0.08)] rounded-xl overflow-hidden py-1.5 min-w-[148px] animate-in fade-in zoom-in-95 duration-150"
                                             >
                                                 {overflowItems.map((item, i) =>
                                                     item === null ? (
@@ -702,10 +702,10 @@ function DocumentEditor({
                                                                 "w-full text-left text-xs px-3 py-1.5 transition-colors flex items-center gap-2",
                                                                 item.active
                                                                     ? "text-foreground font-medium bg-muted"
-                                                                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                                    : "text-foreground/70 hover:text-foreground hover:bg-muted"
                                                             )}
                                                         >
-                                                            <item.icon size={12} className="shrink-0 opacity-70" />
+                                                            <item.icon size={12} className="shrink-0" />
                                                             {item.label}
                                                         </button>
                                                     )
