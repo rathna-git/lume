@@ -6,6 +6,26 @@
 
 ## 2026-03-24
 
+### AI Panel — Spacing, Readability, and Collapsible Result Section
+
+- Tightened outer panel gap `gap-5` → `gap-4`; actions label `mb-2` → `mb-2.5`
+- Result section top padding `pt-4` → `pt-5` for a more intentional transition from action tabs
+- Stale note: `text-xs text-muted-foreground/60` → `text-[0.8rem] text-muted-foreground/50` — quieter, de-emphasised metadata
+- Action buttons section: `gap-1.5 pt-3` → `gap-2 pt-4` for more breathing room
+- History section: `gap-1 pt-3` → `gap-1.5 pt-4`; history item padding `px-2.5 py-2` → `px-3 py-2.5`
+- Added `ChevronDown` collapse toggle in the result section header — visible only when a result exists
+- `resultCollapsed` state (default `false`) collapses everything below the section header: pending state, empty state, rendered markdown, action buttons (Replace content / Insert below / Copy / Revert to original), and the Previous results history list
+- Chevron rotates 180° when expanded (acts as ChevronUp) via `transition-transform duration-200`
+- No editor logic, hooks, routes, or data flow touched
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | AI panel spacing tweaks + `resultCollapsed` collapse toggle |
+
+---
+
 ### Editor Width and Spacing Refinement
 
 - Added `max-w-[680px] mx-auto` writing canvas wrapper around title + divider + Tiptap editor — back link / save-status row stays full-width; writing surface centers at a comfortable reading width

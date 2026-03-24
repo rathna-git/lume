@@ -172,6 +172,7 @@ AiGeneration
 | AI panel pending action | Local `useState` | `pendingAction` — in-flight action; clears on success/error; all generate buttons disabled while set |
 | Replaced generation ID | Local `useState` | `replacedGenerationId` — tracks which generation's output is currently in the editor; drives "Revert to original" button visibility and `isStale` suppression; cleared on user edits |
 | Pre-replace HTML snapshot | Local `useRef` | `originalHtmlRef` — HTML captured at the moment "Replace content" fires; used to restore exact rich formatting on revert; cleared after revert or user edit |
+| AI panel collapse state | Local `useState` | `resultCollapsed` in `AiPanel` — collapses everything below the result section header (pending, empty state, markdown, action buttons, history); default `false` (expanded) |
 
 ---
 
@@ -254,6 +255,7 @@ _(none — all planned items shipped)_
 | `originalHtmlRef` for revert instead of `textToHtml(inputSnapshot)` | `inputSnapshot` is plain text (captured via `textBetween`); re-converting it to HTML strips all rich formatting. Capturing `editor.getHTML()` at the moment "Replace content" is clicked preserves the exact pre-replace state | Ref is cleared on user edits and after revert fires; `isReplacingRef` prevents `onUpdate` from clearing it during programmatic `setContent` calls |
 | `replacedGenerationId` state replaces `content === outputText` for revert button | After `marked.parse()`, `textBetween` strips markdown syntax from rendered HTML so `content !== outputText` is always true — the revert button never showed. Explicit ID tracking is robust regardless of content format | `isReplacingRef` guards against `onUpdate` clearing the state when `setContent` fires synchronously inside `handleReplace` |
 | OpenAI system message for consistent Markdown output | Without a system message, GPT-4o mirrors input style — plain prose input (from `textBetween` after a "Replace content") returns plain prose output. System message overrides this and ensures every generation is Markdown-formatted for `marked.parse()` | Applies to all three actions and all generations including regenerations; keeps user-facing prompts clean |
+| `resultCollapsed` collapses the full result body, not just the markdown | Collapsing only the markdown area would leave orphaned action buttons with no visible content above them — confusing UX. Collapsing the entire body (pending/empty/markdown/buttons/history) keeps the panel clean and predictable when minimised | The section header (label + Regenerate/Back to latest + chevron) always stays visible so the user knows which action is selected |
 
 ---
 
@@ -288,6 +290,7 @@ _(none — all planned items shipped)_
 - [x] Action-driven AI panel (tabs select view; Generate / Regenerate explicit; staleness via `inputSnapshot`)
 - [x] UI polish — Tiptap editor typography (line-height, heading hierarchy, list rhythm, block spacing)
 - [x] UI polish — editor writing canvas constrained to `max-w-[680px]`; card/title/back-link vertical spacing refined
+- [x] UI polish — AI panel spacing and readability; collapsible result section via `resultCollapsed`
 
 ---
 

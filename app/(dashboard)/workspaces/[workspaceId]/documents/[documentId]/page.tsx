@@ -4,7 +4,7 @@ import { use, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2 } from "lucide-react"
+import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown } from "lucide-react"
 import { marked } from "marked"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
@@ -161,11 +161,13 @@ function AiPanel({
     const isPending = pendingAction === selectedAction && selectedAction !== null
     const anyPending = pendingAction !== null
 
+    const [resultCollapsed, setResultCollapsed] = useState(false)
+
     return (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
             {/* Action tabs */}
             <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-2">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-2.5">
                     Actions
                 </p>
                 <div className="flex flex-col gap-1.5">
@@ -212,7 +214,7 @@ function AiPanel({
 
             {/* Result area for selected action */}
             {selectedAction && !generationsLoading && !generationsError && (
-                <div className="flex flex-col gap-3 pt-4 border-t border-border">
+                <div className="flex flex-col gap-3 pt-5 border-t border-border">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
                             {ACTION_LABEL[selectedAction]}
@@ -235,99 +237,110 @@ function AiPanel({
                                     {isPending ? "Running…" : "Regenerate"}
                                 </button>
                             )}
+                            {displayed?.output?.text && (
+                                <button
+                                    onClick={() => setResultCollapsed(c => !c)}
+                                    className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                                    title={resultCollapsed ? "Expand result" : "Collapse result"}
+                                >
+                                    <ChevronDown size={13} className={cn("transition-transform duration-200", !resultCollapsed && "-rotate-180")} />
+                                </button>
+                            )}
                         </div>
                     </div>
 
-                    {/* Pending, no existing result */}
-                    {isPending && !displayed && (
-                        <p className="text-xs text-muted-foreground/50">Running…</p>
-                    )}
-
-                    {/* Empty state */}
-                    {!displayed && !isPending && (
-                        <div className="flex flex-col gap-3">
-                            <p className="text-xs text-muted-foreground/50 leading-relaxed">
-                                No {ACTION_LABEL[selectedAction].toLowerCase()} yet.
-                            </p>
-                            <button
-                                onClick={() => onGenerate(selectedAction)}
-                                disabled={anyPending || !content.trim()}
-                                className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                                Generate
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Displayed result */}
-                    {displayed?.output?.text && (
+                    {!resultCollapsed && (
                         <>
-                            {isStale && (
-                                <p className="text-xs text-muted-foreground/60 italic leading-relaxed">
-                                    This result may be outdated. It was generated from an earlier version of this document.
-                                </p>
-                            )}
-                            <div className="max-h-[40vh] overflow-y-auto">
-                                <div className="prose-ai text-[0.875rem] leading-relaxed text-foreground">
-                                    <ReactMarkdown
-                                        components={{
-                                            p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-                                            h1: ({ children }) => <p className="font-semibold text-base mb-2">{children}</p>,
-                                            h2: ({ children }) => <p className="font-semibold text-sm mb-2">{children}</p>,
-                                            h3: ({ children }) => <p className="font-medium text-sm mb-1">{children}</p>,
-                                            ul: ({ children }) => <ul className="list-disc pl-4 mb-3 space-y-0.5">{children}</ul>,
-                                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-3 space-y-0.5">{children}</ol>,
-                                            li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-                                            strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                                            em: ({ children }) => <em className="italic">{children}</em>,
-                                            blockquote: ({ children }) => <blockquote className="border-l-2 border-border pl-3 text-muted-foreground italic mb-3">{children}</blockquote>,
-                                            code: ({ children, className }) =>
-                                                className ? (
-                                                    <code className="block bg-muted rounded-md px-3 py-2 text-xs font-mono overflow-x-auto mb-3 whitespace-pre">{children}</code>
-                                                ) : (
-                                                    <code className="bg-muted rounded px-1 py-0.5 text-xs font-mono">{children}</code>
-                                                ),
-                                            pre: ({ children }) => <pre className="mb-3">{children}</pre>,
-                                        }}
-                                    >
-                                        {displayed.output.text}
-                                    </ReactMarkdown>
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-1.5 pt-3 border-t border-border">
-                                <button
-                                    onClick={() => onReplace(displayed.output!.text, displayed.id)}
-                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                >
-                                    Replace content
-                                </button>
-                                <button
-                                    onClick={() => onInsertBelow(displayed.output!.text)}
-                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                >
-                                    Insert below
-                                </button>
-                                <button
-                                    onClick={() => onCopy(displayed.output!.text)}
-                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                >
-                                    Copy
-                                </button>
-                                {displayed.inputSnapshot && replacedGenerationId === displayed.id && (
-                                    <button
-                                        onClick={() => onRevert()}
-                                        className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                    >
-                                        Revert to original
-                                    </button>
-                                )}
-                            </div>
-                        </>
-                    )}
+                        {/* Pending, no existing result */}
+                        {isPending && !displayed && (
+                            <p className="text-xs text-muted-foreground/50">Running…</p>
+                        )}
 
-                    {/* Previous results */}
-                    {olderGenerations.length > 0 && (
-                        <div className="flex flex-col gap-1 pt-3 border-t border-border">
+                        {/* Empty state */}
+                        {!displayed && !isPending && (
+                            <div className="flex flex-col gap-3">
+                                <p className="text-xs text-muted-foreground/50 leading-relaxed">
+                                    No {ACTION_LABEL[selectedAction].toLowerCase()} yet.
+                                </p>
+                                <button
+                                    onClick={() => onGenerate(selectedAction)}
+                                    disabled={anyPending || !content.trim()}
+                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    Generate
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Displayed result */}
+                        {displayed?.output?.text && (
+                            <>
+                                {isStale && (
+                                    <p className="text-[0.8rem] text-muted-foreground/50 italic leading-relaxed">
+                                        This result may be outdated. It was generated from an earlier version of this document.
+                                    </p>
+                                )}
+                                <div className="max-h-[40vh] overflow-y-auto">
+                                    <div className="prose-ai text-[0.875rem] leading-relaxed text-foreground">
+                                        <ReactMarkdown
+                                            components={{
+                                                p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                                                h1: ({ children }) => <p className="font-semibold text-base mb-2">{children}</p>,
+                                                h2: ({ children }) => <p className="font-semibold text-sm mb-2">{children}</p>,
+                                                h3: ({ children }) => <p className="font-medium text-sm mb-1">{children}</p>,
+                                                ul: ({ children }) => <ul className="list-disc pl-4 mb-3 space-y-0.5">{children}</ul>,
+                                                ol: ({ children }) => <ol className="list-decimal pl-4 mb-3 space-y-0.5">{children}</ol>,
+                                                li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                                                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                                em: ({ children }) => <em className="italic">{children}</em>,
+                                                blockquote: ({ children }) => <blockquote className="border-l-2 border-border pl-3 text-muted-foreground italic mb-3">{children}</blockquote>,
+                                                code: ({ children, className }) =>
+                                                    className ? (
+                                                        <code className="block bg-muted rounded-md px-3 py-2 text-xs font-mono overflow-x-auto mb-3 whitespace-pre">{children}</code>
+                                                    ) : (
+                                                        <code className="bg-muted rounded px-1 py-0.5 text-xs font-mono">{children}</code>
+                                                    ),
+                                                pre: ({ children }) => <pre className="mb-3">{children}</pre>,
+                                            }}
+                                        >
+                                            {displayed.output.text}
+                                        </ReactMarkdown>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                                    <button
+                                        onClick={() => onReplace(displayed.output!.text, displayed.id)}
+                                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                    >
+                                        Replace content
+                                    </button>
+                                    <button
+                                        onClick={() => onInsertBelow(displayed.output!.text)}
+                                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                    >
+                                        Insert below
+                                    </button>
+                                    <button
+                                        onClick={() => onCopy(displayed.output!.text)}
+                                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                    >
+                                        Copy
+                                    </button>
+                                    {displayed.inputSnapshot && replacedGenerationId === displayed.id && (
+                                        <button
+                                            onClick={() => onRevert()}
+                                            className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                        >
+                                            Revert to original
+                                        </button>
+                                    )}
+                                </div>
+                            </>
+                        )}
+
+                        {/* Previous results */}
+                        {olderGenerations.length > 0 && (
+                            <div className="flex flex-col gap-1.5 pt-4 border-t border-border">
                             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-1">
                                 Previous
                             </p>
@@ -335,7 +348,7 @@ function AiPanel({
                                 <button
                                     key={g.id}
                                     onClick={() => onSelectGeneration(g.id)}
-                                    className={`text-left rounded-lg px-2.5 py-2 transition-colors border ${
+                                    className={`text-left rounded-lg px-3 py-2.5 transition-colors border ${
                                         displayed?.id === g.id
                                             ? "border-border bg-muted"
                                             : "border-transparent hover:bg-muted/60"
@@ -351,6 +364,8 @@ function AiPanel({
                             ))}
                         </div>
                     )}
+                        </>
+                    )} {/* end !resultCollapsed */}
                 </div>
             )}
 
