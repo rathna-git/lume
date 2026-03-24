@@ -51,6 +51,7 @@ app/
 │   │       └── generations/route.ts← GET — AI generations for document
 │   └── ai/
 │       └── generate/route.ts       ← POST — AI actions (summarize/rewrite/expand)
+├── globals.css                     ← global styles, brand tokens, Tiptap ProseMirror styles
 ├── layout.tsx                      ← root layout, fonts, metadata
 └── page.tsx                        ← public landing page
 
@@ -103,6 +104,8 @@ User
   email     String   (unique)
   name      String?
   imageUrl  String?
+  createdAt DateTime
+  updatedAt DateTime
   └── Workspace[]
 
 Workspace
@@ -110,6 +113,8 @@ Workspace
   name        String
   description String?
   emoji       String?   default "📝"
+  createdAt   DateTime
+  updatedAt   DateTime
   userId      String    → User (cascade delete)
   └── Document[]
   @@index([userId])
@@ -117,8 +122,10 @@ Workspace
 Document
   id          String
   title       String
-  content     String?        (Text)
+  content     String?        (Text) — stored as HTML (Tiptap)
   summary     String?        (Text)
+  createdAt   DateTime
+  updatedAt   DateTime
   workspaceId String         → Workspace (cascade delete)
   ├── Tag[]                  (many-to-many)
   └── AiGeneration[]
@@ -128,6 +135,7 @@ Tag
   id        String
   name      String
   color     String?   default "#F5A623"
+  createdAt DateTime
   └── Document[]      (many-to-many)
 
 AiGeneration
@@ -135,10 +143,12 @@ AiGeneration
   type          AiActionType
   status        AiGenerationStatus   default PENDING
   prompt        String?              (Text)
-  inputSnapshot String?              (Text) — document content at time of generation
-  output        Json?                — flexible output structure
+  inputSnapshot String?              (Text) — plain text snapshot via textBetween at generation time
+  output        Json?                — { text: string } — AI markdown output
   errorMessage  String?              (Text)
   model         String               default "gpt-4o"
+  createdAt     DateTime
+  updatedAt     DateTime
   documentId    String               → Document (cascade delete)
   @@index([documentId])
   @@index([type])
@@ -154,7 +164,7 @@ AiGeneration
 | Auth session | Clerk | `auth()` server-side / `useUser()` client |
 | Current user (DB) | Prisma User | Fetched server-side in layouts |
 | Workspaces list | TanStack Query | `useWorkspaces()` |
-| Active workspace | TanStack Query | `useWorkspace(id)` |
+| Active workspace | TanStack Query | `useWorkspace(id)` — local hook defined in the workspace detail page; not in global `hooks/`; keyed `["workspace", workspaceId]` |
 | Documents list | TanStack Query | `useDocuments(workspaceId)` |
 | Document content | Local `useState` | Debounced auto-save via `useMutation` |
 | AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; `staleTime: Infinity`; invalidated after successful mutation |
@@ -235,7 +245,6 @@ _(none — all planned items shipped)_
 | `staleTime: Infinity` on `useAiGenerations` | Generations only change when the user explicitly runs a new action — no background source can mutate them | Must ensure `invalidateQueries` is always called after successful mutation or cache will be stale |
 | AI panel action tabs select view, not trigger generation | Separates navigation from side effects — user can browse results without accidentally firing API calls | Generate/Regenerate must be a deliberate explicit action |
 | `inputSnapshot` staleness over timestamp-based staleness | Content drift is the relevant signal, not time; comparing snapshots directly tells us whether the result is still valid for the current document | Simple string equality — no diffing, no normalization; whitespace differences will mark as stale |
-| Staleness clears when `content === outputText` | "Replace content" sets editor to the AI output, so the result is immediately valid — stale note should not fire | Relies on exact string equality; any post-replace edit re-triggers stale correctly |
 | `proxy.ts` instead of `middleware.ts` | Next.js 16 deprecated the `middleware` file convention in favour of `proxy` | Rename required; export name also changed from `middleware` to `proxy` |
 | Single `pendingAction` state gates all generate buttons | Prevents overlapping mutations and keeps panel state predictable | Only one action can run at a time; users cannot queue multiple generations |
 | Tiptap content stored as HTML; plain text extracted via `textBetween` for AI | AI needs plain text; editor needs HTML for rich formatting. `textBetween(0, size, "\n\n")` reproduces the paragraph-separated format previously stored in `inputSnapshot`, keeping staleness and revert comparisons valid | Old plain-text documents render correctly (Tiptap wraps in `<p>`); newly saved content is HTML |
@@ -318,5 +327,5 @@ _(none — all planned items shipped)_
 - [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
 - [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation
 - [ ] Disable "Insert below" button after "Replace content" is clicked — prevents duplicate content when the displayed result is already the full editor content
-- [x] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button in the AI panel that restores the editor to `inputSnapshot` (the document content captured at generation time); button only visible when `content === outputText` and `inputSnapshot` exists; disappears on further edits; triggers autosave on revert
+- [x] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button that restores the editor to its pre-replace HTML (captured in `originalHtmlRef`); button visible when `replacedGenerationId === displayed.id`; disappears on further edits or insert below; triggers autosave on revert
 - [ ] **Version history (v2)** — full document timeline across edits; allows users to browse and restore any prior state of the document, not just the last AI replace
