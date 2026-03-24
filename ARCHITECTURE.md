@@ -170,7 +170,7 @@ AiGeneration
 | AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; `staleTime: Infinity`; invalidated after successful mutation |
 | AI panel selected action | Local `useState` | `selectedAction` — which action tab is active; drives what persisted result is shown |
 | AI panel pending action | Local `useState` | `pendingAction` — in-flight action; clears on success/error; all generate buttons disabled while set |
-| Replaced generation ID | Local `useState` | `replacedGenerationId` — tracks which generation's output is currently in the editor; drives "Revert to original" button visibility and `isStale` suppression; cleared on user edits |
+| Replaced generation ID | Local `useState` | `replacedGenerationId` — tracks which generation's output is currently in the editor via Replace content; drives "Revert to original" button visibility, `isAlreadyApplied` check, and `isStale` suppression; cleared on user edits or Insert at cursor |
 | Pre-replace HTML snapshot | Local `useRef` | `originalHtmlRef` — HTML captured at the moment "Replace content" fires; used to restore exact rich formatting on revert; cleared after revert or user edit |
 | AI panel collapse state | Local `useState` | `resultCollapsed` in `AiPanel` — collapses everything below the result section header (pending, empty state, markdown, action buttons, history); default `false` (expanded) |
 
@@ -256,6 +256,7 @@ _(none — all planned items shipped)_
 | `replacedGenerationId` state replaces `content === outputText` for revert button | After `marked.parse()`, `textBetween` strips markdown syntax from rendered HTML so `content !== outputText` is always true — the revert button never showed. Explicit ID tracking is robust regardless of content format | `isReplacingRef` guards against `onUpdate` clearing the state when `setContent` fires synchronously inside `handleReplace` |
 | OpenAI system message for consistent Markdown output | Without a system message, GPT-4o mirrors input style — plain prose input (from `textBetween` after a "Replace content") returns plain prose output. System message overrides this and ensures every generation is Markdown-formatted for `marked.parse()` | Applies to all three actions and all generations including regenerations; keeps user-facing prompts clean |
 | `resultCollapsed` collapses the full result body, not just the markdown | Collapsing only the markdown area would leave orphaned action buttons with no visible content above them — confusing UX. Collapsing the entire body (pending/empty/markdown/buttons/history) keeps the panel clean and predictable when minimised | The section header (label + Regenerate/Back to latest + chevron) always stays visible so the user knows which action is selected |
+| `isAlreadyApplied` disables only "Replace content", not "Insert at cursor" | Replace is a terminal state — the result IS the document, re-applying is a no-op. Insert at cursor is additive — users may want multiple insertions at different cursor positions, so it stays enabled. `isAlreadyApplied = displayed.id === replacedGenerationId`; derived inline, no new state or props | "Copy" also stays enabled; helper text below buttons explains the disabled state to users |
 
 ---
 
@@ -291,6 +292,8 @@ _(none — all planned items shipped)_
 - [x] UI polish — Tiptap editor typography (line-height, heading hierarchy, list rhythm, block spacing)
 - [x] UI polish — editor writing canvas constrained to `max-w-[680px]`; card/title/back-link vertical spacing refined
 - [x] UI polish — AI panel spacing and readability; collapsible result section via `resultCollapsed`
+- [x] UI polish — "Insert below" renamed to "Insert at cursor"; `editor.commands.insertContent()` inserts at preserved `editor.state.selection` regardless of focus
+- [x] UI polish — `isAlreadyApplied` disables "Replace content" only (terminal state); "Insert at cursor" stays enabled (additive); helper text shown
 
 ---
 
@@ -331,7 +334,7 @@ _(none — all planned items shipped)_
 - [ ] Add error logging in API route catch blocks — currently errors fail silently with no observability
 - [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
 - [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation
-- [ ] Disable "Insert below" button after "Replace content" is clicked — prevents duplicate content when the displayed result is already the full editor content
+- [x] Disable "Replace content" when generation is already applied (`isAlreadyApplied = displayed.id === replacedGenerationId`); "Insert at cursor" intentionally stays enabled (additive action); helper text shown; "Copy" unaffected
 - [x] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button that restores the editor to its pre-replace HTML (captured in `originalHtmlRef`); button visible when `replacedGenerationId === displayed.id`; disappears on further edits or insert below; triggers autosave on revert
 - [ ] **Version history (v2)** — full document timeline across edits; allows users to browse and restore any prior state of the document, not just the last AI replace
 - [ ] **Image paste — Phase 1 (base64)** — install `@tiptap/extension-image`; add `editorProps.handlePaste` to intercept clipboard image files, convert to base64 data URL via `FileReader`, insert as image node; acceptable short-term but bloats `Document.content` in DB

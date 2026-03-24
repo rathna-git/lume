@@ -120,7 +120,7 @@ function AiPanel({
     onGenerate,
     onReplace,
     replacedGenerationId,
-    onInsertBelow,
+    onInsertAtCursor,
     onCopy,
     onRevert,
     onRetry,
@@ -137,7 +137,7 @@ function AiPanel({
     onGenerate: (action: AiAction) => void
     onReplace: (text: string, id: string) => void
     replacedGenerationId: string | null
-    onInsertBelow: (text: string) => void
+    onInsertAtCursor: (text: string) => void
     onCopy: (text: string) => void
     onRevert: () => void
     onRetry: () => void
@@ -308,32 +308,46 @@ function AiPanel({
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                                    <button
-                                        onClick={() => onReplace(displayed.output!.text, displayed.id)}
-                                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                    >
-                                        Replace content
-                                    </button>
-                                    <button
-                                        onClick={() => onInsertBelow(displayed.output!.text)}
-                                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                    >
-                                        Insert below
-                                    </button>
-                                    <button
-                                        onClick={() => onCopy(displayed.output!.text)}
-                                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                    >
-                                        Copy
-                                    </button>
-                                    {displayed.inputSnapshot && replacedGenerationId === displayed.id && (
-                                        <button
-                                            onClick={() => onRevert()}
-                                            className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
-                                        >
-                                            Revert to original
-                                        </button>
-                                    )}
+                                    {(() => {
+                                        const isAlreadyApplied = displayed.id === replacedGenerationId
+                                        return (
+                                            <>
+                                                <button
+                                                    onClick={() => onReplace(displayed.output!.text, displayed.id)}
+                                                    disabled={isAlreadyApplied}
+                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                                                >
+                                                    Replace content
+                                                </button>
+                                                <button
+                                                    onClick={() => onInsertAtCursor(displayed.output!.text)}
+                                                    disabled={isAlreadyApplied}
+                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                                                >
+                                                    Insert at cursor
+                                                </button>
+                                                <button
+                                                    onClick={() => onCopy(displayed.output!.text)}
+                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                                >
+                                                    Copy
+                                                </button>
+                                                {displayed.inputSnapshot && isAlreadyApplied && (
+                                                    <button
+                                                        onClick={() => onRevert()}
+                                                        className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                                    >
+                                                        Revert to original
+                                                    </button>
+                                                )}
+                                                {isAlreadyApplied && (
+                                                    <p className="text-[0.75rem] text-muted-foreground/50 leading-relaxed pt-0.5">
+                                                        This result is already applied to the document.
+                                                    </p>
+                                                )}
+                                            </>
+                                        )
+                                    })()}
                                 </div>
                             </>
                         )}
@@ -405,7 +419,7 @@ function DocumentEditor({
     const [deleteError, setDeleteError] = useState<string | null>(null)
     const [overflowOpen, setOverflowOpen] = useState(false)
     // Tracks which generation's output is currently shown in the editor (set by handleReplace,
-    // cleared by user edits, handleInsertBelow, or handleRevert). Used for the revert button.
+    // cleared by user edits, handleInsertAtCursor, or handleRevert). Used for the revert button.
     const [replacedGenerationId, setReplacedGenerationId] = useState<string | null>(null)
 
     // Refs for stable access inside useEditor callbacks (avoids stale closure on title/save)
@@ -490,12 +504,14 @@ function DocumentEditor({
         editor?.commands.setContent(marked.parse(text) as string)
     }
 
-    function handleInsertBelow(text: string) {
+    function handleInsertAtCursor(text: string) {
         if (!editor) return
         isReplacingRef.current = true
         setReplacedGenerationId(null)
         originalHtmlRef.current = null
-        editor.commands.setContent(editor.getHTML() + (marked.parse(text) as string))
+        // insertContent uses editor.state.selection, which is preserved even when the editor
+        // loses focus (e.g. user clicked the AI panel button) — so the last cursor position is valid
+        editor.commands.insertContent(marked.parse(text) as string)
     }
 
     function handleCopy(text: string) {
@@ -707,7 +723,7 @@ function DocumentEditor({
                         onGenerate={handleGenerate}
                         onReplace={handleReplace}
                         replacedGenerationId={replacedGenerationId}
-                        onInsertBelow={handleInsertBelow}
+                        onInsertAtCursor={handleInsertAtCursor}
                         onCopy={handleCopy}
                         onRevert={handleRevert}
                         onRetry={retryGenerations}

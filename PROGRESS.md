@@ -6,6 +6,25 @@
 
 ## 2026-03-24
 
+### AI Panel — Insert at Cursor + Applied State Refinement
+
+- Renamed "Insert below" → "Insert at cursor"; `handleInsertBelow` → `handleInsertAtCursor`
+- Insertion uses `editor.commands.insertContent(html)` — inserts at `editor.state.selection`, which ProseMirror preserves even after the editor loses focus (e.g. when user clicks the AI panel button); no `isFocused` check needed
+- Derived `isAlreadyApplied` inline (`displayed.id === replacedGenerationId`) within the action buttons block — no new state or props
+- Only "Replace content" is disabled when `isAlreadyApplied` — Replace is a terminal state (the result IS the document); "Insert at cursor" stays enabled because it is additive and users may want multiple insertions at different positions
+- "Copy" remains enabled at all times
+- "Revert to original" visibility unchanged (`displayed.inputSnapshot && isAlreadyApplied`)
+- Helper text "This result is already applied to the document." appears only when `isAlreadyApplied`
+- No AI logic, hooks, routes, or data flow touched
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Insert at cursor behavior; `isAlreadyApplied` disables only Replace content |
+
+---
+
 ### AI Panel — Spacing, Readability, and Collapsible Result Section
 
 - Tightened outer panel gap `gap-5` → `gap-4`; actions label `mb-2` → `mb-2.5`
@@ -14,7 +33,7 @@
 - Action buttons section: `gap-1.5 pt-3` → `gap-2 pt-4` for more breathing room
 - History section: `gap-1 pt-3` → `gap-1.5 pt-4`; history item padding `px-2.5 py-2` → `px-3 py-2.5`
 - Added `ChevronDown` collapse toggle in the result section header — visible only when a result exists
-- `resultCollapsed` state (default `false`) collapses everything below the section header: pending state, empty state, rendered markdown, action buttons (Replace content / Insert below / Copy / Revert to original), and the Previous results history list
+- `resultCollapsed` state (default `false`) collapses everything below the section header: pending state, empty state, rendered markdown, action buttons (Replace content / Insert at cursor / Copy / Revert to original), and the Previous results history list
 - Chevron rotates 180° when expanded (acts as ChevronUp) via `transition-transform duration-200`
 - No editor logic, hooks, routes, or data flow touched
 
