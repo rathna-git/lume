@@ -1,9 +1,13 @@
 "use client"
 
-import { use, useRef, useState } from "react"
+import { use, useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Sparkles } from "lucide-react"
+import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2 } from "lucide-react"
+import { useEditor, EditorContent, type Editor } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
+import { cn } from "@/lib/utils"
 import { useDocument, useUpdateDocument, useDeleteDocument } from "@/hooks/use-document"
 import { useGenerateAi, useAiGenerations, type AiAction, type AiGeneration } from "@/hooks/use-ai"
 import { Button } from "@/components/ui/button"
@@ -31,6 +35,91 @@ function relativeTime(dateStr: string) {
     const hrs = Math.floor(mins / 60)
     if (hrs < 24) return `${hrs}h ago`
     return `${Math.floor(hrs / 24)}d ago`
+}
+
+/** Convert plain text (with \n\n paragraph separators) to HTML for Tiptap */
+function textToHtml(text: string): string {
+    if (!text) return "<p></p>"
+    return text
+        .split("\n\n")
+        .map((para) => {
+            const escaped = para
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+            return `<p>${escaped.replace(/\n/g, "<br>")}</p>`
+        })
+        .join("")
+}
+
+/**
+ * Floating bubble menu — appears above any text selection.
+ * In Tiptap v3, BubbleMenu is a bare extension with no React wrapper.
+ * This component listens to editor events directly and uses a portal for positioning.
+ */
+function BubbleMenuReact({
+    editor,
+    children,
+    onHide,
+}: {
+    editor: Editor
+    children: React.ReactNode
+    onHide: () => void
+}) {
+    const [rect, setRect] = useState<DOMRect | null>(null)
+    const onHideRef = useRef(onHide)
+    onHideRef.current = onHide
+
+    useEffect(() => {
+        function handleSelectionUpdate() {
+            const { from, to } = editor.state.selection
+            if (from === to) {
+                setRect(null)
+                onHideRef.current()
+                return
+            }
+            const sel = window.getSelection()
+            if (sel && sel.rangeCount > 0) {
+                setRect(sel.getRangeAt(0).getBoundingClientRect())
+            } else {
+                setRect(null)
+            }
+        }
+
+        function handleBlur() {
+            setRect(null)
+            onHideRef.current()
+        }
+
+        editor.on("selectionUpdate", handleSelectionUpdate)
+        editor.on("blur", handleBlur)
+
+        return () => {
+            editor.off("selectionUpdate", handleSelectionUpdate)
+            editor.off("blur", handleBlur)
+        }
+    }, [editor])
+
+    if (!rect) return null
+
+    // Anchor the bottom of the menu 8px above the selection top.
+    // Using `bottom` (instead of `top`) means the overflow panel grows upward,
+    // so it can never be clipped by the bottom of the viewport.
+    const bottom = window.innerHeight - rect.top + 8
+    const left = Math.min(
+        Math.max(rect.left + rect.width / 2, 80),
+        window.innerWidth - 80
+    )
+
+    return createPortal(
+        <div
+            style={{ position: "fixed", bottom, left, transform: "translateX(-50%)", zIndex: 50 }}
+            onMouseDown={(e) => e.preventDefault()}
+        >
+            {children}
+        </div>,
+        document.body
+    )
 }
 
 function AiPanel({
@@ -317,11 +406,11 @@ function DocumentEditor({
     const [pendingAction, setPendingAction] = useState<AiAction | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const [deleteError, setDeleteError] = useState<string | null>(null)
+    const [overflowOpen, setOverflowOpen] = useState(false)
 
-    function handleSelectAction(action: AiAction) {
-        setSelectedAction(action)
-        setSelectedGenerationId(null)
-    }
+    // Refs for stable access inside useEditor callbacks (avoids stale closure on title/save)
+    const titleRef = useRef(title)
+    titleRef.current = title
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -339,20 +428,44 @@ function DocumentEditor({
         }, 800)
     }
 
+    const saveRef = useRef(save)
+    saveRef.current = save
+
+    const editor = useEditor({
+        extensions: [StarterKit],
+        content: doc.content ?? "",
+        onUpdate: ({ editor }) => {
+            const html = editor.getHTML()
+            setContent(html)
+            saveRef.current(titleRef.current, html)
+        },
+        editorProps: {
+            attributes: {
+                class: "outline-none min-h-[60vh] text-[0.95rem] leading-relaxed text-foreground font-light",
+            },
+        },
+    })
+
+    // Plain text extracted from editor — used for AI calls and staleness comparisons.
+    // textBetween with "\n\n" separator matches the format stored in inputSnapshot.
+    const textContent = editor
+        ? editor.state.doc.textBetween(0, editor.state.doc.content.size, "\n\n")
+        : (doc.content ?? "")
+
+    function handleSelectAction(action: AiAction) {
+        setSelectedAction(action)
+        setSelectedGenerationId(null)
+    }
+
     function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setTitle(e.target.value)
         save(e.target.value, content)
     }
 
-    function handleContentChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-        setContent(e.target.value)
-        save(title, e.target.value)
-    }
-
     function handleGenerate(action: AiAction) {
         setPendingAction(action)
         generateAi(
-            { documentId, action, content },
+            { documentId, action, content: textContent },
             {
                 onSuccess: () => { setPendingAction(null); setSelectedGenerationId(null) },
                 onError: () => setPendingAction(null),
@@ -361,14 +474,12 @@ function DocumentEditor({
     }
 
     function handleReplace(text: string) {
-        setContent(text)
-        save(title, text)
+        editor?.commands.setContent(textToHtml(text))
     }
 
     function handleInsertBelow(text: string) {
-        const next = content ? `${content}\n\n${text}` : text
-        setContent(next)
-        save(title, next)
+        if (!editor) return
+        editor.commands.setContent(editor.getHTML() + textToHtml(text))
     }
 
     function handleCopy(text: string) {
@@ -376,8 +487,7 @@ function DocumentEditor({
     }
 
     function handleRevert(snapshot: string) {
-        setContent(snapshot)
-        save(title, snapshot)
+        editor?.commands.setContent(textToHtml(snapshot))
     }
 
     function handleDelete() {
@@ -390,6 +500,31 @@ function DocumentEditor({
             onError: (err) => setDeleteError(err instanceof Error ? err.message : "Something went wrong."),
         })
     }
+
+    const bubbleBtn = (active: boolean) =>
+        cn(
+            "w-7 h-7 rounded-full flex items-center justify-center transition-colors",
+            active
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        )
+
+    const overflowItems = editor
+        ? [
+              { icon: Pilcrow,      label: "Paragraph",    action: () => editor.chain().focus().setParagraph().run(),               active: editor.isActive("paragraph") && !editor.isActive("bulletList") && !editor.isActive("orderedList") },
+              { icon: Heading1,     label: "Heading 1",    action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),   active: editor.isActive("heading", { level: 1 }) },
+              { icon: Heading2,     label: "Heading 2",    action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),   active: editor.isActive("heading", { level: 2 }) },
+              { icon: Heading3,     label: "Heading 3",    action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),   active: editor.isActive("heading", { level: 3 }) },
+              { icon: List,         label: "Bullet list",  action: () => editor.chain().focus().toggleBulletList().run(),            active: editor.isActive("bulletList") },
+              { icon: ListOrdered,  label: "Ordered list", action: () => editor.chain().focus().toggleOrderedList().run(),           active: editor.isActive("orderedList") },
+              { icon: Quote,        label: "Blockquote",   action: () => editor.chain().focus().toggleBlockquote().run(),            active: editor.isActive("blockquote") },
+              { icon: Code2,        label: "Code block",   action: () => editor.chain().focus().toggleCodeBlock().run(),             active: editor.isActive("codeBlock") },
+              { icon: Minus,        label: "Divider",      action: () => editor.chain().focus().setHorizontalRule().run(),           active: false },
+              null,
+              { icon: Undo2,        label: "Undo",         action: () => editor.chain().focus().undo().run(),                       active: false },
+              { icon: Redo2,        label: "Redo",         action: () => editor.chain().focus().redo().run(),                       active: false },
+          ]
+        : []
 
     return (
         <div className="min-h-full bg-muted p-4 md:p-6">
@@ -433,13 +568,89 @@ function DocumentEditor({
                     {/* Divider */}
                     <div className="border-t border-border mb-8" />
 
-                    {/* Content */}
-                    <textarea
-                        value={content}
-                        onChange={handleContentChange}
-                        placeholder="Start writing…"
-                        className="w-full min-h-[60vh] text-[0.95rem] leading-relaxed text-foreground placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none font-light"
-                    />
+                    {/* Tiptap editor */}
+                    <div className="tiptap-editor">
+                        {editor && (
+                            <BubbleMenuReact
+                                editor={editor}
+                                onHide={() => setOverflowOpen(false)}
+                            >
+                                {/* flex-col-reverse: pill sits at the bottom (close to selection),
+                                    overflow panel grows upward above the pill */}
+                                <div className="flex flex-col-reverse gap-1">
+                                    {/* Primary pill */}
+                                    <div className="flex items-center bg-popover border border-border shadow-lg rounded-full px-1.5 py-1 gap-0.5">
+                                        <button
+                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run() }}
+                                            className={bubbleBtn(editor.isActive("bold"))}
+                                            title="Bold"
+                                        >
+                                            <Bold size={12} />
+                                        </button>
+                                        <button
+                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run() }}
+                                            className={bubbleBtn(editor.isActive("italic"))}
+                                            title="Italic"
+                                        >
+                                            <Italic size={12} />
+                                        </button>
+                                        <button
+                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleStrike().run() }}
+                                            className={bubbleBtn(editor.isActive("strike"))}
+                                            title="Strikethrough"
+                                        >
+                                            <Strikethrough size={12} />
+                                        </button>
+                                        <button
+                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleCode().run() }}
+                                            className={bubbleBtn(editor.isActive("code"))}
+                                            title="Inline code"
+                                        >
+                                            <Code size={12} />
+                                        </button>
+                                        <div className="w-px h-4 bg-border mx-0.5" />
+                                        <button
+                                            onMouseDown={(e) => { e.preventDefault(); setOverflowOpen((v) => !v) }}
+                                            className={bubbleBtn(overflowOpen)}
+                                            title="More formatting"
+                                        >
+                                            <MoreHorizontal size={12} />
+                                        </button>
+                                    </div>
+
+                                    {/* Overflow panel */}
+                                    {overflowOpen && (
+                                        <div className="bg-popover border border-border shadow-lg rounded-xl overflow-hidden py-1 min-w-[148px]">
+                                            {overflowItems.map((item, i) =>
+                                                item === null ? (
+                                                    <div key={i} className="h-px bg-border my-1 mx-2" />
+                                                ) : (
+                                                    <button
+                                                        key={item.label}
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault()
+                                                            item.action()
+                                                            setOverflowOpen(false)
+                                                        }}
+                                                        className={cn(
+                                                            "w-full text-left text-xs px-3 py-1.5 transition-colors flex items-center gap-2",
+                                                            item.active
+                                                                ? "text-foreground font-medium bg-muted"
+                                                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                        )}
+                                                    >
+                                                        <item.icon size={12} className="shrink-0 opacity-70" />
+                                                        {item.label}
+                                                    </button>
+                                                )
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </BubbleMenuReact>
+                        )}
+                        <EditorContent editor={editor} />
+                    </div>
                 </div>
 
                 {/* AI panel surface */}
@@ -449,7 +660,7 @@ function DocumentEditor({
                         <p className="text-xs font-medium text-foreground">AI Assistant</p>
                     </div>
                     <AiPanel
-                        content={content}
+                        content={textContent}
                         selectedAction={selectedAction}
                         generations={generations}
                         generationsLoading={generationsLoading}

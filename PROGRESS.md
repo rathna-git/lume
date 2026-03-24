@@ -6,6 +6,44 @@
 
 ## 2026-03-23
 
+### Tiptap Rich Text Editor
+
+- Replaced `<textarea>` with Tiptap (StarterKit) rich text editor
+- Content stored as HTML in the DB; plain text extracted via `editor.state.doc.textBetween(0, size, "\n\n")` for AI calls and staleness comparisons — preserves compatibility with stored `inputSnapshot` values
+- Selection-based bubble menu appears above any text selection with a pill-shaped floating bar: **Bold**, **Italic**, **Strike**, **Inline code**, and a **"More" (⋯)** overflow toggle
+- Overflow panel exposes: Paragraph, H1/H2/H3, Bullet list, Ordered list, Blockquote, Code block, Divider, Undo, Redo
+- `onMouseDown` + `e.preventDefault()` on all bubble buttons keeps the editor selection alive when applying formatting
+- Custom `BubbleMenuReact` component (portal to `document.body`) — Tiptap v3 dropped the React component wrapper from `@tiptap/react`; lightweight implementation using `editor.on("selectionUpdate")` + `window.getSelection()` + `createPortal`
+- `titleRef` / `saveRef` pattern used to avoid stale closures in `useEditor`'s `onUpdate` callback
+- AI actions (Replace content, Insert below, Revert to original) convert plain text → HTML via `textToHtml()` helper before calling `editor.commands.setContent()`
+- Autosave preserved: `onUpdate` fires HTML → `save(title, html)` via debounce
+- ProseMirror content styles added to `globals.css` (.tiptap-editor scope): headings, lists, blockquote, code block, inline code, horizontal rule, placeholder
+- Old plain-text documents load correctly — Tiptap wraps unstructured content in `<p>` on first render
+
+### Files Modified
+
+| File                                                                       | Status   | Notes                                                                                      |
+| -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Replaced textarea with Tiptap editor + custom BubbleMenuReact; updated all content handlers |
+| `app/globals.css`                                                          | Modified | Added `.tiptap-editor` ProseMirror styles                                                  |
+
+### Dependencies Added
+
+| Package                        | Version | Notes                                                      |
+| ------------------------------ | ------- | ---------------------------------------------------------- |
+| `@tiptap/react`                | 3.20.4  | Core React integration (`useEditor`, `EditorContent`)      |
+| `@tiptap/starter-kit`          | 3.20.4  | All standard extensions (Bold, Italic, Headings, Lists...) |
+| `@tiptap/extension-bubble-menu`| 3.20.4  | Installed but not used — Tiptap v3 dropped React wrapper; custom component used instead |
+
+### Edge Cases Handled
+
+- Old plain-text DB content renders correctly in Tiptap (wrapped in `<p>` on load)
+- `textBetween` with `"\n\n"` separator matches stored `inputSnapshot` format → staleness and revert comparisons remain accurate
+- Stale closure on `title` inside `onUpdate` handled via `titleRef` pattern
+- `textToHtml` escapes `&`, `<`, `>` before inserting AI output into the editor — prevents HTML injection from AI responses
+
+---
+
 ### Manual Testing Pass
 
 - Performed full manual test pass across all features built to date

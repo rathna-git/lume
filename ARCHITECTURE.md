@@ -236,6 +236,8 @@ _(none — all planned items shipped)_
 | Staleness clears when `content === outputText` | "Replace content" sets editor to the AI output, so the result is immediately valid — stale note should not fire | Relies on exact string equality; any post-replace edit re-triggers stale correctly |
 | `proxy.ts` instead of `middleware.ts` | Next.js 16 deprecated the `middleware` file convention in favour of `proxy` | Rename required; export name also changed from `middleware` to `proxy` |
 | Single `pendingAction` state gates all generate buttons | Prevents overlapping mutations and keeps panel state predictable | Only one action can run at a time; users cannot queue multiple generations |
+| Tiptap content stored as HTML; plain text extracted via `textBetween` for AI | AI needs plain text; editor needs HTML for rich formatting. `textBetween(0, size, "\n\n")` reproduces the paragraph-separated format previously stored in `inputSnapshot`, keeping staleness and revert comparisons valid | Old plain-text documents render correctly (Tiptap wraps in `<p>`); newly saved content is HTML |
+| Custom `BubbleMenuReact` portal instead of Tiptap's BubbleMenu extension | Tiptap v3 dropped the React component wrapper from `@tiptap/react`; the extension is a bare ProseMirror plugin requiring manual DOM integration. A lightweight React component using `editor.on("selectionUpdate")` + `window.getSelection()` + `createPortal` is simpler and fully sufficient | No dependency on `@tiptap/extension-bubble-menu`; `onMouseDown` + `preventDefault` keeps selection alive when clicking menu buttons |
 
 ---
 
@@ -296,7 +298,7 @@ _(none — all planned items shipped)_
 ### Lower Priority
 
 - [x] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
-- [ ] Replace `<textarea>` editor with Tiptap rich text editor — enables formatting toolbar, and allows markdown-to-rich-text insert from AI panel
+- [x] Replace `<textarea>` editor with Tiptap rich text editor — StarterKit, custom `BubbleMenuReact` (portal-based, Tiptap v3 has no React wrapper), selection bubble menu with Bold/Italic/Strike/Code + overflow panel (Paragraph, H1-H3, lists, blockquote, code block, divider, undo/redo); content stored as HTML; plain text extracted via `textBetween` for AI and staleness comparisons
 - [x] Replace `confirm()` on document delete with a proper confirmation dialog (same pattern as workspace delete)
 - [ ] Conditionally adjust workspace delete dialog copy — omit "and all documents inside it" when workspace is empty
 - [ ] Add filtering / sorting for AI generations
