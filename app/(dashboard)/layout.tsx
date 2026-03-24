@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
+import { Toaster } from "sonner"
 
 export default async function DashboardLayout({
     children,
@@ -45,6 +46,19 @@ export default async function DashboardLayout({
                     {children}
                 </main>
             </div>
+            <Toaster
+                position="bottom-right"
+                duration={2500}
+                toastOptions={{
+                    style: {
+                        background: '#FFF8F0',
+                        border: '1px solid #F0E8DF',
+                        color: '#1A1410',
+                        fontSize: '0.8125rem',
+                        boxShadow: '0 2px 8px rgba(26,20,16,0.07)',
+                    },
+                }}
+            />
         </div>
     )
 }

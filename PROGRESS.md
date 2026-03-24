@@ -6,6 +6,35 @@
 
 ## 2026-03-24
 
+### AI Panel — Toast Notifications + History Horizontal Scroll
+
+- Added `sonner` (v2.0.7) for toast feedback on AI panel actions
+- `toast.success()` fires after: Replace content, Insert at cursor, Copy, Revert to original
+- `<Toaster>` placed in `app/(dashboard)/layout.tsx` — position `bottom-right`, duration 2500ms
+- Toast styled to Lume theme via `toastOptions.style`: background `#FFF8F0`, border `#F0E8DF`, text `#1A1410`, soft box shadow
+- Success icon color overridden to `#F5A623` (lume-amber) via `[data-sonner-toast] [data-icon]` in `globals.css`
+- "Undo with Cmd+Z" hint shown below action buttons when a result exists (`displayed?.output?.text`); `text-[0.7rem] text-muted-foreground/60 text-right`
+- History list layout changed from vertical `flex-col` to horizontal `flex-row overflow-x-auto` — two cards visible, rest scrollable; scrollbar hidden via `[&::-webkit-scrollbar]:hidden`
+- Each history card is `shrink-0 w-[calc(50%-0.25rem)]` with `line-clamp-2` for the snippet
+- When `olderGenerations.length > 2`: `ChevronRight` icon overlaid at the right edge with a `bg-linear-to-l from-background` fade — signals that more results are scrollable; `pointer-events-none` so it doesn't block scroll
+- `ChevronRight` added to lucide-react import
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/(dashboard)/layout.tsx` | Modified | `<Toaster>` added with Lume theme options |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | `toast.success()` calls; undo hint; history horizontal scroll + chevron |
+| `app/globals.css` | Modified | Sonner icon color override |
+
+### Dependencies Added
+
+| Package | Version | Notes |
+| ------- | ------- | ----- |
+| `sonner` | 2.0.7 | Lightweight toast library; no Toaster component needed in root layout — placed in dashboard layout only |
+
+---
+
 ### AI Panel — Insert at Cursor + Applied State Refinement
 
 - Renamed "Insert below" → "Insert at cursor"; `handleInsertBelow` → `handleInsertAtCursor`
@@ -175,7 +204,7 @@
 - `onMouseDown` + `e.preventDefault()` on all bubble buttons keeps the editor selection alive when applying formatting
 - Custom `BubbleMenuReact` component (portal to `document.body`) — Tiptap v3 dropped the React component wrapper from `@tiptap/react`; lightweight implementation using `editor.on("selectionUpdate")` + `window.getSelection()` + `createPortal`
 - `titleRef` / `saveRef` pattern used to avoid stale closures in `useEditor`'s `onUpdate` callback
-- AI actions use `marked.parse()` (Replace content, Insert below) or restore `originalHtmlRef` (Revert to original) — `textToHtml()` helper was later removed
+- AI actions use `marked.parse()` (Replace content, Insert at cursor) or restore `originalHtmlRef` (Revert to original) — `textToHtml()` helper was later removed
 - Autosave preserved: `onUpdate` fires HTML → `save(title, html)` via debounce
 - ProseMirror content styles added to `globals.css` (.tiptap-editor scope): headings, lists, blockquote, code block, inline code, horizontal rule, placeholder
 - Old plain-text documents load correctly — Tiptap wraps unstructured content in `<p>` on first render
@@ -200,7 +229,7 @@
 - Old plain-text DB content renders correctly in Tiptap (wrapped in `<p>` on load)
 - `textBetween` with `"\n\n"` separator matches stored `inputSnapshot` format → staleness and revert comparisons remain accurate
 - Stale closure on `title` inside `onUpdate` handled via `titleRef` pattern
-- `textToHtml` escapes `&`, `<`, `>` before inserting AI output into the editor — prevents HTML injection from AI responses
+- `textToHtml` was removed — AI output is now inserted via `marked.parse()` (HTML) or `originalHtmlRef` (revert); no plain-text injection path remains
 
 ---
 

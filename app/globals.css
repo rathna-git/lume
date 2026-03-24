@@ -234,6 +234,11 @@
   height: 0;
 }
 
+/* ── Sonner toast — Lume theme ── */
+[data-sonner-toast] [data-icon] {
+  color: #F5A623;
+}
+
 /* ── Lume animations ── */
 @keyframes lume-spin-slow {
   from { transform: rotate(0deg); }

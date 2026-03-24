@@ -4,8 +4,9 @@ import { use, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown } from "lucide-react"
+import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight } from "lucide-react"
 import { marked } from "marked"
+import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import { cn } from "@/lib/utils"
@@ -349,6 +350,9 @@ function AiPanel({
                                         )
                                     })()}
                                 </div>
+                                <p className="text-[0.7rem] text-muted-foreground/60 mt-3 text-right">
+                                    Undo with Cmd+Z
+                                </p>
                             </>
                         )}
 
@@ -358,24 +362,34 @@ function AiPanel({
                             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-1">
                                 Previous
                             </p>
-                            {olderGenerations.map((g) => (
-                                <button
-                                    key={g.id}
-                                    onClick={() => onSelectGeneration(g.id)}
-                                    className={`text-left rounded-lg px-3 py-2.5 transition-colors border ${
-                                        displayed?.id === g.id
-                                            ? "border-border bg-muted"
-                                            : "border-transparent hover:bg-muted/60"
-                                    }`}
-                                >
-                                    <span className="text-[10px] text-muted-foreground/50 block mb-0.5">
-                                        {relativeTime(g.createdAt)}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground line-clamp-1">
-                                        {g.output?.text?.slice(0, 80) ?? "—"}
-                                    </span>
-                                </button>
-                            ))}
+                            <div className="relative">
+                                <div className="flex flex-row gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                {olderGenerations.map((g) => (
+                                    <button
+                                        key={g.id}
+                                        onClick={() => onSelectGeneration(g.id)}
+                                        className={`text-left rounded-lg px-3 py-2.5 transition-colors border shrink-0 w-[calc(50%-0.25rem)] ${
+                                            displayed?.id === g.id
+                                                ? "border-border bg-muted"
+                                                : "border-border hover:bg-muted/60"
+                                        }`}
+                                    >
+                                        <span className="text-[10px] text-muted-foreground/50 block mb-0.5">
+                                            {relativeTime(g.createdAt)}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground line-clamp-2">
+                                            {g.output?.text?.slice(0, 80) ?? "—"}
+                                        </span>
+                                    </button>
+                                ))}
+                                </div>
+                                {olderGenerations.length > 2 && (
+                                    <div className="absolute right-0 top-0 bottom-1 w-8 flex items-center justify-end pointer-events-none">
+                                        <div className="absolute inset-y-0 right-0 w-8 bg-linear-to-l from-background to-transparent" />
+                                        <ChevronRight size={11} className="relative text-muted-foreground/40" />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                         </>
@@ -502,6 +516,7 @@ function DocumentEditor({
         isReplacingRef.current = true
         setReplacedGenerationId(generationId)
         editor?.commands.setContent(marked.parse(text) as string)
+        toast.success("Replaced with AI result")
     }
 
     function handleInsertAtCursor(text: string) {
@@ -512,10 +527,12 @@ function DocumentEditor({
         // insertContent uses editor.state.selection, which is preserved even when the editor
         // loses focus (e.g. user clicked the AI panel button) — so the last cursor position is valid
         editor.commands.insertContent(marked.parse(text) as string)
+        toast.success("Inserted into document")
     }
 
     function handleCopy(text: string) {
         navigator.clipboard.writeText(text)
+        toast.success("Copied to clipboard")
     }
 
     function handleRevert() {
@@ -524,6 +541,7 @@ function DocumentEditor({
         setReplacedGenerationId(null)
         editor.commands.setContent(originalHtmlRef.current)
         originalHtmlRef.current = null
+        toast.success("Restored original content")
     }
 
     function handleDelete() {

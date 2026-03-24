@@ -294,6 +294,8 @@ _(none — all planned items shipped)_
 - [x] UI polish — AI panel spacing and readability; collapsible result section via `resultCollapsed`
 - [x] UI polish — "Insert below" renamed to "Insert at cursor"; `editor.commands.insertContent()` inserts at preserved `editor.state.selection` regardless of focus
 - [x] UI polish — `isAlreadyApplied` disables "Replace content" only (terminal state); "Insert at cursor" stays enabled (additive); helper text shown
+- [x] UI polish — `sonner` toast notifications for Replace, Insert at cursor, Copy, Revert; Lume-themed via `toastOptions.style` + CSS icon override; `bottom-right` position
+- [x] UI polish — AI panel history list changed to horizontal scroll; two cards visible, `ChevronRight` fade overlay when `olderGenerations.length > 2`; "Undo with Cmd+Z" hint below action buttons
 
 ---
 
