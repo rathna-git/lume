@@ -6,6 +6,36 @@
 
 ## 2026-03-23
 
+### Bubble Menu — Viewport-Aware Side Panel + AI Replace Markdown Fix
+
+#### Bubble menu overflow positioning
+
+- Overflow panel no longer stacks above the pill — it now floats **to the side** (right by default, left when near the right viewport edge)
+- `BubbleMenuReact` refactored to a **render prop** (`children: (opts: { flipLeft }) => ReactNode`) so viewport-derived positioning info can flow to the overflow panel without prop-drilling or context
+- Overflow panel uses `position: absolute` with `left: calc(100% + 8px)` / `right: calc(100% + 8px)` — never clips at top or bottom of viewport
+- Added `showBelow` logic: when selection is within 56px of the top, the whole menu appears **below** the selection (`top: rect.bottom + 8`) instead of above — handles top-edge clipping
+- `flipLeft` threshold: when the pill's center is within 224px of the right viewport edge, overflow opens to the left side instead
+
+#### AI replace / insert below — markdown formatting preserved
+
+- `handleReplace` and `handleInsertBelow` now use `marked.parse(text)` instead of `textToHtml()` — AI output is markdown; Tiptap receives proper HTML with bold, headings, lists, code blocks, etc.
+- `handleRevert` keeps `textToHtml()` — `inputSnapshot` is plain text captured via `textBetween`, not markdown
+- `marked` added as a dependency (`v17.0.5`)
+
+### Files Modified
+
+| File                                                                       | Status   | Notes                                                                                           |
+| -------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Render prop on `BubbleMenuReact`; side-panel overflow; `showBelow`; `marked.parse` for AI ops  |
+
+### Dependencies Added
+
+| Package  | Version | Notes                                                   |
+| -------- | ------- | ------------------------------------------------------- |
+| `marked` | 17.0.5  | Markdown → HTML for AI replace/insert; sync via `marked.parse()` |
+
+---
+
 ### Tiptap Rich Text Editor
 
 - Replaced `<textarea>` with Tiptap (StarterKit) rich text editor

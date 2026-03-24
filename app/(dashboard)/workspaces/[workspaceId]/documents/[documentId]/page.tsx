@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2 } from "lucide-react"
+import { marked } from "marked"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import { cn } from "@/lib/utils"
@@ -53,18 +54,18 @@ function textToHtml(text: string): string {
 }
 
 /**
- * Floating bubble menu — appears above any text selection.
- * In Tiptap v3, BubbleMenu is a bare extension with no React wrapper.
- * This component listens to editor events directly and uses a portal for positioning.
+ * Floating bubble menu — appears near any text selection.
+ * Uses a render prop to pass positioning info (flipLeft) to children
+ * so the overflow panel can be placed to the correct side of the pill.
  */
 function BubbleMenuReact({
     editor,
-    children,
     onHide,
+    children,
 }: {
     editor: Editor
-    children: React.ReactNode
     onHide: () => void
+    children: (opts: { flipLeft: boolean }) => React.ReactNode
 }) {
     const [rect, setRect] = useState<DOMRect | null>(null)
     const onHideRef = useRef(onHide)
@@ -102,21 +103,19 @@ function BubbleMenuReact({
 
     if (!rect) return null
 
-    // Anchor the bottom of the menu 8px above the selection top.
-    // Using `bottom` (instead of `top`) means the overflow panel grows upward,
-    // so it can never be clipped by the bottom of the viewport.
-    const bottom = window.innerHeight - rect.top + 8
-    const left = Math.min(
-        Math.max(rect.left + rect.width / 2, 80),
-        window.innerWidth - 80
-    )
+    const left = Math.min(Math.max(rect.left + rect.width / 2, 80), window.innerWidth - 80)
+    // Not enough space above → show below selection instead
+    const showBelow = rect.top < 56
+    // Not enough room to the right for the overflow panel (~128px + 8px gap) → flip it left
+    const flipLeft = left > window.innerWidth - 224
+
+    const posStyle: React.CSSProperties = showBelow
+        ? { position: "fixed", top: rect.bottom + 8, left, transform: "translateX(-50%)", zIndex: 50 }
+        : { position: "fixed", bottom: window.innerHeight - rect.top + 8, left, transform: "translateX(-50%)", zIndex: 50 }
 
     return createPortal(
-        <div
-            style={{ position: "fixed", bottom, left, transform: "translateX(-50%)", zIndex: 50 }}
-            onMouseDown={(e) => e.preventDefault()}
-        >
-            {children}
+        <div style={posStyle} onMouseDown={(e) => e.preventDefault()}>
+            {children({ flipLeft })}
         </div>,
         document.body
     )
@@ -474,12 +473,12 @@ function DocumentEditor({
     }
 
     function handleReplace(text: string) {
-        editor?.commands.setContent(textToHtml(text))
+        editor?.commands.setContent(marked.parse(text) as string)
     }
 
     function handleInsertBelow(text: string) {
         if (!editor) return
-        editor.commands.setContent(editor.getHTML() + textToHtml(text))
+        editor.commands.setContent(editor.getHTML() + (marked.parse(text) as string))
     }
 
     function handleCopy(text: string) {
@@ -575,78 +574,88 @@ function DocumentEditor({
                                 editor={editor}
                                 onHide={() => setOverflowOpen(false)}
                             >
-                                {/* flex-col-reverse: pill sits at the bottom (close to selection),
-                                    overflow panel grows upward above the pill */}
-                                <div className="flex flex-col-reverse gap-1">
-                                    {/* Primary pill */}
-                                    <div className="flex items-center bg-popover border border-border shadow-lg rounded-full px-1.5 py-1 gap-0.5">
-                                        <button
-                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run() }}
-                                            className={bubbleBtn(editor.isActive("bold"))}
-                                            title="Bold"
-                                        >
-                                            <Bold size={12} />
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run() }}
-                                            className={bubbleBtn(editor.isActive("italic"))}
-                                            title="Italic"
-                                        >
-                                            <Italic size={12} />
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleStrike().run() }}
-                                            className={bubbleBtn(editor.isActive("strike"))}
-                                            title="Strikethrough"
-                                        >
-                                            <Strikethrough size={12} />
-                                        </button>
-                                        <button
-                                            onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleCode().run() }}
-                                            className={bubbleBtn(editor.isActive("code"))}
-                                            title="Inline code"
-                                        >
-                                            <Code size={12} />
-                                        </button>
-                                        <div className="w-px h-4 bg-border mx-0.5" />
-                                        <button
-                                            onMouseDown={(e) => { e.preventDefault(); setOverflowOpen((v) => !v) }}
-                                            className={bubbleBtn(overflowOpen)}
-                                            title="More formatting"
-                                        >
-                                            <MoreHorizontal size={12} />
-                                        </button>
-                                    </div>
-
-                                    {/* Overflow panel */}
-                                    {overflowOpen && (
-                                        <div className="bg-popover border border-border shadow-lg rounded-xl overflow-hidden py-1 min-w-[148px]">
-                                            {overflowItems.map((item, i) =>
-                                                item === null ? (
-                                                    <div key={i} className="h-px bg-border my-1 mx-2" />
-                                                ) : (
-                                                    <button
-                                                        key={item.label}
-                                                        onMouseDown={(e) => {
-                                                            e.preventDefault()
-                                                            item.action()
-                                                            setOverflowOpen(false)
-                                                        }}
-                                                        className={cn(
-                                                            "w-full text-left text-xs px-3 py-1.5 transition-colors flex items-center gap-2",
-                                                            item.active
-                                                                ? "text-foreground font-medium bg-muted"
-                                                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                                        )}
-                                                    >
-                                                        <item.icon size={12} className="shrink-0 opacity-70" />
-                                                        {item.label}
-                                                    </button>
-                                                )
-                                            )}
+                                {({ flipLeft }) => (
+                                    <div style={{ position: "relative" }}>
+                                        {/* Primary pill */}
+                                        <div className="flex items-center bg-popover border border-border shadow-lg rounded-full px-1.5 py-1 gap-0.5">
+                                            <button
+                                                onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run() }}
+                                                className={bubbleBtn(editor.isActive("bold"))}
+                                                title="Bold"
+                                            >
+                                                <Bold size={12} />
+                                            </button>
+                                            <button
+                                                onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run() }}
+                                                className={bubbleBtn(editor.isActive("italic"))}
+                                                title="Italic"
+                                            >
+                                                <Italic size={12} />
+                                            </button>
+                                            <button
+                                                onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleStrike().run() }}
+                                                className={bubbleBtn(editor.isActive("strike"))}
+                                                title="Strikethrough"
+                                            >
+                                                <Strikethrough size={12} />
+                                            </button>
+                                            <button
+                                                onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleCode().run() }}
+                                                className={bubbleBtn(editor.isActive("code"))}
+                                                title="Inline code"
+                                            >
+                                                <Code size={12} />
+                                            </button>
+                                            <div className="w-px h-4 bg-border mx-0.5" />
+                                            <button
+                                                onMouseDown={(e) => { e.preventDefault(); setOverflowOpen((v) => !v) }}
+                                                className={bubbleBtn(overflowOpen)}
+                                                title="More formatting"
+                                            >
+                                                <MoreHorizontal size={12} />
+                                            </button>
                                         </div>
-                                    )}
-                                </div>
+
+                                        {/* Overflow panel — floats to the side of the pill */}
+                                        {overflowOpen && (
+                                            <div
+                                                style={{
+                                                    position: "absolute",
+                                                    ...(flipLeft
+                                                        ? { right: "calc(100% + 8px)" }
+                                                        : { left: "calc(100% + 8px)" }),
+                                                    top: "50%",
+                                                    transform: "translateY(-50%)",
+                                                }}
+                                                className="bg-popover border border-border shadow-lg rounded-xl overflow-hidden py-1 min-w-[148px]"
+                                            >
+                                                {overflowItems.map((item, i) =>
+                                                    item === null ? (
+                                                        <div key={i} className="h-px bg-border my-1 mx-2" />
+                                                    ) : (
+                                                        <button
+                                                            key={item.label}
+                                                            onMouseDown={(e) => {
+                                                                e.preventDefault()
+                                                                item.action()
+                                                                setOverflowOpen(false)
+                                                            }}
+                                                            className={cn(
+                                                                "w-full text-left text-xs px-3 py-1.5 transition-colors flex items-center gap-2",
+                                                                item.active
+                                                                    ? "text-foreground font-medium bg-muted"
+                                                                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                            )}
+                                                        >
+                                                            <item.icon size={12} className="shrink-0 opacity-70" />
+                                                            {item.label}
+                                                        </button>
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </BubbleMenuReact>
                         )}
                         <EditorContent editor={editor} />
