@@ -286,6 +286,8 @@ _(none — all planned items shipped)_
 - [x] `useAiGenerations` hook (`staleTime: Infinity`, invalidated after mutation)
 - [x] Two-surface editor layout (editor card + persistent AI panel)
 - [x] Action-driven AI panel (tabs select view; Generate / Regenerate explicit; staleness via `inputSnapshot`)
+- [x] UI polish — Tiptap editor typography (line-height, heading hierarchy, list rhythm, block spacing)
+- [x] UI polish — editor writing canvas constrained to `max-w-[680px]`; card/title/back-link vertical spacing refined
 
 ---
 
@@ -329,3 +331,5 @@ _(none — all planned items shipped)_
 - [ ] Disable "Insert below" button after "Replace content" is clicked — prevents duplicate content when the displayed result is already the full editor content
 - [x] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button that restores the editor to its pre-replace HTML (captured in `originalHtmlRef`); button visible when `replacedGenerationId === displayed.id`; disappears on further edits or insert below; triggers autosave on revert
 - [ ] **Version history (v2)** — full document timeline across edits; allows users to browse and restore any prior state of the document, not just the last AI replace
+- [ ] **Image paste — Phase 1 (base64)** — install `@tiptap/extension-image`; add `editorProps.handlePaste` to intercept clipboard image files, convert to base64 data URL via `FileReader`, insert as image node; acceptable short-term but bloats `Document.content` in DB
+- [ ] **Image paste — Phase 2 (S3 upload)** — add `POST /api/upload` route returning a permanent URL; replace `FileReader.readAsDataURL` with a fetch to the upload endpoint; aligns with planned migration of document content storage to AWS S3

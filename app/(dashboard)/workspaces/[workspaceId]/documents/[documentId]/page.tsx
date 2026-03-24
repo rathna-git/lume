@@ -536,9 +536,9 @@ function DocumentEditor({
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start max-w-[1400px] mx-auto">
 
                 {/* Editor surface */}
-                <div className="flex-1 min-w-0 bg-card rounded-2xl border border-border shadow-sm px-8 py-8">
+                <div className="flex-1 min-w-0 bg-card rounded-2xl border border-border shadow-sm px-8 py-10">
                     {/* Back + save status */}
-                    <div className="flex items-center justify-between mb-10">
+                    <div className="flex items-center justify-between mb-8">
                         <Link
                             href={`/workspaces/${workspaceId}`}
                             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -561,13 +561,16 @@ function DocumentEditor({
                         </div>
                     </div>
 
+                    {/* Writing canvas — constrained to a comfortable reading width */}
+                    <div className="max-w-[680px] mx-auto">
+
                     {/* Title */}
                     <input
                         type="text"
                         value={title}
                         onChange={handleTitleChange}
                         placeholder="Untitled"
-                        className="w-full font-serif text-3xl text-foreground tracking-tight placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none mb-8"
+                        className="w-full font-serif text-3xl text-foreground tracking-tight placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none mb-5"
                     />
 
                     {/* Divider */}
@@ -666,6 +669,8 @@ function DocumentEditor({
                         )}
                         <EditorContent editor={editor} />
                     </div>
+
+                    </div> {/* end writing canvas */}
                 </div>
 
                 {/* AI panel surface */}

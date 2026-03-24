@@ -4,6 +4,25 @@
 
 ---
 
+## 2026-03-24
+
+### Editor Width and Spacing Refinement
+
+- Added `max-w-[680px] mx-auto` writing canvas wrapper around title + divider + Tiptap editor — back link / save-status row stays full-width; writing surface centers at a comfortable reading width
+- Increased editor card vertical padding `py-8` → `py-10` for more generous inset above and below content
+- Tightened back link row bottom margin `mb-10` → `mb-8` — less dead space before the title
+- Tightened title bottom margin `mb-8` → `mb-5` — divider provides visual separation; old gap was redundant
+- Divider bottom margin `mb-8` unchanged — intentional transition beat before writing begins
+- No editor logic, Tiptap behavior, AI panel, routes, or hooks touched
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | Writing canvas `max-w` wrapper + card/title/back-link spacing adjustments |
+
+---
+
 ## 2026-03-23
 
 ### Editor Typography Polish
