@@ -18,8 +18,8 @@
 
 #### AI replace / insert below — markdown formatting preserved
 
-- `handleReplace` and `handleInsertBelow` now use `marked.parse(text)` instead of `textToHtml()` — AI output is markdown; Tiptap receives proper HTML with bold, headings, lists, code blocks, etc.
-- `handleRevert` keeps `textToHtml()` — `inputSnapshot` is plain text captured via `textBetween`, not markdown
+- `handleReplace` and `handleInsertBelow` now use `marked.parse(text)` — AI output is markdown; Tiptap receives proper HTML with bold, headings, lists, code blocks, etc.
+- `textToHtml()` helper removed entirely (was only used for revert; see revert fix below)
 - `marked` added as a dependency (`v17.0.5`)
 
 ### Files Modified
@@ -36,6 +36,56 @@
 
 ---
 
+### Revert-to-Original Formatting Fix
+
+- **Root cause**: `inputSnapshot` is stored as plain text (captured via `textBetween`). `textToHtml(snapshot)` stripped all rich formatting. The editor showed plain paragraphs instead of the original headings, bold, lists, etc.
+- **Fix**: capture `editor.getHTML()` into `originalHtmlRef` immediately before `Replace content` overwrites the editor; `handleRevert` restores that exact HTML snapshot
+- `originalHtmlRef` is cleared on user edits (`onUpdate`), `handleInsertBelow`, and after revert completes
+- `handleRevert` signature changed to `() => void` — no longer needs a snapshot argument; `AiPanel.onRevert` updated accordingly
+- `textToHtml()` helper removed (was only used for revert; no longer needed)
+
+### Files Modified
+
+| File                                                                       | Status   | Notes                                                                     |
+| -------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | `originalHtmlRef`; updated `handleReplace`, `handleRevert`, `onUpdate`; removed `textToHtml` |
+
+---
+
+### Revert Button Visibility Fix (`replacedGenerationId`)
+
+- **Root cause**: the revert button condition `content === outputText` compared `textBetween` output (plain text, markdown stripped) against raw AI markdown — always false after `marked.parse()` was introduced
+- **Fix**: `replacedGenerationId` state tracks which generation's output is currently in the editor
+  - Set to `generation.id` on "Replace content"
+  - Cleared on user edits (`onUpdate`), "Insert below", and after revert
+  - `isReplacingRef` prevents `onUpdate` from clearing it during programmatic `setContent` calls
+- `isStale` updated: replaced `outputText !== content` check with `replacedGenerationId !== displayed?.id`
+- Revert button condition updated: `replacedGenerationId === displayed.id` (replaces `content === outputText`)
+- `onReplace` prop signature updated to `(text: string, id: string) => void`
+- `outputText` local variable removed (no longer needed)
+
+### Files Modified
+
+| File                                                                       | Status   | Notes                                                                               |
+| -------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Modified | `replacedGenerationId` state + `isReplacingRef`; updated revert button + isStale conditions |
+
+---
+
+### AI System Message — Always Respond in Markdown
+
+- **Root cause**: after "Replace content", the editor holds rendered HTML; `textBetween` extracts plain prose (no markdown syntax). "Regenerate" sends this plain prose to GPT-4o, which mirrors it back as plain prose — `marked.parse()` has no markdown to convert, so the editor shows unformatted text
+- **Fix**: added OpenAI system message: _"You are a writing assistant. Always respond using Markdown formatting… Never return plain unformatted prose."_ — applies to all three actions and to every generation including regenerations
+- User-facing prompts kept clean (no redundant markdown instructions)
+
+### Files Modified
+
+| File                              | Status   | Notes                                           |
+| --------------------------------- | -------- | ----------------------------------------------- |
+| `app/api/ai/generate/route.ts`    | Modified | System message added to OpenAI chat completions |
+
+---
+
 ### Tiptap Rich Text Editor
 
 - Replaced `<textarea>` with Tiptap (StarterKit) rich text editor
@@ -45,7 +95,7 @@
 - `onMouseDown` + `e.preventDefault()` on all bubble buttons keeps the editor selection alive when applying formatting
 - Custom `BubbleMenuReact` component (portal to `document.body`) — Tiptap v3 dropped the React component wrapper from `@tiptap/react`; lightweight implementation using `editor.on("selectionUpdate")` + `window.getSelection()` + `createPortal`
 - `titleRef` / `saveRef` pattern used to avoid stale closures in `useEditor`'s `onUpdate` callback
-- AI actions (Replace content, Insert below, Revert to original) convert plain text → HTML via `textToHtml()` helper before calling `editor.commands.setContent()`
+- AI actions use `marked.parse()` (Replace content, Insert below) or restore `originalHtmlRef` (Revert to original) — `textToHtml()` helper was later removed
 - Autosave preserved: `onUpdate` fires HTML → `save(title, html)` via debounce
 - ProseMirror content styles added to `globals.css` (.tiptap-editor scope): headings, lists, blockquote, code block, inline code, horizontal rule, placeholder
 - Old plain-text documents load correctly — Tiptap wraps unstructured content in `<p>` on first render

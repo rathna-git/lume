@@ -160,6 +160,8 @@ AiGeneration
 | AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; `staleTime: Infinity`; invalidated after successful mutation |
 | AI panel selected action | Local `useState` | `selectedAction` — which action tab is active; drives what persisted result is shown |
 | AI panel pending action | Local `useState` | `pendingAction` — in-flight action; clears on success/error; all generate buttons disabled while set |
+| Replaced generation ID | Local `useState` | `replacedGenerationId` — tracks which generation's output is currently in the editor; drives "Revert to original" button visibility and `isStale` suppression; cleared on user edits |
+| Pre-replace HTML snapshot | Local `useRef` | `originalHtmlRef` — HTML captured at the moment "Replace content" fires; used to restore exact rich formatting on revert; cleared after revert or user edit |
 
 ---
 
@@ -207,7 +209,7 @@ AiGeneration
 - `useAiGenerations(documentId)` fetches and caches saved generations (`staleTime: Infinity`); invalidated after each successful mutation
 - Editor uses a two-surface layout: editor card (left) + AI panel (right, sticky)
 - AI panel is action-driven: selecting a tab shows the latest `SUCCESS` generation for that type
-- Staleness: shown when `content !== inputSnapshot && content !== outputText` — clears after "Replace content" because content then matches the output exactly
+- Staleness: shown when `replacedGenerationId !== displayed.id && content !== inputSnapshot` — suppressed immediately after "Replace content" via the ID check; `inputSnapshot` and `content` are both plain text (`textBetween`) so the comparison remains valid
 - Regenerate always available when a result exists; fires the same mutation, creates a new row, invalidation refreshes the panel
 
 ### Planned
@@ -239,7 +241,10 @@ _(none — all planned items shipped)_
 | Tiptap content stored as HTML; plain text extracted via `textBetween` for AI | AI needs plain text; editor needs HTML for rich formatting. `textBetween(0, size, "\n\n")` reproduces the paragraph-separated format previously stored in `inputSnapshot`, keeping staleness and revert comparisons valid | Old plain-text documents render correctly (Tiptap wraps in `<p>`); newly saved content is HTML |
 | Custom `BubbleMenuReact` portal instead of Tiptap's BubbleMenu extension | Tiptap v3 dropped the React component wrapper from `@tiptap/react`; the extension is a bare ProseMirror plugin requiring manual DOM integration. A lightweight React component using `editor.on("selectionUpdate")` + `window.getSelection()` + `createPortal` is simpler and fully sufficient | No dependency on `@tiptap/extension-bubble-menu`; `onMouseDown` + `preventDefault` keeps selection alive when clicking menu buttons |
 | `BubbleMenuReact` render prop for `flipLeft` | The overflow panel needs viewport-derived positioning computed inside `BubbleMenuReact` from `rect` + `window.innerWidth`. A render prop (`children: (opts: { flipLeft }) => ReactNode`) flows this info without prop-drilling | Overflow panel uses `position: absolute` horizontally — never clips at top or bottom; `showBelow` handles top-edge clipping for the pill |
-| `marked.parse()` for AI replace/insert; `textToHtml` for revert | AI output is markdown; Tiptap needs HTML. `marked.parse()` converts the full markdown AST (headings, bold, lists, code blocks). `textToHtml` is kept only for `handleRevert` since `inputSnapshot` is plain text from `textBetween` | `marked.parse()` used synchronously (no async extensions); cast as `string` to satisfy TypeScript |
+| `marked.parse()` for AI replace/insert | AI output is markdown; Tiptap needs HTML. `marked.parse()` converts the full markdown AST (headings, bold, lists, code blocks). `textToHtml` helper removed after revert was redesigned to use `originalHtmlRef` | `marked.parse()` used synchronously (no async extensions); cast as `string` to satisfy TypeScript |
+| `originalHtmlRef` for revert instead of `textToHtml(inputSnapshot)` | `inputSnapshot` is plain text (captured via `textBetween`); re-converting it to HTML strips all rich formatting. Capturing `editor.getHTML()` at the moment "Replace content" is clicked preserves the exact pre-replace state | Ref is cleared on user edits and after revert fires; `isReplacingRef` prevents `onUpdate` from clearing it during programmatic `setContent` calls |
+| `replacedGenerationId` state replaces `content === outputText` for revert button | After `marked.parse()`, `textBetween` strips markdown syntax from rendered HTML so `content !== outputText` is always true — the revert button never showed. Explicit ID tracking is robust regardless of content format | `isReplacingRef` guards against `onUpdate` clearing the state when `setContent` fires synchronously inside `handleReplace` |
+| OpenAI system message for consistent Markdown output | Without a system message, GPT-4o mirrors input style — plain prose input (from `textBetween` after a "Replace content") returns plain prose output. System message overrides this and ensures every generation is Markdown-formatted for `marked.parse()` | Applies to all three actions and all generations including regenerations; keeps user-facing prompts clean |
 
 ---
 
@@ -300,7 +305,7 @@ _(none — all planned items shipped)_
 ### Lower Priority
 
 - [x] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
-- [x] Replace `<textarea>` editor with Tiptap rich text editor — StarterKit, custom `BubbleMenuReact` (portal-based, Tiptap v3 has no React wrapper), selection bubble menu with Bold/Italic/Strike/Code + overflow panel (Paragraph, H1-H3, lists, blockquote, code block, divider, undo/redo); content stored as HTML; plain text extracted via `textBetween` for AI and staleness comparisons; overflow panel side-floats via render prop + `position: absolute`; `marked.parse()` converts AI markdown output to HTML on replace/insert
+- [x] Replace `<textarea>` editor with Tiptap rich text editor — StarterKit, custom `BubbleMenuReact` (portal-based, Tiptap v3 has no React wrapper), selection bubble menu with Bold/Italic/Strike/Code + overflow panel (Paragraph, H1-H3, lists, blockquote, code block, divider, undo/redo); content stored as HTML; plain text extracted via `textBetween` for AI and staleness comparisons; overflow panel side-floats via render prop + `position: absolute`; `marked.parse()` converts AI markdown to HTML on replace/insert; `originalHtmlRef` preserves formatting on revert; `replacedGenerationId` tracks replace state for revert button + staleness; OpenAI system message ensures markdown output on all generations
 - [x] Replace `confirm()` on document delete with a proper confirmation dialog (same pattern as workspace delete)
 - [ ] Conditionally adjust workspace delete dialog copy — omit "and all documents inside it" when workspace is empty
 - [ ] Add filtering / sorting for AI generations
