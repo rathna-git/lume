@@ -38,20 +38,6 @@ function relativeTime(dateStr: string) {
     return `${Math.floor(hrs / 24)}d ago`
 }
 
-/** Convert plain text (with \n\n paragraph separators) to HTML for Tiptap */
-function textToHtml(text: string): string {
-    if (!text) return "<p></p>"
-    return text
-        .split("\n\n")
-        .map((para) => {
-            const escaped = para
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-            return `<p>${escaped.replace(/\n/g, "<br>")}</p>`
-        })
-        .join("")
-}
 
 /**
  * Floating bubble menu — appears near any text selection.
@@ -153,7 +139,7 @@ function AiPanel({
     replacedGenerationId: string | null
     onInsertBelow: (text: string) => void
     onCopy: (text: string) => void
-    onRevert: (text: string) => void
+    onRevert: () => void
     onRetry: () => void
 }) {
     const actionGenerations = selectedAction
@@ -329,7 +315,7 @@ function AiPanel({
                                 </button>
                                 {displayed.inputSnapshot && replacedGenerationId === displayed.id && (
                                     <button
-                                        onClick={() => onRevert(displayed.inputSnapshot!)}
+                                        onClick={() => onRevert()}
                                         className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
                                     >
                                         Revert to original
@@ -412,6 +398,8 @@ function DocumentEditor({
     titleRef.current = title
     // Prevents onUpdate from clearing replacedGenerationId on programmatic setContent calls
     const isReplacingRef = useRef(false)
+    // HTML snapshot captured right before a Replace Content — used to restore formatting on revert
+    const originalHtmlRef = useRef<string | null>(null)
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -442,6 +430,7 @@ function DocumentEditor({
             // User typed → clear replaced state. Skip when the update came from setContent.
             if (!isReplacingRef.current) {
                 setReplacedGenerationId(null)
+                originalHtmlRef.current = null
             }
             isReplacingRef.current = false
         },
@@ -480,6 +469,7 @@ function DocumentEditor({
     }
 
     function handleReplace(text: string, generationId: string) {
+        originalHtmlRef.current = editor?.getHTML() ?? null
         isReplacingRef.current = true
         setReplacedGenerationId(generationId)
         editor?.commands.setContent(marked.parse(text) as string)
@@ -489,6 +479,7 @@ function DocumentEditor({
         if (!editor) return
         isReplacingRef.current = true
         setReplacedGenerationId(null)
+        originalHtmlRef.current = null
         editor.commands.setContent(editor.getHTML() + (marked.parse(text) as string))
     }
 
@@ -496,10 +487,12 @@ function DocumentEditor({
         navigator.clipboard.writeText(text)
     }
 
-    function handleRevert(snapshot: string) {
+    function handleRevert() {
+        if (!editor || !originalHtmlRef.current) return
         isReplacingRef.current = true
         setReplacedGenerationId(null)
-        editor?.commands.setContent(textToHtml(snapshot))
+        editor.commands.setContent(originalHtmlRef.current)
+        originalHtmlRef.current = null
     }
 
     function handleDelete() {
