@@ -137,22 +137,93 @@
 }
 
 /* ── Tiptap editor ── */
-.tiptap-editor .ProseMirror p { margin-bottom: 0.75rem; }
+
+/* Base prose — airy line-height, consistent font size */
+.tiptap-editor .ProseMirror {
+  font-size: 0.9375rem;   /* 15px — slightly smaller than default for a refined feel */
+  line-height: 1.75;
+  color: var(--foreground);
+}
+
+/* Paragraphs */
+.tiptap-editor .ProseMirror p { margin-bottom: 1rem; }
 .tiptap-editor .ProseMirror p:last-child { margin-bottom: 0; }
-.tiptap-editor .ProseMirror h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.75rem; }
-.tiptap-editor .ProseMirror h2 { font-size: 1.25rem; font-weight: 600; line-height: 1.3; margin-bottom: 0.5rem; }
-.tiptap-editor .ProseMirror h3 { font-size: 1.1rem; font-weight: 600; line-height: 1.3; margin-bottom: 0.5rem; }
-.tiptap-editor .ProseMirror ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
-.tiptap-editor .ProseMirror ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; }
-.tiptap-editor .ProseMirror li { margin-bottom: 0.25rem; }
-.tiptap-editor .ProseMirror blockquote { border-left: 2px solid var(--border); padding-left: 0.75rem; color: var(--muted-foreground); font-style: italic; margin-bottom: 0.75rem; }
-.tiptap-editor .ProseMirror pre { background: var(--muted); border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.8rem; overflow-x: auto; margin-bottom: 0.75rem; }
+
+/* Headings — restrained scale, generous top-margin to breathe from preceding content */
+.tiptap-editor .ProseMirror h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+.tiptap-editor .ProseMirror h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-top: 1.75rem;
+  margin-bottom: 0.375rem;
+}
+.tiptap-editor .ProseMirror h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+/* Collapse excess top-margin when heading is the first element */
+.tiptap-editor .ProseMirror > h1:first-child,
+.tiptap-editor .ProseMirror > h2:first-child,
+.tiptap-editor .ProseMirror > h3:first-child { margin-top: 0; }
+
+/* Lists — comfortable indent, item breathing room */
+.tiptap-editor .ProseMirror ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+.tiptap-editor .ProseMirror ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+.tiptap-editor .ProseMirror li { margin-bottom: 0.375rem; line-height: 1.7; }
+.tiptap-editor .ProseMirror li:last-child { margin-bottom: 0; }
+/* Nested lists — tighter gap so they read as sub-items, not new sections */
+.tiptap-editor .ProseMirror li > ul,
+.tiptap-editor .ProseMirror li > ol { margin-top: 0.25rem; margin-bottom: 0.25rem; }
+
+/* Blockquote */
+.tiptap-editor .ProseMirror blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+/* Code block */
+.tiptap-editor .ProseMirror pre {
+  background: var(--muted);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1.125rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
 .tiptap-editor .ProseMirror pre code { background: none; padding: 0; font-size: inherit; }
-.tiptap-editor .ProseMirror code:not(pre code) { background: var(--muted); border-radius: 0.25rem; padding: 0.1em 0.3em; font-size: 0.85em; }
-.tiptap-editor .ProseMirror hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+/* Inline code */
+.tiptap-editor .ProseMirror code:not(pre code) {
+  background: var(--muted);
+  border-radius: 0.25rem;
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+}
+
+/* Horizontal rule */
+.tiptap-editor .ProseMirror hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+/* Inline marks */
 .tiptap-editor .ProseMirror strong { font-weight: 700; }
 .tiptap-editor .ProseMirror em { font-style: italic; }
 .tiptap-editor .ProseMirror s { text-decoration: line-through; }
+
 /* Placeholder — shown only when editor is completely empty */
 .tiptap-editor .ProseMirror.is-editor-empty > p:first-child::before {
   content: "Start writing…";

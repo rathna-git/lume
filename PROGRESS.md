@@ -6,6 +6,28 @@
 
 ## 2026-03-23
 
+### Editor Typography Polish
+
+- Refined all `.tiptap-editor .ProseMirror` styles in `app/globals.css` for a calmer, Notion-level reading and writing experience
+- Base prose: `font-size: 0.9375rem` (15px) + `line-height: 1.75` — the two primary levers for premium feel
+- Paragraphs: increased gap from `0.75rem` → `1rem`
+- Headings: each level now has size-specific `margin-top` (2rem / 1.75rem / 1.5rem) to pull them toward what follows, not what precedes; slight `letter-spacing: -0.02em` on H1/H2 for tighter weight; `margin-top: 0` when the heading is the first element in the editor
+- Lists: indent increased to `1.5rem`, item gap to `0.375rem`, `line-height: 1.7` on `li`; nested lists get `0.25rem` top/bottom margin so sub-items cluster under their parent without extra visual weight
+- Blockquote: border thickened `2px` → `3px`, padding increased to `1rem`
+- Code block: slightly larger font (`0.8125rem`), more comfortable padding, `line-height: 1.65`
+- HR: margin expanded `1.5rem` → `2rem` for a true section-break feel
+- No editor logic, hooks, or component files touched
+
+### Files Modified
+
+| File | Status | Notes |
+| ---- | ------ | ----- |
+| `app/globals.css` | Modified | Typography scale and spacing inside `.tiptap-editor .ProseMirror` only |
+
+---
+
+
+
 ### Bubble Menu — Viewport-Aware Side Panel + AI Replace Markdown Fix
 
 #### Bubble menu overflow positioning
