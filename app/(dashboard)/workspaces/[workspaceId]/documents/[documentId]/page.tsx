@@ -133,6 +133,7 @@ function AiPanel({
     onSelectGeneration,
     onGenerate,
     onReplace,
+    replacedGenerationId,
     onInsertBelow,
     onCopy,
     onRevert,
@@ -148,7 +149,8 @@ function AiPanel({
     onSelectAction: (action: AiAction) => void
     onSelectGeneration: (id: string | null) => void
     onGenerate: (action: AiAction) => void
-    onReplace: (text: string) => void
+    onReplace: (text: string, id: string) => void
+    replacedGenerationId: string | null
     onInsertBelow: (text: string) => void
     onCopy: (text: string) => void
     onRevert: (text: string) => void
@@ -167,14 +169,9 @@ function AiPanel({
     const isViewingLatest = displayed?.id === latest?.id
     const olderGenerations = actionGenerations.slice(1)
 
-    const outputText = displayed?.output != null && typeof (displayed.output as { text?: string }).text === "string"
-        ? (displayed.output as { text: string }).text
-        : null
-    const isStale = isViewingLatest && !!(
-        displayed?.inputSnapshot != null &&
-        displayed.inputSnapshot !== content &&
-        outputText !== content
-    )
+    const isStale = isViewingLatest &&
+        replacedGenerationId !== displayed?.id &&
+        !!(displayed?.inputSnapshot != null && displayed.inputSnapshot !== content)
     const isPending = pendingAction === selectedAction && selectedAction !== null
     const anyPending = pendingAction !== null
 
@@ -313,7 +310,7 @@ function AiPanel({
                             </div>
                             <div className="flex flex-col gap-1.5 pt-3 border-t border-border">
                                 <button
-                                    onClick={() => onReplace(displayed.output!.text)}
+                                    onClick={() => onReplace(displayed.output!.text, displayed.id)}
                                     className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
                                 >
                                     Replace content
@@ -330,7 +327,7 @@ function AiPanel({
                                 >
                                     Copy
                                 </button>
-                                {displayed.inputSnapshot && content === outputText && (
+                                {displayed.inputSnapshot && replacedGenerationId === displayed.id && (
                                     <button
                                         onClick={() => onRevert(displayed.inputSnapshot!)}
                                         className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
@@ -406,10 +403,15 @@ function DocumentEditor({
     const [deleteOpen, setDeleteOpen] = useState(false)
     const [deleteError, setDeleteError] = useState<string | null>(null)
     const [overflowOpen, setOverflowOpen] = useState(false)
+    // Tracks which generation's output is currently shown in the editor (set by handleReplace,
+    // cleared by user edits, handleInsertBelow, or handleRevert). Used for the revert button.
+    const [replacedGenerationId, setReplacedGenerationId] = useState<string | null>(null)
 
     // Refs for stable access inside useEditor callbacks (avoids stale closure on title/save)
     const titleRef = useRef(title)
     titleRef.current = title
+    // Prevents onUpdate from clearing replacedGenerationId on programmatic setContent calls
+    const isReplacingRef = useRef(false)
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -437,6 +439,11 @@ function DocumentEditor({
             const html = editor.getHTML()
             setContent(html)
             saveRef.current(titleRef.current, html)
+            // User typed → clear replaced state. Skip when the update came from setContent.
+            if (!isReplacingRef.current) {
+                setReplacedGenerationId(null)
+            }
+            isReplacingRef.current = false
         },
         editorProps: {
             attributes: {
@@ -472,12 +479,16 @@ function DocumentEditor({
         )
     }
 
-    function handleReplace(text: string) {
+    function handleReplace(text: string, generationId: string) {
+        isReplacingRef.current = true
+        setReplacedGenerationId(generationId)
         editor?.commands.setContent(marked.parse(text) as string)
     }
 
     function handleInsertBelow(text: string) {
         if (!editor) return
+        isReplacingRef.current = true
+        setReplacedGenerationId(null)
         editor.commands.setContent(editor.getHTML() + (marked.parse(text) as string))
     }
 
@@ -486,6 +497,8 @@ function DocumentEditor({
     }
 
     function handleRevert(snapshot: string) {
+        isReplacingRef.current = true
+        setReplacedGenerationId(null)
         editor?.commands.setContent(textToHtml(snapshot))
     }
 
@@ -680,6 +693,7 @@ function DocumentEditor({
                         onSelectGeneration={setSelectedGenerationId}
                         onGenerate={handleGenerate}
                         onReplace={handleReplace}
+                        replacedGenerationId={replacedGenerationId}
                         onInsertBelow={handleInsertBelow}
                         onCopy={handleCopy}
                         onRevert={handleRevert}
