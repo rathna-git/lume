@@ -6,6 +6,20 @@
 
 ## 2026-03-26
 
+### Polish — Debounce Cleanup + Workspace Delete Copy
+
+- Added `useEffect` cleanup in the document editor to `clearTimeout(debounceRef.current)` on unmount — prevents a stale save from firing after the user navigates away
+- Workspace delete dialog copy is now conditional: omits "and all documents inside it" when the workspace has no documents; reads `documents.length` from the already-loaded `useDocuments` query
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `useEffect` debounce cleanup on unmount |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Conditional delete dialog copy |
+
+---
+
 ### API Hardening — Timeout + Error Handling
 
 - OpenAI API call timeout reduced to 15s (`{ timeout: 15_000 }`) — tight enough to fail fast on slow responses without cutting off normal generations

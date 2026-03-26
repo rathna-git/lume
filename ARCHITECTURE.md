@@ -330,7 +330,7 @@ _(none — all planned items shipped)_
 - [x] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
 - [x] Replace `<textarea>` editor with Tiptap rich text editor — StarterKit, custom `BubbleMenuReact` (portal-based, Tiptap v3 has no React wrapper), selection bubble menu with Bold/Italic/Strike/Code + overflow panel (Paragraph, H1-H3, lists, blockquote, code block, divider, undo/redo); content stored as HTML; plain text extracted via `textBetween` for AI and staleness comparisons; overflow panel side-floats via render prop + `position: absolute`; `marked.parse()` converts AI markdown to HTML on replace/insert; `originalHtmlRef` preserves formatting on revert; `replacedGenerationId` tracks replace state for revert button + staleness; OpenAI system message ensures markdown output on all generations
 - [x] Replace `confirm()` on document delete with a proper confirmation dialog (same pattern as workspace delete)
-- [ ] Conditionally adjust workspace delete dialog copy — omit "and all documents inside it" when workspace is empty
+- [x] Conditionally adjust workspace delete dialog copy — omit "and all documents inside it" when workspace is empty; reads `documents.length` from loaded `useDocuments` query
 - [ ] Add filtering / sorting for AI generations
 - [ ] Define retention / versioning strategy for AI outputs
 - [ ] Harden Clerk webhook sync flow post-MVP
@@ -340,7 +340,7 @@ _(none — all planned items shipped)_
 - [x] Add timeout to OpenAI API call — 15s timeout (`{ timeout: 15_000 }`); timeout errors return a distinct user-friendly message
 - [x] Add error logging in API route catch blocks — `console.error` in `POST /api/ai/generate` catch; logs `generationId`, `documentId`, `action`, error message to Vercel function logs
 - [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
-- [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation
+- [x] Clean up debounce timeout on editor unmount — `useEffect` cleanup calls `clearTimeout(debounceRef.current)` to prevent stale save after navigation
 - [x] Disable "Replace content" when generation is already applied (`isAlreadyApplied = displayed.id === replacedGenerationId`); "Insert at cursor" intentionally stays enabled (additive action); helper text shown; "Copy" unaffected
 - [x] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button that restores the editor to its pre-replace HTML (captured in `originalHtmlRef`); button visible when `replacedGenerationId === displayed.id`; disappears on further edits or insert below; triggers autosave on revert
 - [ ] **Version history (v2)** — full document timeline across edits; allows users to browse and restore any prior state of the document, not just the last AI replace

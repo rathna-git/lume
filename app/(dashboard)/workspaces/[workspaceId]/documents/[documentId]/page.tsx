@@ -484,6 +484,12 @@ function DocumentEditor({
         },
     })
 
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) clearTimeout(debounceRef.current)
+        }
+    }, [])
+
     // Plain text extracted from editor — used for AI calls and staleness comparisons.
     // textBetween with "\n\n" separator matches the format stored in inputSnapshot.
     const textContent = editor

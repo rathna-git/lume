@@ -205,7 +205,9 @@ export default function WorkspaceDetailPage({
                         <DialogTitle>Delete workspace?</DialogTitle>
                     </DialogHeader>
                     <p className="text-sm text-muted-foreground">
-                        This will permanently delete this workspace and all documents inside it. This action cannot be undone.
+                        {documents && documents.length > 0
+                            ? "This will permanently delete this workspace and all documents inside it. This action cannot be undone."
+                            : "This will permanently delete this workspace. This action cannot be undone."}
                     </p>
                     {deleteError && (
                         <p className="text-sm text-destructive">{deleteError}</p>
