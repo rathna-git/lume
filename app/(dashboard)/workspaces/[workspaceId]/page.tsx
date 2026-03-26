@@ -2,7 +2,7 @@
 
 import { use, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, ArrowLeft, Pencil, Trash2 } from "lucide-react"
+import { Plus, ArrowLeft, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { useDocuments, useCreateDocument, type Document } from "@/hooks/use-documents"
 import { useUpdateWorkspace, useDeleteWorkspace } from "@/hooks/use-workspaces"
@@ -56,6 +56,7 @@ export default function WorkspaceDetailPage({
     const { mutate: updateWorkspace, isPending: isSaving } = useUpdateWorkspace()
     const { mutate: deleteWorkspace, isPending: isDeleting } = useDeleteWorkspace()
 
+    const [menuOpen, setMenuOpen] = useState(false)
     const [editOpen, setEditOpen] = useState(false)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const [deleteError, setDeleteError] = useState<string | null>(null)
@@ -124,25 +125,41 @@ export default function WorkspaceDetailPage({
                         </div>
                     ) : workspace ? (
                         <>
-                            <div className="flex items-center gap-3 mb-1.5">
+                            <div className="group flex items-center gap-3 mb-1.5">
                                 <span className="text-3xl leading-none">{workspace.emoji ?? "📝"}</span>
                                 <h1 className="font-serif text-3xl text-foreground tracking-tight leading-none">
                                     {workspace.name}
                                 </h1>
-                                <button
-                                    onClick={handleOpenEdit}
-                                    className="text-muted-foreground/40 hover:text-muted-foreground transition-colors mt-1"
-                                    aria-label="Edit workspace"
-                                >
-                                    <Pencil size={14} />
-                                </button>
-                                <button
-                                    onClick={() => setDeleteOpen(true)}
-                                    className="text-muted-foreground/40 hover:text-destructive transition-colors mt-1"
-                                    aria-label="Delete workspace"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
+                                <div className="relative mt-1">
+                                    <button
+                                        onClick={() => setMenuOpen(v => !v)}
+                                        aria-label="Workspace actions"
+                                        className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/60 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-150"
+                                    >
+                                        <MoreHorizontal size={15} />
+                                    </button>
+                                    {menuOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                                            <div className="absolute left-0 top-full mt-1 z-20 bg-card border border-border rounded-lg shadow-md py-1 min-w-[168px]">
+                                                <button
+                                                    onClick={() => { setMenuOpen(false); handleOpenEdit() }}
+                                                    className="w-full text-left text-sm px-3 py-2 text-foreground/80 hover:text-foreground hover:bg-muted/60 transition-colors flex items-center gap-2"
+                                                >
+                                                    <Pencil size={13} />
+                                                    Rename
+                                                </button>
+                                                <button
+                                                    onClick={() => { setMenuOpen(false); setDeleteOpen(true) }}
+                                                    className="w-full text-left text-sm px-3 py-2 text-destructive/80 hover:text-destructive hover:bg-destructive/5 transition-colors flex items-center gap-2"
+                                                >
+                                                    <Trash2 size={13} />
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
                             {workspace.description && (

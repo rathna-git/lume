@@ -4,7 +4,7 @@ import { use, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar } from "lucide-react"
+import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown } from "lucide-react"
 import { marked } from "marked"
 import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
@@ -48,6 +48,12 @@ const ACTION_LABEL: Record<AiAction, string> = {
     summarize: "Summarize",
     rewrite: "Rewrite",
     expand: "Expand",
+}
+
+const ACTION_ICON: Record<AiAction, React.ReactNode> = {
+    summarize: <BookText size={13} />,
+    rewrite: <PenLine size={13} />,
+    expand: <ChevronsUpDown size={13} />,
 }
 
 
@@ -188,12 +194,13 @@ function AiPanel({
                         <button
                             key={action}
                             onClick={() => onSelectAction(action)}
-                            className={`text-xs rounded-lg px-3 py-2 text-left transition-colors border ${
+                            className={`text-xs rounded-lg px-3 py-2 text-left transition-colors border flex items-center gap-2 ${
                                 selectedAction === action
                                     ? "border-border bg-muted text-foreground font-medium"
                                     : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
                             }`}
                         >
+                            {ACTION_ICON[action]}
                             {ACTION_LABEL[action]}
                         </button>
                     ))}

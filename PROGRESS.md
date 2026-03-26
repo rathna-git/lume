@@ -6,6 +6,34 @@
 
 ## 2026-03-26
 
+### Polish — Workspace Header Three-Dot Menu
+
+- Replaced inline `Pencil` + `Trash2` buttons in workspace header with a single `MoreHorizontal` three-dot button
+- Button is hidden by default (`opacity-0`), fades in on hover of the title row (`group` / `group-hover:opacity-100`) and on keyboard focus (`focus:opacity-100`) — `transition-opacity duration-150`
+- Clicking opens a custom inline dropdown with "Rename" (Pencil icon) and "Delete" (Trash2 icon) items; clicking outside closes via a fixed inset overlay
+- Delete item styled in `text-destructive` to signal destructive action
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Three-dot menu replacing Pencil/Trash2; `menuOpen` state; hover/focus reveal |
+
+---
+
+### Polish — AI Panel Action Button Icons
+
+- Added icons to the three AI action tab buttons: `BookText` (Summarize), `PenLine` (Rewrite), `ChevronsUpDown` (Expand)
+- `ACTION_ICON` map added alongside existing `ACTION_LABEL`; buttons updated to `flex items-center gap-2`
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `ACTION_ICON` map; icons rendered in action tab buttons |
+
+---
+
 ### Feature — Last Modified Info + Document Sort
 
 - Document cards on workspace page show "Last modified · X hours ago" with exact timestamp (e.g. "Mar 24, 2026 · 2:15 PM") on hover via `title` attribute
