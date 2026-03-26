@@ -258,6 +258,7 @@ _(none — all planned items shipped)_
 | OpenAI system message for consistent Markdown output | Without a system message, GPT-4o mirrors input style — plain prose input (from `textBetween` after a "Replace content") returns plain prose output. System message overrides this and ensures every generation is Markdown-formatted for `marked.parse()` | Applies to all three actions and all generations including regenerations; keeps user-facing prompts clean |
 | `resultCollapsed` collapses the full result body, not just the markdown | Collapsing only the markdown area would leave orphaned action buttons with no visible content above them — confusing UX. Collapsing the entire body (pending/empty/markdown/buttons/history) keeps the panel clean and predictable when minimised | The section header (label + Regenerate/Back to latest + chevron) always stays visible so the user knows which action is selected |
 | `isAlreadyApplied` disables only "Replace content", not "Insert at cursor" | Replace is a terminal state — the result IS the document, re-applying is a no-op. Insert at cursor is additive — users may want multiple insertions at different cursor positions, so it stays enabled. `isAlreadyApplied = displayed.id === replacedGenerationId`; derived inline, no new state or props | "Copy" also stays enabled; helper text below buttons explains the disabled state to users |
+| OpenAI timeout set to 15s | Vercel serverless functions have a max execution time; a hung OpenAI call would silently consume it. 15s is tight enough to fail fast without cutting off normal generations (~3–8s). Timeout errors surface a distinct user message ("AI took too long to respond") rather than the generic failure copy | Aggressive timeout may occasionally reject slow-but-valid responses; can be raised if needed |
 
 ---
 
@@ -336,8 +337,8 @@ _(none — all planned items shipped)_
 - [ ] Future: migrate document content storage to AWS S3 — store content as files in S3, save S3 URL in the Neon `Document` table instead of storing raw text in the DB; improves scalability for large documents
 - [x] Add rate limiting to `POST /api/ai/generate` — in-memory per-user limiter (12 req/min); per-instance on Vercel, sufficient for v1
 - [ ] **Rate limiting v2** — replace in-memory limiter with a distributed solution (e.g. Upstash Redis) so the limit is enforced globally across all Vercel instances
-- [ ] Add timeout to OpenAI API call — prevent serverless function from hanging on slow/unresponsive OpenAI responses
-- [ ] Add error logging in API route catch blocks — currently errors fail silently with no observability
+- [x] Add timeout to OpenAI API call — 15s timeout (`{ timeout: 15_000 }`); timeout errors return a distinct user-friendly message
+- [x] Add error logging in API route catch blocks — `console.error` in `POST /api/ai/generate` catch; logs `generationId`, `documentId`, `action`, error message to Vercel function logs
 - [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
 - [ ] Clean up debounce timeout on editor unmount — `clearTimeout(debounceRef.current)` in a `useEffect` cleanup to avoid firing after navigation
 - [x] Disable "Replace content" when generation is already applied (`isAlreadyApplied = displayed.id === replacedGenerationId`); "Insert at cursor" intentionally stays enabled (additive action); helper text shown; "Copy" unaffected

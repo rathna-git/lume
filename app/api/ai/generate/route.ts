@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     const parsed = generateSchema.safeParse(body)
     if (!parsed.success) {
         return NextResponse.json(
-            { error: "Invalid input", details: parsed.error.flatten().fieldErrors },
+            { error: "Invalid input", details: parsed.error.flatten((i) => i.message).fieldErrors },
             { status: 400 }
         )
     }
@@ -77,18 +77,21 @@ export async function POST(req: Request) {
     })
 
     try {
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                {
-                    role: "system",
-                    content:
-                        "You are a writing assistant. Always respond using Markdown formatting — use headings, bold, bullet lists, numbered lists, and other Markdown elements where they improve clarity and structure. Never return plain unformatted prose.",
-                },
-                { role: "user", content: prompt },
-            ],
-            temperature: 0.7,
-        })
+        const response = await openai.chat.completions.create(
+            {
+                model: "gpt-4o",
+                messages: [
+                    {
+                        role: "system",
+                        content:
+                            "You are a writing assistant. Always respond using Markdown formatting — use headings, bold, bullet lists, numbered lists, and other Markdown elements where they improve clarity and structure. Never return plain unformatted prose.",
+                    },
+                    { role: "user", content: prompt },
+                ],
+                temperature: 0.7,
+            },
+            { timeout: 15_000 }
+        )
 
         const text = response.choices[0]?.message?.content ?? ""
 
@@ -100,11 +103,21 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ generation: updated })
     } catch (err) {
+        const isTimeout = err instanceof Error && err.message.toLowerCase().includes("timeout")
         const errorMessage = err instanceof Error ? err.message : "Unknown error"
+        console.error("[ai/generate] OpenAI call failed:", {
+            generationId: generation.id,
+            documentId,
+            action,
+            error: errorMessage,
+        })
         await prisma.aiGeneration.update({
             where: { id: generation.id },
             data: { status: "ERROR", errorMessage },
         })
-        return NextResponse.json({ error: "AI generation failed" }, { status: 500 })
+        return NextResponse.json(
+            { error: isTimeout ? "AI took too long to respond. Please try again." : "AI generation failed" },
+            { status: 500 }
+        )
     }
 }

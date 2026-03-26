@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-03-26
+
+### API Hardening — Timeout + Error Handling
+
+- OpenAI API call timeout reduced to 15s (`{ timeout: 15_000 }`) — tight enough to fail fast on slow responses without cutting off normal generations
+- Catch block now detects timeout errors via `err.message.toLowerCase().includes("timeout")` and returns `"AI took too long to respond. Please try again."` instead of the generic `"AI generation failed"`
+- `console.error` added in catch block — logs `generationId`, `documentId`, `action`, and error message; visible in Vercel function logs for observability
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/api/ai/generate/route.ts` | 15s timeout; timeout-specific error message; `console.error` logging |
+
+---
+
 ## 2026-03-25
 
 ### Rate Limiting — AI Generation Endpoint
