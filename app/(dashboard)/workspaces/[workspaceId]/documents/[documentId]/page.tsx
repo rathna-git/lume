@@ -4,7 +4,7 @@ import { use, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight } from "lucide-react"
+import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar } from "lucide-react"
 import { marked } from "marked"
 import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
@@ -22,6 +22,26 @@ type Doc = {
     id: string
     title: string
     content: string | null
+    updatedAt: string
+}
+
+function formatExactDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric",
+        hour: "numeric", minute: "2-digit",
+    })
+}
+
+function relativeTime(dateStr: string): string {
+    const diff = Date.now() - new Date(dateStr).getTime()
+    const mins = Math.floor(diff / 60_000)
+    if (mins < 1) return "just now"
+    if (mins < 60) return `${mins} minute${mins === 1 ? "" : "s"} ago`
+    const hours = Math.floor(mins / 60)
+    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`
+    const days = Math.floor(hours / 24)
+    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`
+    return formatExactDate(dateStr)
 }
 
 const ACTION_LABEL: Record<AiAction, string> = {
@@ -30,14 +50,6 @@ const ACTION_LABEL: Record<AiAction, string> = {
     expand: "Expand",
 }
 
-function relativeTime(dateStr: string) {
-    const mins = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000)
-    if (mins < 1) return "just now"
-    if (mins < 60) return `${mins}m ago`
-    const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return `${hrs}h ago`
-    return `${Math.floor(hrs / 24)}d ago`
-}
 
 
 /**
@@ -625,8 +637,14 @@ function DocumentEditor({
                         value={title}
                         onChange={handleTitleChange}
                         placeholder="Untitled"
-                        className="w-full font-serif text-3xl text-foreground tracking-tight placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none mb-5"
+                        className="w-full font-serif text-3xl text-foreground tracking-tight placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none mb-2"
                     />
+
+                    {/* Last modified */}
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground/50 mb-5">
+                        <Calendar size={11} />
+                        Last modified · {formatExactDate(doc.updatedAt)}
+                    </p>
 
                     {/* Divider */}
                     <div className="border-t border-border mb-8" />

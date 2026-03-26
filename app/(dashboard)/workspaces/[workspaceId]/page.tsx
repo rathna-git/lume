@@ -192,7 +192,9 @@ export default function WorkspaceDetailPage({
             {/* Grid */}
             {!isLoading && !isError && documents && documents.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {documents.map((doc) => (
+                    {[...documents]
+                        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+                        .map((doc) => (
                         <DocumentCard key={doc.id} document={doc} workspaceId={workspaceId} />
                     ))}
                 </div>

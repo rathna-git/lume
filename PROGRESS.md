@@ -6,6 +6,24 @@
 
 ## 2026-03-26
 
+### Feature — Last Modified Info + Document Sort
+
+- Document cards on workspace page show "Last modified · X hours ago" with exact timestamp (e.g. "Mar 24, 2026 · 2:15 PM") on hover via `title` attribute
+- Relative time helper: "just now" / "N minutes ago" / "N hours ago" / "N days ago" / formatted date beyond 7 days; computed on render, no live refresh
+- Documents sorted by `updatedAt DESC` on render — most recently edited appears first
+- Editor page shows exact "Last modified · Mar 24, 2026 · 2:15 PM" with `Calendar` icon under the title input
+- `Doc` type in editor page extended with `updatedAt: string`; `formatExactDate` and `relativeTime` helpers added at module level
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/document/document-card.tsx` | Relative time + hover tooltip; `relativeTime` + `exactDate` helpers |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Sort documents by `updatedAt DESC` |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `updatedAt` in `Doc` type; exact timestamp under title; `Calendar` icon; `formatExactDate` + `relativeTime` helpers |
+
+---
+
 ### Polish — Debounce Cleanup + Workspace Delete Copy
 
 - Added `useEffect` cleanup in the document editor to `clearTimeout(debounceRef.current)` on unmount — prevents a stale save from firing after the user navigates away
