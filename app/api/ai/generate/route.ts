@@ -3,6 +3,7 @@ import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { openai } from "@/lib/openai"
 import { requireCurrentDbUser } from "@/lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const generateSchema = z.object({
     documentId: z.string().min(1),
@@ -36,6 +37,14 @@ function buildPrompt(
 export async function POST(req: Request) {
     const user = await requireCurrentDbUser()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const { allowed } = checkRateLimit(user.id)
+    if (!allowed) {
+        return NextResponse.json(
+            { error: "Too many requests. Please wait a moment." },
+            { status: 429 }
+        )
+    }
 
     const body = await req.json()
     const parsed = generateSchema.safeParse(body)

@@ -72,7 +72,8 @@ lib/
 ├── openai.ts                       ← OpenAI singleton client
 ├── auth.ts                         ← requireCurrentDbUser() — Clerk → DB bridge
 ├── env.ts                          ← server-side env validation
-└── utils.ts                        ← cn() utility (shadcn)
+├── utils.ts                        ← cn() utility (shadcn)
+└── rate-limit.ts                   ← in-memory sliding window rate limiter (per-user, reusable)
 
 hooks/
 ├── use-workspaces.ts               ← useWorkspaces, useCreateWorkspace, useUpdateWorkspace, useDeleteWorkspace
@@ -297,6 +298,7 @@ _(none — all planned items shipped)_
 - [x] UI polish — `sonner` toast notifications for Replace, Insert at cursor, Copy, Revert; Lume-themed via `toastOptions.style` + CSS icon override; `bottom-right` position
 - [x] UI polish — AI panel history list changed to horizontal scroll; two cards visible, `ChevronRight` fade overlay when `olderGenerations.length > 2`; "Undo with Cmd+Z" hint below action buttons
 - [x] UI polish — bubble menu visual refinement: solid `bg-card`, softer shadow/border, `rounded-md` buttons, soft active tint (`bg-foreground/10`), cleaner icon colors, `animate-in fade-in zoom-in-95` entry animation on pill and overflow panel
+- [x] Rate limiting — `lib/rate-limit.ts` in-memory per-user limiter; 12 req/min sliding window; 429 returned before any OpenAI or DB work
 
 ---
 
@@ -332,7 +334,8 @@ _(none — all planned items shipped)_
 - [ ] Define retention / versioning strategy for AI outputs
 - [ ] Harden Clerk webhook sync flow post-MVP
 - [ ] Future: migrate document content storage to AWS S3 — store content as files in S3, save S3 URL in the Neon `Document` table instead of storing raw text in the DB; improves scalability for large documents
-- [ ] Add rate limiting to `POST /api/ai/generate` — prevent cost abuse from repeated AI calls
+- [x] Add rate limiting to `POST /api/ai/generate` — in-memory per-user limiter (12 req/min); per-instance on Vercel, sufficient for v1
+- [ ] **Rate limiting v2** — replace in-memory limiter with a distributed solution (e.g. Upstash Redis) so the limit is enforced globally across all Vercel instances
 - [ ] Add timeout to OpenAI API call — prevent serverless function from hanging on slow/unresponsive OpenAI responses
 - [ ] Add error logging in API route catch blocks — currently errors fail silently with no observability
 - [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back

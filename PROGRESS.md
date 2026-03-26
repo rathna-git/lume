@@ -4,6 +4,28 @@
 
 ---
 
+## 2026-03-25
+
+### Rate Limiting — AI Generation Endpoint
+
+- Added `lib/rate-limit.ts` — in-memory sliding window rate limiter
+- Stores `Map<userId, number[]>` of request timestamps; drops entries older than 60s on each call
+- Limit: 12 requests per minute per user
+- Returns HTTP 429 with `{ "error": "Too many requests. Please wait a moment." }` when exceeded
+- Check fires in `POST /api/ai/generate` immediately after auth, before any OpenAI or DB work
+- Marked rate limiting v2 (distributed, Upstash Redis) as a future todo
+
+**Limitation:** Vercel runs multiple serverless instances — each holds its own `Map`, so the limit is per-instance, not globally enforced. Acceptable for v1 cost protection; v2 will use a shared store.
+
+### Files Created/Modified
+
+| File | Change |
+| ---- | ------ |
+| `lib/rate-limit.ts` | New — sliding window rate limiter |
+| `app/api/ai/generate/route.ts` | Added `checkRateLimit` call after auth check |
+
+---
+
 ## 2026-03-24 (continued)
 
 ### UI Polish — Bubble Menu Visual Refinement
