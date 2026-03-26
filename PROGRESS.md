@@ -6,6 +6,24 @@
 
 ## 2026-03-26
 
+### Polish — Workspace & Document Card Visual Depth Pass
+
+- `<main>` background set to `bg-white` — creates clear surface hierarchy: warm ivory sidebar/header vs white content area
+- Document cards cycle through 4 calm accent colors (amber, teal, violet, rose) via `accentIndex` prop — left border + matching hover tint + colored hover shadow per card; color derived from sorted position
+- Warm brown-tinted base shadow (`rgba(107,79,58,0.10)`) lifts cards off the white surface; hover shadow deepens with per-accent color via `onMouseEnter/Leave`
+- `DocumentCard` accepts `accentIndex?: number`; `CARD_ACCENTS` array defines all four color combinations as static strings (safe for Tailwind purge)
+- Workspace page passes `i` from `.map()` as `accentIndex`
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/layout.tsx` | `<main>` background changed to `bg-white` |
+| `components/document/document-card.tsx` | `accentIndex` prop; `CARD_ACCENTS` palette; warm shadow lift |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Passes `accentIndex={i}`; removed ambient glow div; removed "Documents" section label |
+
+---
+
 ### Polish — Workspace Header Three-Dot Menu
 
 - Replaced inline `Pencil` + `Trash2` buttons in workspace header with a single `MoreHorizontal` three-dot button

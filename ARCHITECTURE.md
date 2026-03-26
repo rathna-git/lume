@@ -302,6 +302,7 @@ _(none — all planned items shipped)_
 - [x] Rate limiting — `lib/rate-limit.ts` in-memory per-user limiter; 12 req/min sliding window; 429 returned before any OpenAI or DB work
 - [x] UI polish — AI action tab buttons now show icons (`BookText` / `PenLine` / `ChevronsUpDown`) via `ACTION_ICON` map alongside `ACTION_LABEL`
 - [x] UI polish — workspace header three-dot menu: `MoreHorizontal` button replaces inline Pencil/Trash2; hidden by default, fades in on hover/focus; dropdown with Rename + Delete items
+- [x] UI polish — visual depth pass: `<main>` set to `bg-white`; document cards cycle through 4 accent colors (amber/teal/violet/rose) via `accentIndex`; warm brown-tinted shadow lifts cards; colored hover shadow per accent
 - [x] Feature — documents sorted by `updatedAt DESC` on workspace page; cards show relative "Last modified" time with exact timestamp on hover; editor page shows exact timestamp with `Calendar` icon under title
 
 ---
