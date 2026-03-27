@@ -2,7 +2,6 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Sidebar } from "@/components/layout/sidebar"
-import { Header } from "@/components/layout/header"
 import { Toaster } from "sonner"
 
 export default async function DashboardLayout({
@@ -41,8 +40,7 @@ export default async function DashboardLayout({
         <div className="flex h-screen bg-background">
             <Sidebar />
             <div className="flex flex-col flex-1 min-w-0">
-                <Header />
-                <main className="flex-1 overflow-y-auto bg-white">
+<main className="flex-1 overflow-y-auto bg-white">
                     {children}
                 </main>
             </div>

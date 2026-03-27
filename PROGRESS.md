@@ -6,6 +6,25 @@
 
 ## 2026-03-26
 
+### Polish — Color Refinement & Header Removal
+
+- Removed the empty `Header` component entirely — it was a blank 56px bar with no content; deleted file and removed from layout
+- Sidebar color set to `#FFFBE8` — a warm, muted butter yellow; distinct from the warm ivory background while staying calm
+- Document page background set to `#FFFEF9` — near-white with a faint warm tint, lighter than the AI panel
+- AI panel background set to `#FFFCEE` — sits between sidebar and page background in warmth, creating a subtle 3-level surface hierarchy
+- Fixed Tiptap SSR hydration warning by adding `immediatelyRender: false` to `useEditor`
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/layout.tsx` | Removed `<Header />` and import |
+| `components/layout/header.tsx` | Deleted |
+| `app/globals.css` | `--sidebar` updated to `#FFFBE8` |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Page bg `#FFFEF9`; AI panel bg `#FFFCEE`; `immediatelyRender: false` on `useEditor` |
+
+---
+
 ### Polish — Workspace & Document Card Visual Depth Pass
 
 - `<main>` background set to `bg-white` — creates clear surface hierarchy: warm ivory sidebar/header vs white content area
