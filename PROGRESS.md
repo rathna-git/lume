@@ -6,6 +6,20 @@
 
 ## 2026-03-27
 
+### Polish — Colored Icons on AI Panel Buttons
+
+- Action tab icons now have distinct colors: Summarize (amber), Rewrite (teal), Expand (violet) — matches document card accent palette
+- Apply buttons get colored icons too: Replace content (`Replace`, amber), Insert at cursor (`TextCursorInput`, teal), Copy (`ClipboardCopy`, violet), Revert (`RotateCcw`, rose)
+- Button text/backgrounds stay neutral for a calm feel; icons add personality and scannability
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Colored `className` on `ACTION_ICON` entries; `Replace`, `TextCursorInput`, `ClipboardCopy`, `RotateCcw` icons added to apply buttons |
+
+---
+
 ### Polish — Document Editor Three-Dot Menu
 
 - Replaced bare "Delete" text button with a `MoreHorizontal` three-dot menu (always visible, top-right)

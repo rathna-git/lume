@@ -4,7 +4,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown, Trash2 } from "lucide-react"
+import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown, Trash2, Replace, TextCursorInput, ClipboardCopy, RotateCcw } from "lucide-react"
 import { marked } from "marked"
 import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
@@ -51,9 +51,9 @@ const ACTION_LABEL: Record<AiAction, string> = {
 }
 
 const ACTION_ICON: Record<AiAction, React.ReactNode> = {
-    summarize: <BookText size={13} />,
-    rewrite: <PenLine size={13} />,
-    expand: <ChevronsUpDown size={13} />,
+    summarize: <BookText size={13} className="text-amber-500" />,
+    rewrite: <PenLine size={13} className="text-teal-500" />,
+    expand: <ChevronsUpDown size={13} className="text-violet-500" />,
 }
 
 
@@ -335,28 +335,32 @@ function AiPanel({
                                                 <button
                                                     onClick={() => onReplace(displayed.output!.text, displayed.id)}
                                                     disabled={isAlreadyApplied}
-                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground flex items-center gap-2"
                                                 >
+                                                    <Replace size={12} className="text-amber-500" />
                                                     Replace content
                                                 </button>
                                                 <button
                                                     onClick={() => onInsertAtCursor(displayed.output!.text)}
                                                     disabled={isAlreadyApplied}
-                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground flex items-center gap-2"
                                                 >
+                                                    <TextCursorInput size={12} className="text-teal-500" />
                                                     Insert at cursor
                                                 </button>
                                                 <button
                                                     onClick={() => onCopy(displayed.output!.text)}
-                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 flex items-center gap-2"
                                                 >
+                                                    <ClipboardCopy size={12} className="text-violet-500" />
                                                     Copy
                                                 </button>
                                                 {displayed.inputSnapshot && isAlreadyApplied && (
                                                     <button
                                                         onClick={() => onRevert()}
-                                                        className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                                                        className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 flex items-center gap-2"
                                                     >
+                                                        <RotateCcw size={12} className="text-rose-400" />
                                                         Revert to original
                                                     </button>
                                                 )}

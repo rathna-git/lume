@@ -305,6 +305,7 @@ _(none — all planned items shipped)_
 - [x] UI polish — visual depth pass: `<main>` set to `bg-white`; document cards cycle through 4 accent colors (amber/teal/violet/rose) via `accentIndex`; warm brown-tinted shadow lifts cards; colored hover shadow per accent
 - [x] Feature — documents sorted by `updatedAt DESC` on workspace page; cards show relative "Last modified" time with exact timestamp on hover; editor page shows exact timestamp with `Calendar` icon under title
 - [x] UI polish — document editor three-dot menu: `MoreHorizontal` replaces bare "Delete" text; always-visible dropdown with `Trash2` Delete item; future-ready for Share/Import actions
+- [x] UI polish — colored icons on AI panel: action tabs (amber/teal/violet) + apply buttons (Replace amber, Insert teal, Copy violet, Revert rose); text stays neutral
 - [x] Fix — React 19 read-only `useRef` assignments wrapped in `useEffect`; `save` wrapped in `useCallback`
 - [x] UI polish — color refinement: sidebar `#FFFBE8`, AI panel `#FFFCEE`, document page bg `#FFFEF9`; removed empty `Header` component; Tiptap `immediatelyRender: false` for SSR
 
