@@ -6,6 +6,21 @@
 
 ## 2026-03-27
 
+### Polish — Document Editor Three-Dot Menu
+
+- Replaced bare "Delete" text button with a `MoreHorizontal` three-dot menu (always visible, top-right)
+- Dropdown contains "Delete" item with `Trash2` icon, styled in `text-destructive`
+- Same pattern as workspace page: fixed inset overlay for outside-click dismiss
+- Future-ready: Share and Import actions can be added to this menu
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `docMenuOpen` state; three-dot dropdown replacing bare Delete button; `Trash2` icon added to imports |
+
+---
+
 ### Fix — React 19 Read-Only Ref Assignments
 
 - React 19's `useRef` returns `RefObject` with read-only `.current` — direct assignments in the render body (`ref.current = value`) now error

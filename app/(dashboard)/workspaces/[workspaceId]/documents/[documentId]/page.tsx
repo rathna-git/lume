@@ -4,7 +4,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown } from "lucide-react"
+import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown, Trash2 } from "lucide-react"
 import { marked } from "marked"
 import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
@@ -450,6 +450,7 @@ function DocumentEditor({
     const [pendingAction, setPendingAction] = useState<AiAction | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const [deleteError, setDeleteError] = useState<string | null>(null)
+    const [docMenuOpen, setDocMenuOpen] = useState(false)
     const [overflowOpen, setOverflowOpen] = useState(false)
     // Tracks which generation's output is currently shown in the editor (set by handleReplace,
     // cleared by user edits, handleInsertAtCursor, or handleRevert). Used for the revert button.
@@ -627,12 +628,29 @@ function DocumentEditor({
                                 {saveStatus === "saved" && "Saved"}
                                 {saveStatus === "error" && "Error saving"}
                             </span>
-                            <button
-                                onClick={() => setDeleteOpen(true)}
-                                className="text-xs text-muted-foreground/50 hover:text-destructive transition-colors"
-                            >
-                                Delete
-                            </button>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setDocMenuOpen(v => !v)}
+                                    aria-label="Document actions"
+                                    className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/60 transition-colors"
+                                >
+                                    <MoreHorizontal size={15} />
+                                </button>
+                                {docMenuOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setDocMenuOpen(false)} />
+                                        <div className="absolute right-0 top-full mt-1 z-20 bg-card border border-border rounded-lg shadow-md py-1 min-w-[148px]">
+                                            <button
+                                                onClick={() => { setDocMenuOpen(false); setDeleteOpen(true) }}
+                                                className="w-full text-left text-sm px-3 py-2 text-destructive/80 hover:text-destructive hover:bg-destructive/5 transition-colors flex items-center gap-2"
+                                            >
+                                                <Trash2 size={13} />
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
 
