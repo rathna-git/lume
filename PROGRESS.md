@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-03-27
+
+### Fix — React 19 Read-Only Ref Assignments
+
+- React 19's `useRef` returns `RefObject` with read-only `.current` — direct assignments in the render body (`ref.current = value`) now error
+- Wrapped all `ref.current` assignments in `useEffect` callbacks: `onHideRef`, `titleRef`, `saveRef`
+- Converted `save` function to `useCallback` to stabilize it as a `useEffect` dependency
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `useCallback` for `save`; `useEffect` wrappers for ref assignments |
+
+---
+
 ## 2026-03-26
 
 ### Polish — Color Refinement & Header Removal

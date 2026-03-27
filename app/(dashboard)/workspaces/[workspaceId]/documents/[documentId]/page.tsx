@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useRef, useState } from "react"
+import { use, useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -74,7 +74,7 @@ function BubbleMenuReact({
 }) {
     const [rect, setRect] = useState<DOMRect | null>(null)
     const onHideRef = useRef(onHide)
-    onHideRef.current = onHide
+    useEffect(() => { onHideRef.current = onHide }, [onHide])
 
     useEffect(() => {
         function handleSelectionUpdate() {
@@ -457,7 +457,7 @@ function DocumentEditor({
 
     // Refs for stable access inside useEditor callbacks (avoids stale closure on title/save)
     const titleRef = useRef(title)
-    titleRef.current = title
+    useEffect(() => { titleRef.current = title }, [title])
     // Prevents onUpdate from clearing replacedGenerationId on programmatic setContent calls
     const isReplacingRef = useRef(false)
     // HTML snapshot captured right before a Replace Content — used to restore formatting on revert
@@ -465,7 +465,7 @@ function DocumentEditor({
 
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-    function save(nextTitle: string, nextContent: string) {
+    const save = useCallback((nextTitle: string, nextContent: string) => {
         if (debounceRef.current) clearTimeout(debounceRef.current)
         setSaveStatus("saving")
         debounceRef.current = setTimeout(() => {
@@ -477,10 +477,10 @@ function DocumentEditor({
                 }
             )
         }, 800)
-    }
+    }, [documentId, updateDocument])
 
     const saveRef = useRef(save)
-    saveRef.current = save
+    useEffect(() => { saveRef.current = save }, [save])
 
     const editor = useEditor({
         immediatelyRender: false,
