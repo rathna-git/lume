@@ -6,6 +6,28 @@
 
 ## 2026-03-30
 
+### Feature — Slash Command Menu
+
+- Typing `/` in the editor opens a dropdown command menu (Notion-style)
+- 9 commands: Text, Heading 1/2/3, Bullet List, Numbered List, Quote, Code Block, Divider
+- Fuzzy filtering as you type (e.g. `/hea` shows only headings)
+- Arrow keys to navigate, Enter to select, Escape to dismiss; mouse hover + click also works
+- Menu rendered via `createPortal` positioned below the cursor
+- Architecture: Tiptap extension (`@tiptap/suggestion`) emits events via a callback bus; a React component (`SlashCommandMenu`) subscribes and renders the dropdown — avoids creating a separate React root inside ProseMirror
+- Placeholder extension (`@tiptap/extension-placeholder`) shows "Type '/' for commands or start writing…" when editor is empty
+- Tiptap packages aligned to `3.21.0`; `@tiptap/core` and `@tiptap/pm` added as direct dependencies to resolve type mismatches
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/document/slash-command.tsx` | **New file** — `SlashCommandExtension` (Tiptap extension using `@tiptap/suggestion`), `SlashCommandMenu` (React dropdown component), `SLASH_COMMANDS` definitions, event bus (`onSlashEvent`) |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Added `SlashCommandExtension` + `Placeholder` to editor extensions; `SlashCommandMenu` rendered alongside `EditorContent` |
+| `app/globals.css` | Placeholder CSS updated to use `data-placeholder` attribute from Tiptap Placeholder extension |
+| `package.json` | Added `@tiptap/core`, `@tiptap/pm`, `@tiptap/suggestion`, `@tiptap/extension-placeholder`; aligned all Tiptap packages to `3.21.0` |
+
+---
+
 ### Polish — Back to Workspace Link
 
 - Moved "Back to workspace" link outside the white editor card — now sits above the card on the `#FFFEF9` page background, separating navigation from document content

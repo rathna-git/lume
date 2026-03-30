@@ -224,9 +224,9 @@
 .tiptap-editor .ProseMirror em { font-style: italic; }
 .tiptap-editor .ProseMirror s { text-decoration: line-through; }
 
-/* Placeholder — shown only when editor is completely empty */
-.tiptap-editor .ProseMirror.is-editor-empty > p:first-child::before {
-  content: "Start writing…";
+/* Placeholder — Tiptap Placeholder extension */
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
   float: left;
   color: var(--muted-foreground);
   opacity: 0.4;

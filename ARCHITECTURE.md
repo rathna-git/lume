@@ -16,6 +16,7 @@
 | Database | PostgreSQL + Prisma v6 |
 | Server state | TanStack Query v5 |
 | Validation | Zod |
+| Rich text editor | Tiptap v3 (ProseMirror) |
 | AI | OpenAI (GPT-4o) |
 | Package manager | pnpm |
 
@@ -64,7 +65,8 @@ components/
 ├── workspace/
 │   └── workspace-card.tsx          ← clickable card linking to workspace
 └── document/
-    └── document-card.tsx           ← clickable card linking to document editor
+    ├── document-card.tsx           ← clickable card linking to document editor
+    └── slash-command.tsx           ← slash command Tiptap extension + React dropdown menu
 
 lib/
 ├── prisma.ts                       ← Prisma singleton client
@@ -173,6 +175,7 @@ AiGeneration
 | Replaced generation ID | Local `useState` | `replacedGenerationId` — tracks which generation's output is currently in the editor via Replace content; drives "Revert to original" button visibility, `isAlreadyApplied` check, and `isStale` suppression; cleared on user edits or Insert at cursor |
 | Pre-replace HTML snapshot | Local `useRef` | `originalHtmlRef` — HTML captured at the moment "Replace content" fires; used to restore exact rich formatting on revert; cleared after revert or user edit |
 | AI panel collapse state | Local `useState` | `resultCollapsed` in `AiPanel` — collapses everything below the result section header (pending, empty state, markdown, action buttons, history); default `false` (expanded) |
+| Slash command menu | Local `useState` in `SlashCommandMenu` | `open`, `items`, `selected`, `pos`, `commandFn` — driven by events from `SlashCommandExtension` via `onSlashEvent` callback bus |
 
 ---
 
@@ -258,6 +261,8 @@ _(none — all planned items shipped)_
 | `resultCollapsed` collapses the full result body, not just the markdown | Collapsing only the markdown area would leave orphaned action buttons with no visible content above them — confusing UX. Collapsing the entire body (pending/empty/markdown/buttons/history) keeps the panel clean and predictable when minimised | The section header (label + Regenerate/Back to latest + chevron) always stays visible so the user knows which action is selected |
 | `isAlreadyApplied` disables only "Replace content", not "Insert at cursor" | Replace is a terminal state — the result IS the document, re-applying is a no-op. Insert at cursor is additive — users may want multiple insertions at different cursor positions, so it stays enabled. `isAlreadyApplied = displayed.id === replacedGenerationId`; derived inline, no new state or props | "Copy" also stays enabled; helper text below buttons explains the disabled state to users |
 | OpenAI timeout set to 15s | Vercel serverless functions have a max execution time; a hung OpenAI call would silently consume it. 15s is tight enough to fail fast without cutting off normal generations (~3–8s). Timeout errors surface a distinct user message ("AI took too long to respond") rather than the generic failure copy | Aggressive timeout may occasionally reject slow-but-valid responses; can be raised if needed |
+| Slash command event bus instead of separate React root | Creating a `createRoot` inside a Tiptap extension render callback is fragile (async mount, separate React tree, no access to parent context). An event bus (`onSlashEvent`) lets the extension emit open/update/close signals that a normal React component subscribes to via `useEffect` | Global singleton callback — only one editor instance can use slash commands at a time; sufficient for single-document editing |
+| `@tiptap/extension-placeholder` for empty editor hint | CSS-only `.is-editor-empty` placeholder was unreliable — Tiptap v3 applies the class on the `<p>` element, not `ProseMirror`. The official Placeholder extension adds `data-placeholder` attribute reliably | Extra dependency; CSS targets `p.is-editor-empty:first-child::before` with `content: attr(data-placeholder)` |
 
 ---
 
@@ -274,7 +279,7 @@ _(none — all planned items shipped)_
 - [x] Clerk setup in root layout
 - [x] Auth pages (sign-in / sign-up)
 - [x] Middleware — route protection
-- [x] Protected app shell (sidebar + header)
+- [x] Protected app shell (sidebar)
 - [x] Server-side user bootstrap (create DB user on first request)
 - [x] Default workspace creation
 - [x] Workspace API routes
@@ -308,6 +313,7 @@ _(none — all planned items shipped)_
 - [x] Fix — React 19 read-only `useRef` assignments wrapped in `useEffect`; `save` wrapped in `useCallback`
 - [x] UI polish — color refinement: sidebar `#FFFBE8`, AI panel `#FFFCEE`, document page bg `#FFFEF9`; removed empty `Header` component; Tiptap `immediatelyRender: false` for SSR
 - [x] UI polish — "Back to workspace" link moved outside editor card onto page background; `ArrowLeft` → `ChevronLeft`; `text-sm font-medium` for bolder treatment
+- [x] Feature — slash command menu: type `/` to open a filtered dropdown (Text, H1-H3, lists, quote, code block, divider); `@tiptap/suggestion` extension + event bus + `SlashCommandMenu` React component; `@tiptap/extension-placeholder` for empty editor hint
 
 ---
 

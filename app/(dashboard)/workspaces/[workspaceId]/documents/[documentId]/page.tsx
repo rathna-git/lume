@@ -9,6 +9,8 @@ import { marked } from "marked"
 import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
+import Placeholder from "@tiptap/extension-placeholder"
+import SlashCommandExtension, { SlashCommandMenu } from "@/components/document/slash-command"
 import { cn } from "@/lib/utils"
 import { useDocument, useUpdateDocument, useDeleteDocument } from "@/hooks/use-document"
 import { useGenerateAi, useAiGenerations, type AiAction, type AiGeneration } from "@/hooks/use-ai"
@@ -489,7 +491,13 @@ function DocumentEditor({
 
     const editor = useEditor({
         immediatelyRender: false,
-        extensions: [StarterKit],
+        extensions: [
+            StarterKit,
+            SlashCommandExtension,
+            Placeholder.configure({
+                placeholder: "Type '/' for commands or start writing…",
+            }),
+        ],
         content: doc.content ?? "",
         onUpdate: ({ editor }) => {
             const html = editor.getHTML()
@@ -773,6 +781,7 @@ function DocumentEditor({
                             </BubbleMenuReact>
                         )}
                         <EditorContent editor={editor} />
+                        <SlashCommandMenu editor={editor} />
                     </div>
 
                     </div> {/* end writing canvas */}
