@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-03-30
+
+### Polish — Back to Workspace Link
+
+- Moved "Back to workspace" link outside the white editor card — now sits above the card on the `#FFFEF9` page background, separating navigation from document content
+- Swapped `ArrowLeft` icon for `ChevronLeft` for a cleaner chevron style
+- Bumped from `text-xs` to `text-sm font-medium` for more visual weight
+- Same treatment applied to the error state ("Document not found") back link
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `ChevronLeft` replaces `ArrowLeft`; link moved outside card wrapper; `justify-end` on save/menu row; extra `max-w-[1400px]` wrapper div |
+
+---
+
 ## 2026-03-27
 
 ### Polish — Colored Icons on AI Panel Buttons

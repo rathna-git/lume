@@ -4,7 +4,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown, Trash2, Replace, TextCursorInput, ClipboardCopy, RotateCcw } from "lucide-react"
+import { ChevronLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown, Trash2, Replace, TextCursorInput, ClipboardCopy, RotateCcw } from "lucide-react"
 import { marked } from "marked"
 import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
@@ -613,19 +613,21 @@ function DocumentEditor({
 
     return (
         <div className="min-h-full bg-[#FFFEF9] p-4 md:p-6">
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start max-w-[1400px] mx-auto">
+            <div className="max-w-[1400px] mx-auto">
+                <Link
+                    href={`/workspaces/${workspaceId}`}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-3"
+                >
+                    <ChevronLeft size={14} />
+                    Back to workspace
+                </Link>
+
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
 
                 {/* Editor surface */}
                 <div className="flex-1 min-w-0 bg-card rounded-2xl border border-border shadow-sm px-8 py-10">
-                    {/* Back + save status */}
-                    <div className="flex items-center justify-between mb-8">
-                        <Link
-                            href={`/workspaces/${workspaceId}`}
-                            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                            <ArrowLeft size={12} />
-                            Back to workspace
-                        </Link>
+                    {/* Save status + menu */}
+                    <div className="flex items-center justify-end mb-8">
                         <div className="flex items-center gap-3">
                             <span className="text-xs text-muted-foreground/60">
                                 {saveStatus === "saving" && "Saving…"}
@@ -826,6 +828,7 @@ function DocumentEditor({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+            </div>
         </div>
     )
 }
@@ -860,9 +863,9 @@ export default function DocumentEditorPage({
                 <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border shadow-sm px-8 py-8">
                     <Link
                         href={`/workspaces/${workspaceId}`}
-                        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
                     >
-                        <ArrowLeft size={12} />
+                        <ChevronLeft size={14} />
                         Back to workspace
                     </Link>
                     <p className="text-sm text-muted-foreground py-16 text-center">

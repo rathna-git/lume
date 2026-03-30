@@ -60,8 +60,7 @@ components/
 ├── logo.tsx                        ← LumeMark + LumeLogo
 ├── providers.tsx                   ← TanStack Query provider + devtools (dev only)
 ├── layout/
-│   ├── sidebar.tsx                 ← nav + active state + Clerk UserButton
-│   └── header.tsx                  ← top bar with optional title
+│   └── sidebar.tsx                 ← nav + active state + Clerk UserButton
 ├── workspace/
 │   └── workspace-card.tsx          ← clickable card linking to workspace
 └── document/
@@ -308,6 +307,7 @@ _(none — all planned items shipped)_
 - [x] UI polish — colored icons on AI panel: action tabs (amber/teal/violet) + apply buttons (Replace amber, Insert teal, Copy violet, Revert rose); text stays neutral
 - [x] Fix — React 19 read-only `useRef` assignments wrapped in `useEffect`; `save` wrapped in `useCallback`
 - [x] UI polish — color refinement: sidebar `#FFFBE8`, AI panel `#FFFCEE`, document page bg `#FFFEF9`; removed empty `Header` component; Tiptap `immediatelyRender: false` for SSR
+- [x] UI polish — "Back to workspace" link moved outside editor card onto page background; `ArrowLeft` → `ChevronLeft`; `text-sm font-medium` for bolder treatment
 
 ---
 
