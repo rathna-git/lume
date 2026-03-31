@@ -2,23 +2,23 @@
 
 > This document reflects the **current** system design.
 > When architecture changes, update this file in the same commit.
-> Log the *reason* for the change in `PROGRESS.md`.
+> Log the _reason_ for the change in `PROGRESS.md`.
 
 ---
 
 ## Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16, App Router, TypeScript |
-| Styling | Tailwind CSS v4, shadcn/ui |
-| Auth | Clerk |
-| Database | PostgreSQL + Prisma v6 |
-| Server state | TanStack Query v5 |
-| Validation | Zod |
-| Rich text editor | Tiptap v3 (ProseMirror) |
-| AI | OpenAI (GPT-4o) |
-| Package manager | pnpm |
+| Layer            | Technology                         |
+| ---------------- | ---------------------------------- |
+| Framework        | Next.js 16, App Router, TypeScript |
+| Styling          | Tailwind CSS v4, shadcn/ui         |
+| Auth             | Clerk                              |
+| Database         | PostgreSQL + Prisma v6             |
+| Server state     | TanStack Query v5                  |
+| Validation       | Zod                                |
+| Rich text editor | Tiptap v3 (ProseMirror)            |
+| AI               | OpenAI (GPT-4o)                    |
+| Package manager  | pnpm                               |
 
 ---
 
@@ -161,54 +161,54 @@ AiGeneration
 
 ## Type & State Ownership
 
-| Data | Owner | Mechanism |
-|---|---|---|
-| Auth session | Clerk | `auth()` server-side / `useUser()` client |
-| Current user (DB) | Prisma User | Fetched server-side in layouts |
-| Workspaces list | TanStack Query | `useWorkspaces()` |
-| Active workspace | TanStack Query | `useWorkspace(id)` — local hook defined in the workspace detail page; not in global `hooks/`; keyed `["workspace", workspaceId]` |
-| Documents list | TanStack Query | `useDocuments(workspaceId)` |
-| Document content | Local `useState` | Debounced auto-save via `useMutation` |
-| AI generations (persisted) | TanStack Query | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; `staleTime: Infinity`; invalidated after successful mutation |
-| AI panel selected action | Local `useState` | `selectedAction` — which action tab is active; drives what persisted result is shown |
-| AI panel pending action | Local `useState` | `pendingAction` — in-flight action; clears on success/error; all generate buttons disabled while set |
-| Replaced generation ID | Local `useState` | `replacedGenerationId` — tracks which generation's output is currently in the editor via Replace content; drives "Revert to original" button visibility, `isAlreadyApplied` check, and `isStale` suppression; cleared on user edits or Insert at cursor |
-| Pre-replace HTML snapshot | Local `useRef` | `originalHtmlRef` — HTML captured at the moment "Replace content" fires; used to restore exact rich formatting on revert; cleared after revert or user edit |
-| AI panel collapse state | Local `useState` | `resultCollapsed` in `AiPanel` — collapses everything below the result section header (pending, empty state, markdown, action buttons, history); default `false` (expanded) |
-| Slash command menu | Local `useState` in `SlashCommandMenu` | `open`, `items`, `selected`, `pos`, `commandFn` — driven by events from `SlashCommandExtension` via `onSlashEvent` callback bus |
+| Data                       | Owner                                  | Mechanism                                                                                                                                                                                                                                               |
+| -------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth session               | Clerk                                  | `auth()` server-side / `useUser()` client                                                                                                                                                                                                               |
+| Current user (DB)          | Prisma User                            | Fetched server-side in layouts                                                                                                                                                                                                                          |
+| Workspaces list            | TanStack Query                         | `useWorkspaces()`                                                                                                                                                                                                                                       |
+| Active workspace           | TanStack Query                         | `useWorkspace(id)` — local hook defined in the workspace detail page; not in global `hooks/`; keyed `["workspace", workspaceId]`                                                                                                                        |
+| Documents list             | TanStack Query                         | `useDocuments(workspaceId)`                                                                                                                                                                                                                             |
+| Document content           | Local `useState`                       | Debounced auto-save via `useMutation`                                                                                                                                                                                                                   |
+| AI generations (persisted) | TanStack Query                         | `useAiGenerations(documentId)` — keyed `["aiGenerations", documentId]`; `staleTime: Infinity`; invalidated after successful mutation                                                                                                                    |
+| AI panel selected action   | Local `useState`                       | `selectedAction` — which action tab is active; drives what persisted result is shown                                                                                                                                                                    |
+| AI panel pending action    | Local `useState`                       | `pendingAction` — in-flight action; clears on success/error; all generate buttons disabled while set                                                                                                                                                    |
+| Replaced generation ID     | Local `useState`                       | `replacedGenerationId` — tracks which generation's output is currently in the editor via Replace content; drives "Revert to original" button visibility, `isAlreadyApplied` check, and `isStale` suppression; cleared on user edits or Insert at cursor |
+| Pre-replace HTML snapshot  | Local `useRef`                         | `originalHtmlRef` — HTML captured at the moment "Replace content" fires; used to restore exact rich formatting on revert; cleared after revert or user edit                                                                                             |
+| AI panel collapse state    | Local `useState`                       | `resultCollapsed` in `AiPanel` — collapses everything below the result section header (pending, empty state, markdown, action buttons, history); default `false` (expanded)                                                                             |
+| Slash command menu         | Local `useState` in `SlashCommandMenu` | `open`, `items`, `selected`, `pos`, `commandFn` — driven by events from `SlashCommandExtension` via `onSlashEvent` callback bus                                                                                                                         |
 
 ---
 
 ## Route Map
 
-| Route | Type | Description |
-|---|---|---|
-| `/` | Public page | Landing page |
-| `/sign-in` | Auth page | Clerk sign-in |
-| `/sign-up` | Auth page | Clerk sign-up |
-| `/workspaces` | Protected page | Workspace list |
-| `/workspaces/[id]` | Protected page | Workspace + document list |
-| `/workspaces/[id]/documents/[id]` | Protected page | Document editor |
-| `/settings` | Protected page | User settings |
-| `POST /api/webhooks/clerk` | API | Sync Clerk user to DB _(not implemented — server-side bootstrap used instead)_ |
-| `GET/POST /api/workspaces` | API | List / create workspaces |
-| `GET/PATCH/DELETE /api/workspaces/[id]` | API | Single workspace |
-| `GET/POST /api/documents` | API | List / create documents |
-| `GET/PATCH/DELETE /api/documents/[id]` | API | Single document |
-| `POST /api/ai/generate` | API | AI content actions |
-| `GET /api/documents/[id]/generations` | API | Fetch saved AI generations for a document, newest first |
+| Route                                   | Type           | Description                                                                    |
+| --------------------------------------- | -------------- | ------------------------------------------------------------------------------ |
+| `/`                                     | Public page    | Landing page                                                                   |
+| `/sign-in`                              | Auth page      | Clerk sign-in                                                                  |
+| `/sign-up`                              | Auth page      | Clerk sign-up                                                                  |
+| `/workspaces`                           | Protected page | Workspace list                                                                 |
+| `/workspaces/[id]`                      | Protected page | Workspace + document list                                                      |
+| `/workspaces/[id]/documents/[id]`       | Protected page | Document editor                                                                |
+| `/settings`                             | Protected page | User settings                                                                  |
+| `POST /api/webhooks/clerk`              | API            | Sync Clerk user to DB _(not implemented — server-side bootstrap used instead)_ |
+| `GET/POST /api/workspaces`              | API            | List / create workspaces                                                       |
+| `GET/PATCH/DELETE /api/workspaces/[id]` | API            | Single workspace                                                               |
+| `GET/POST /api/documents`               | API            | List / create documents                                                        |
+| `GET/PATCH/DELETE /api/documents/[id]`  | API            | Single document                                                                |
+| `POST /api/ai/generate`                 | API            | AI content actions                                                             |
+| `GET /api/documents/[id]/generations`   | API            | Fetch saved AI generations for a document, newest first                        |
 
 ---
 
 ## Loading / Error / Empty States
 
-| Screen | Loading | Error | Empty |
-|---|---|---|---|
-| Workspace list | Skeleton cards | Inline "Something went wrong" text | "No workspaces yet" CTA |
-| Document list | Skeleton rows | Inline "Something went wrong" text | "No documents yet" with create button |
-| Document editor | Pulse skeleton card | Inline "Document not found" | Placeholder "Untitled document" in title; "Type '/' for commands or start writing" + subtle AI panel helper line in editor body |
-| AI generate | "Running…" on button, disabled state; Regenerate icon spins | Error silently clears `pendingAction` | "No {action} yet" + Generate button (disabled when doc empty) |
-| AI panel | Animated skeleton (4 rows, action tab must be selected) | "Couldn't load your previous results." + "Try again" | "Summarize, rewrite, or expand without leaving the editor." when no action selected; per-action empty state with Generate CTA |
+| Screen          | Loading                                                     | Error                                                | Empty                                                                                                                           |
+| --------------- | ----------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Workspace list  | Skeleton cards                                              | Inline "Something went wrong" text                   | "No workspaces yet" CTA                                                                                                         |
+| Document list   | Skeleton rows                                               | Inline "Something went wrong" text                   | "No documents yet" with create button                                                                                           |
+| Document editor | Pulse skeleton card                                         | Inline "Document not found"                          | Placeholder "Untitled document" in title; "Type '/' for commands or start writing" + subtle AI panel helper line in editor body |
+| AI generate     | "Running…" on button, disabled state; Regenerate icon spins | Error silently clears `pendingAction`                | "No {action} yet" + Generate button (disabled when doc empty)                                                                   |
+| AI panel        | Animated skeleton (4 rows, action tab must be selected)     | "Couldn't load your previous results." + "Try again" | "Summarize, rewrite, or expand without leaving the editor." when no action selected; per-action empty state with Generate CTA   |
 
 ---
 
@@ -234,35 +234,35 @@ _(none — all planned items shipped)_
 
 ## Key Decisions & Tradeoffs
 
-| Decision | Reason | Tradeoff |
-|---|---|---|
-| API routes over Server Actions | Easier to test, reusable from hooks | More boilerplate |
-| Clerk webhook for user sync | Clean separation of auth and DB | Needs public URL in dev (ngrok) |
-| Debounced auto-save | Better UX than manual save | Risk of content loss on abrupt close |
-| Prisma v6 (not v7) | Node.js 20.10 compatibility | Miss v7 features; upgrade when Node is updated |
-| No real-time (Phase 1) | Simpler architecture | Two tabs editing same doc will conflict |
-| Tags as many-to-many | Proper relational model | Join table adds complexity; simplify to string[] if needed |
-| No `src/` directory | Flatter, cleaner root | Personal preference — consistent across team |
-| Use server-side user bootstrap for MVP instead of webhook-first sync | Simplifies local development and avoids ngrok/webhook setup during early build phase | Webhook still required later for production-grade sync guarantees |
-| Persist AI generations before building read flow | Preserves outputs and avoids schema churn later | AI panel is now fully persistence-driven via `useAiGenerations` |
-| Split page into shell + editor components for async data init | Avoids `useEffect` state seeding; state initialized directly from props at mount | Adds one level of component nesting |
-| `staleTime: Infinity` on `useAiGenerations` | Generations only change when the user explicitly runs a new action — no background source can mutate them | Must ensure `invalidateQueries` is always called after successful mutation or cache will be stale |
-| AI panel action tabs select view, not trigger generation | Separates navigation from side effects — user can browse results without accidentally firing API calls | Generate/Regenerate must be a deliberate explicit action |
-| `inputSnapshot` staleness over timestamp-based staleness | Content drift is the relevant signal, not time; comparing snapshots directly tells us whether the result is still valid for the current document | Simple string equality — no diffing, no normalization; whitespace differences will mark as stale |
-| `proxy.ts` instead of `middleware.ts` | Next.js 16 deprecated the `middleware` file convention in favour of `proxy` | Rename required; export name also changed from `middleware` to `proxy` |
-| Single `pendingAction` state gates all generate buttons | Prevents overlapping mutations and keeps panel state predictable | Only one action can run at a time; users cannot queue multiple generations |
-| Tiptap content stored as HTML; plain text extracted via `textBetween` for AI | AI needs plain text; editor needs HTML for rich formatting. `textBetween(0, size, "\n\n")` reproduces the paragraph-separated format previously stored in `inputSnapshot`, keeping staleness and revert comparisons valid | Old plain-text documents render correctly (Tiptap wraps in `<p>`); newly saved content is HTML |
-| Custom `BubbleMenuReact` portal instead of Tiptap's BubbleMenu extension | Tiptap v3 dropped the React component wrapper from `@tiptap/react`; the extension is a bare ProseMirror plugin requiring manual DOM integration. A lightweight React component using `editor.on("selectionUpdate")` + `window.getSelection()` + `createPortal` is simpler and fully sufficient | No dependency on `@tiptap/extension-bubble-menu`; `onMouseDown` + `preventDefault` keeps selection alive when clicking menu buttons |
-| `BubbleMenuReact` render prop for `flipLeft` | The overflow panel needs viewport-derived positioning computed inside `BubbleMenuReact` from `rect` + `window.innerWidth`. A render prop (`children: (opts: { flipLeft }) => ReactNode`) flows this info without prop-drilling | Overflow panel uses `position: absolute` horizontally — never clips at top or bottom; `showBelow` handles top-edge clipping for the pill |
-| `marked.parse()` for AI replace/insert | AI output is markdown; Tiptap needs HTML. `marked.parse()` converts the full markdown AST (headings, bold, lists, code blocks). `textToHtml` helper removed after revert was redesigned to use `originalHtmlRef` | `marked.parse()` used synchronously (no async extensions); cast as `string` to satisfy TypeScript |
-| `originalHtmlRef` for revert instead of `textToHtml(inputSnapshot)` | `inputSnapshot` is plain text (captured via `textBetween`); re-converting it to HTML strips all rich formatting. Capturing `editor.getHTML()` at the moment "Replace content" is clicked preserves the exact pre-replace state | Ref is cleared on user edits and after revert fires; `isReplacingRef` prevents `onUpdate` from clearing it during programmatic `setContent` calls |
-| `replacedGenerationId` state replaces `content === outputText` for revert button | After `marked.parse()`, `textBetween` strips markdown syntax from rendered HTML so `content !== outputText` is always true — the revert button never showed. Explicit ID tracking is robust regardless of content format | `isReplacingRef` guards against `onUpdate` clearing the state when `setContent` fires synchronously inside `handleReplace` |
-| OpenAI system message for consistent Markdown output | Without a system message, GPT-4o mirrors input style — plain prose input (from `textBetween` after a "Replace content") returns plain prose output. System message overrides this and ensures every generation is Markdown-formatted for `marked.parse()` | Applies to all three actions and all generations including regenerations; keeps user-facing prompts clean |
-| `resultCollapsed` collapses the full result body, not just the markdown | Collapsing only the markdown area would leave orphaned action buttons with no visible content above them — confusing UX. Collapsing the entire body (pending/empty/markdown/buttons/history) keeps the panel clean and predictable when minimised | The section header (label + Regenerate/Back to latest + chevron) always stays visible so the user knows which action is selected |
-| `isAlreadyApplied` disables only "Replace content", not "Insert at cursor" | Replace is a terminal state — the result IS the document, re-applying is a no-op. Insert at cursor is additive — users may want multiple insertions at different cursor positions, so it stays enabled. `isAlreadyApplied = displayed.id === replacedGenerationId`; derived inline, no new state or props | "Copy" also stays enabled; helper text below buttons explains the disabled state to users |
-| OpenAI timeout set to 15s | Vercel serverless functions have a max execution time; a hung OpenAI call would silently consume it. 15s is tight enough to fail fast without cutting off normal generations (~3–8s). Timeout errors surface a distinct user message ("AI took too long to respond") rather than the generic failure copy | Aggressive timeout may occasionally reject slow-but-valid responses; can be raised if needed |
-| Slash command event bus instead of separate React root | Creating a `createRoot` inside a Tiptap extension render callback is fragile (async mount, separate React tree, no access to parent context). An event bus (`onSlashEvent`) lets the extension emit open/update/close signals that a normal React component subscribes to via `useEffect` | Global singleton callback — only one editor instance can use slash commands at a time; sufficient for single-document editing |
-| `@tiptap/extension-placeholder` for empty editor hint | CSS-only `.is-editor-empty` placeholder was unreliable — Tiptap v3 applies the class on the `<p>` element, not `ProseMirror`. The official Placeholder extension adds `data-placeholder` attribute reliably | Extra dependency; CSS targets `p.is-editor-empty:first-child::before` with `content: attr(data-placeholder)`; a second React-rendered helper line below the editor uses `editor?.isEmpty` |
+| Decision                                                                         | Reason                                                                                                                                                                                                                                                                                                    | Tradeoff                                                                                                                                                                                  |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| API routes over Server Actions                                                   | Easier to test, reusable from hooks                                                                                                                                                                                                                                                                       | More boilerplate                                                                                                                                                                          |
+| Clerk webhook for user sync                                                      | Clean separation of auth and DB                                                                                                                                                                                                                                                                           | Needs public URL in dev (ngrok)                                                                                                                                                           |
+| Debounced auto-save                                                              | Better UX than manual save                                                                                                                                                                                                                                                                                | Risk of content loss on abrupt close                                                                                                                                                      |
+| Prisma v6 (not v7)                                                               | Node.js 20.10 compatibility                                                                                                                                                                                                                                                                               | Miss v7 features; upgrade when Node is updated                                                                                                                                            |
+| No real-time (Phase 1)                                                           | Simpler architecture                                                                                                                                                                                                                                                                                      | Two tabs editing same doc will conflict                                                                                                                                                   |
+| Tags as many-to-many                                                             | Proper relational model                                                                                                                                                                                                                                                                                   | Join table adds complexity; simplify to string[] if needed                                                                                                                                |
+| No `src/` directory                                                              | Flatter, cleaner root                                                                                                                                                                                                                                                                                     | Personal preference — consistent across team                                                                                                                                              |
+| Use server-side user bootstrap for MVP instead of webhook-first sync             | Simplifies local development and avoids ngrok/webhook setup during early build phase                                                                                                                                                                                                                      | Webhook still required later for production-grade sync guarantees                                                                                                                         |
+| Persist AI generations before building read flow                                 | Preserves outputs and avoids schema churn later                                                                                                                                                                                                                                                           | AI panel is now fully persistence-driven via `useAiGenerations`                                                                                                                           |
+| Split page into shell + editor components for async data init                    | Avoids `useEffect` state seeding; state initialized directly from props at mount                                                                                                                                                                                                                          | Adds one level of component nesting                                                                                                                                                       |
+| `staleTime: Infinity` on `useAiGenerations`                                      | Generations only change when the user explicitly runs a new action — no background source can mutate them                                                                                                                                                                                                 | Must ensure `invalidateQueries` is always called after successful mutation or cache will be stale                                                                                         |
+| AI panel action tabs select view, not trigger generation                         | Separates navigation from side effects — user can browse results without accidentally firing API calls                                                                                                                                                                                                    | Generate/Regenerate must be a deliberate explicit action                                                                                                                                  |
+| `inputSnapshot` staleness over timestamp-based staleness                         | Content drift is the relevant signal, not time; comparing snapshots directly tells us whether the result is still valid for the current document                                                                                                                                                          | Simple string equality — no diffing, no normalization; whitespace differences will mark as stale                                                                                          |
+| `proxy.ts` instead of `middleware.ts`                                            | Next.js 16 deprecated the `middleware` file convention in favour of `proxy`                                                                                                                                                                                                                               | Rename required; export name also changed from `middleware` to `proxy`                                                                                                                    |
+| Single `pendingAction` state gates all generate buttons                          | Prevents overlapping mutations and keeps panel state predictable                                                                                                                                                                                                                                          | Only one action can run at a time; users cannot queue multiple generations                                                                                                                |
+| Tiptap content stored as HTML; plain text extracted via `textBetween` for AI     | AI needs plain text; editor needs HTML for rich formatting. `textBetween(0, size, "\n\n")` reproduces the paragraph-separated format previously stored in `inputSnapshot`, keeping staleness and revert comparisons valid                                                                                 | Old plain-text documents render correctly (Tiptap wraps in `<p>`); newly saved content is HTML                                                                                            |
+| Custom `BubbleMenuReact` portal instead of Tiptap's BubbleMenu extension         | Tiptap v3 dropped the React component wrapper from `@tiptap/react`; the extension is a bare ProseMirror plugin requiring manual DOM integration. A lightweight React component using `editor.on("selectionUpdate")` + `window.getSelection()` + `createPortal` is simpler and fully sufficient            | No dependency on `@tiptap/extension-bubble-menu`; `onMouseDown` + `preventDefault` keeps selection alive when clicking menu buttons                                                       |
+| `BubbleMenuReact` render prop for `flipLeft`                                     | The overflow panel needs viewport-derived positioning computed inside `BubbleMenuReact` from `rect` + `window.innerWidth`. A render prop (`children: (opts: { flipLeft }) => ReactNode`) flows this info without prop-drilling                                                                            | Overflow panel uses `position: absolute` horizontally — never clips at top or bottom; `showBelow` handles top-edge clipping for the pill                                                  |
+| `marked.parse()` for AI replace/insert                                           | AI output is markdown; Tiptap needs HTML. `marked.parse()` converts the full markdown AST (headings, bold, lists, code blocks). `textToHtml` helper removed after revert was redesigned to use `originalHtmlRef`                                                                                          | `marked.parse()` used synchronously (no async extensions); cast as `string` to satisfy TypeScript                                                                                         |
+| `originalHtmlRef` for revert instead of `textToHtml(inputSnapshot)`              | `inputSnapshot` is plain text (captured via `textBetween`); re-converting it to HTML strips all rich formatting. Capturing `editor.getHTML()` at the moment "Replace content" is clicked preserves the exact pre-replace state                                                                            | Ref is cleared on user edits and after revert fires; `isReplacingRef` prevents `onUpdate` from clearing it during programmatic `setContent` calls                                         |
+| `replacedGenerationId` state replaces `content === outputText` for revert button | After `marked.parse()`, `textBetween` strips markdown syntax from rendered HTML so `content !== outputText` is always true — the revert button never showed. Explicit ID tracking is robust regardless of content format                                                                                  | `isReplacingRef` guards against `onUpdate` clearing the state when `setContent` fires synchronously inside `handleReplace`                                                                |
+| OpenAI system message for consistent Markdown output                             | Without a system message, GPT-4o mirrors input style — plain prose input (from `textBetween` after a "Replace content") returns plain prose output. System message overrides this and ensures every generation is Markdown-formatted for `marked.parse()`                                                 | Applies to all three actions and all generations including regenerations; keeps user-facing prompts clean                                                                                 |
+| `resultCollapsed` collapses the full result body, not just the markdown          | Collapsing only the markdown area would leave orphaned action buttons with no visible content above them — confusing UX. Collapsing the entire body (pending/empty/markdown/buttons/history) keeps the panel clean and predictable when minimised                                                         | The section header (label + Regenerate/Back to latest + chevron) always stays visible so the user knows which action is selected                                                          |
+| `isAlreadyApplied` disables only "Replace content", not "Insert at cursor"       | Replace is a terminal state — the result IS the document, re-applying is a no-op. Insert at cursor is additive — users may want multiple insertions at different cursor positions, so it stays enabled. `isAlreadyApplied = displayed.id === replacedGenerationId`; derived inline, no new state or props | "Copy" also stays enabled; helper text below buttons explains the disabled state to users                                                                                                 |
+| OpenAI timeout set to 15s                                                        | Vercel serverless functions have a max execution time; a hung OpenAI call would silently consume it. 15s is tight enough to fail fast without cutting off normal generations (~3–8s). Timeout errors surface a distinct user message ("AI took too long to respond") rather than the generic failure copy | Aggressive timeout may occasionally reject slow-but-valid responses; can be raised if needed                                                                                              |
+| Slash command event bus instead of separate React root                           | Creating a `createRoot` inside a Tiptap extension render callback is fragile (async mount, separate React tree, no access to parent context). An event bus (`onSlashEvent`) lets the extension emit open/update/close signals that a normal React component subscribes to via `useEffect`                 | Global singleton callback — only one editor instance can use slash commands at a time; sufficient for single-document editing                                                             |
+| `@tiptap/extension-placeholder` for empty editor hint                            | CSS-only `.is-editor-empty` placeholder was unreliable — Tiptap v3 applies the class on the `<p>` element, not `ProseMirror`. The official Placeholder extension adds `data-placeholder` attribute reliably                                                                                               | Extra dependency; CSS targets `p.is-editor-empty:first-child::before` with `content: attr(data-placeholder)`; a second React-rendered helper line below the editor uses `editor?.isEmpty` |
 
 ---
 
@@ -285,8 +285,23 @@ Key milestones shipped to date:
 
 ## Remaining for V1 Release
 
-- [ ] **Better new-document flow (v1 simple safeguard)** — keep the current immediate-create architecture, but prevent junk empty documents from accumulating (e.g. auto-delete untitled documents with no content after a short period, or skip persisting until the user types a title or content)
-- [ ] **Strengthen separator between title/metadata and document body** — the current `border-t` divider is too subtle; needs more visual weight to anchor the writing area
+### Public-facing / product presentation
+
+- [ ] **Landing page reflects what Lume actually is now** — update positioning, structure, and product copy so the public page matches the current product: AI-native writing workspace, rich editor, persisted generations, regenerate/revert flow, and slash commands
+- [ ] **Workspace page no longer feels weaker than editor page** — bring the workspace view up to the same visual and product quality as the editor so the overall app feels consistent
+- [ ] **Sidebar feels intentional and complete** — refine the app shell so the sidebar no longer feels like scaffolding; navigation, spacing, and overall presence should match the polish of the editor experience
+- [ ] **Product copy is consistent across the app** — align wording across landing page, workspace page, editor empty states, and AI panel so the product speaks in one voice
+
+### Product behavior
+
+- [ ] **Better new-document flow (v1 simple safeguard)** — keep the current immediate-create architecture, but prevent junk empty documents from accumulating; ship a simple v1 safeguard before launch
+- [ ] **AI actions on empty docs are handled clearly** — ensure empty-document behavior is obvious and non-confusing; users should understand when AI actions are unavailable or need draft content first
+- [ ] **Strengthen separator between title/metadata and document body** — the current divider is still too subtle; give the writing area a clearer visual anchor if this remains unresolved
+
+### Trust / release confidence
+
+- [ ] **Quick smoke test in production after latest changes** — verify the latest editor, shell, and empty-state changes end-to-end in the deployed app
+- [ ] **One clean demo path for launch / sharing** — define a frictionless walkthrough that reliably shows the core Lume experience for public launch, interviews, and feedback sharing
 
 No other major functional gaps remain for a v1 release. The core writing + AI workflow is complete.
 
