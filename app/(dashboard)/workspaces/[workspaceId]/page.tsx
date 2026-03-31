@@ -2,7 +2,7 @@
 
 import { use, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, ArrowLeft, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
+import { Plus, ChevronLeft, MoreHorizontal, Pencil, Trash2 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { useDocuments, useCreateDocument, type Document } from "@/hooks/use-documents"
 import { useUpdateWorkspace, useDeleteWorkspace } from "@/hooks/use-workspaces"
@@ -108,10 +108,10 @@ export default function WorkspaceDetailPage({
             {/* Back link */}
             <Link
                 href="/workspaces"
-                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"
+                className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-8"
             >
-                <ArrowLeft size={12} />
-                Workspaces
+                <ChevronLeft size={14} />
+                Back to workspaces
             </Link>
 
             {/* Header */}

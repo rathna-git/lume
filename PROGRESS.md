@@ -18,6 +18,7 @@ Brought the workspace detail page up to the same visual quality as the editor. A
 - **Tighter layout**: Max width narrowed from `5xl` to `4xl`; grid gap tightened from `gap-4` to `gap-3`.
 - **Softer empty state**: Smaller emoji, quieter copy, consistent with editor empty state tone.
 - **Three-dot menu**: Resting opacity lowered to 30% (matching editor page).
+- **Back button**: Matched editor page style — `ChevronLeft` icon, "Back to workspaces" text, `text-sm font-medium`.
 
 #### Files Modified
 
