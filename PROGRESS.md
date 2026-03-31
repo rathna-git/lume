@@ -6,6 +6,28 @@
 
 ## 2026-03-31
 
+### Polish — Workspace Page Visual Parity
+
+Brought the workspace detail page up to the same visual quality as the editor. Addressed the "too flat" feel and beginner-look issues.
+
+- **Tinted document cards**: Removed dated colored left-border accent. Cards now have soft tinted backgrounds (amber, teal, violet, rose rotating per card) with matching hover tint and colored border on hover.
+- **Cleaner shadows**: Lighter rest shadow, warmer hover shadow — all via Tailwind classes, removed inline JS mouse event handlers.
+- **Ghost CTA button**: "New Document" switched from solid amber to outline/ghost variant — content-first, not button-first.
+- **Document count**: Shows "3 documents" below workspace description for substance.
+- **Header separator**: Faint border between header and document grid creates visual layering.
+- **Tighter layout**: Max width narrowed from `5xl` to `4xl`; grid gap tightened from `gap-4` to `gap-3`.
+- **Softer empty state**: Smaller emoji, quieter copy, consistent with editor empty state tone.
+- **Three-dot menu**: Resting opacity lowered to 30% (matching editor page).
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/document/document-card.tsx` | Card visual overhaul — tinted backgrounds, uniform border, Tailwind shadows, more padding |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Header separator, doc count, outline button, tighter width/gap, empty state, menu opacity |
+
+---
+
 ### Polish — Document Editor Empty State
 
 Visual mood pass for the empty document editor. All changes scoped to polish — no layout redesign, no new features.

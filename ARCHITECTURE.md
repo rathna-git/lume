@@ -205,7 +205,7 @@ AiGeneration
 | Screen          | Loading                                                     | Error                                                | Empty                                                                                                                           |
 | --------------- | ----------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Workspace list  | Skeleton cards                                              | Inline "Something went wrong" text                   | "No workspaces yet" CTA                                                                                                         |
-| Document list   | Skeleton rows                                               | Inline "Something went wrong" text                   | "No documents yet" with create button                                                                                           |
+| Document list   | Skeleton cards                                              | Inline "Something went wrong" text                   | "No documents yet" — softened empty state with quieter copy                                                                     |
 | Document editor | Pulse skeleton card                                         | Inline "Document not found"                          | Placeholder "Untitled document" in title; "Type '/' for commands or start writing" + subtle AI panel helper line in editor body |
 | AI generate     | "Running…" on button, disabled state; Regenerate icon spins | Error silently clears `pendingAction`                | "No {action} yet" + Generate button (disabled when doc empty)                                                                   |
 | AI panel        | Animated skeleton (4 rows, action tab must be selected)     | "Couldn't load your previous results." + "Try again" | "Summarize, rewrite, or expand without leaving the editor." when no action selected; per-action empty state with Generate CTA   |
@@ -279,7 +279,7 @@ Key milestones shipped to date:
 - Rate limiting (in-memory, 12 req/min) + 15s OpenAI timeout + error logging
 - Document sorting by `updatedAt DESC` with relative timestamps
 - Deployment to Vercel — all features verified end-to-end
-- UI polish passes — editor typography, warm color palette, empty state mood pass, workspace/document three-dot menus, colored AI panel icons, toast notifications, visual depth on document cards
+- UI polish passes — editor typography, warm color palette, empty state mood pass, workspace/document three-dot menus, colored AI panel icons, toast notifications, visual depth on document cards, workspace page visual parity with editor
 
 ---
 
@@ -288,7 +288,7 @@ Key milestones shipped to date:
 ### Public-facing / product presentation
 
 - [ ] **Landing page reflects what Lume actually is now** — update positioning, structure, and product copy so the public page matches the current product: AI-native writing workspace, rich editor, persisted generations, regenerate/revert flow, and slash commands
-- [ ] **Workspace page no longer feels weaker than editor page** — bring the workspace view up to the same visual and product quality as the editor so the overall app feels consistent
+- [x] **Workspace page no longer feels weaker than editor page** — visual polish pass: tinted document cards, outline CTA, document count, header separator, tighter layout, softer empty state, quieter menu
 - [ ] **Sidebar feels intentional and complete** — refine the app shell so the sidebar no longer feels like scaffolding; navigation, spacing, and overall presence should match the polish of the editor experience
 - [ ] **Product copy is consistent across the app** — align wording across landing page, workspace page, editor empty states, and AI panel so the product speaks in one voice
 

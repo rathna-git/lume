@@ -104,7 +104,7 @@ export default function WorkspaceDetailPage({
     const isError = workspaceError || docsError
 
     return (
-        <div className="max-w-5xl mx-auto px-6 py-10">
+        <div className="max-w-4xl mx-auto px-6 py-10">
             {/* Back link */}
             <Link
                 href="/workspaces"
@@ -115,7 +115,7 @@ export default function WorkspaceDetailPage({
             </Link>
 
             {/* Header */}
-            <div className="flex items-start justify-between mb-10">
+            <div className="flex items-start justify-between pb-8 mb-8 border-b border-border/40">
                 <div>
                     {workspaceLoading ? (
                         <div className="animate-pulse">
@@ -134,7 +134,7 @@ export default function WorkspaceDetailPage({
                                     <button
                                         onClick={() => setMenuOpen(v => !v)}
                                         aria-label="Workspace actions"
-                                        className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/60 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-150"
+                                        className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground/30 hover:text-foreground hover:bg-muted/60 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-150"
                                     >
                                         <MoreHorizontal size={15} />
                                     </button>
@@ -167,12 +167,18 @@ export default function WorkspaceDetailPage({
                                     {workspace.description}
                                 </p>
                             )}
+                            {documents && documents.length > 0 && (
+                                <p className="text-xs text-muted-foreground/50 mt-2">
+                                    {documents.length} document{documents.length === 1 ? "" : "s"}
+                                </p>
+                            )}
                         </>
                     ) : null}
                 </div>
                 <Button
+                    variant="outline"
                     size="sm"
-                    className="gap-2"
+                    className="gap-2 text-muted-foreground hover:text-foreground"
                     onClick={handleNewDocument}
                     disabled={isCreating}
                 >
@@ -197,11 +203,11 @@ export default function WorkspaceDetailPage({
 
             {/* Empty */}
             {!isLoading && !isError && documents?.length === 0 && (
-                <div className="text-center py-24">
-                    <p className="text-3xl mb-4">📄</p>
-                    <p className="font-serif text-lg text-foreground mb-1">No documents yet</p>
-                    <p className="text-sm text-muted-foreground mb-6">
-                        Create your first document to start writing.
+                <div className="text-center py-20">
+                    <p className="text-2xl mb-3">📄</p>
+                    <p className="font-serif text-base text-foreground mb-1">No documents yet</p>
+                    <p className="text-sm text-muted-foreground/60">
+                        Create your first document to get started.
                     </p>
                 </div>
             )}
@@ -209,7 +215,7 @@ export default function WorkspaceDetailPage({
             {/* Grid */}
             {!isLoading && !isError && documents && documents.length > 0 && (
                 <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[...documents]
                         .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
                         .map((doc, i) => (
