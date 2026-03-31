@@ -206,9 +206,9 @@ AiGeneration
 |---|---|---|---|
 | Workspace list | Skeleton cards | Inline "Something went wrong" text | "No workspaces yet" CTA |
 | Document list | Skeleton rows | Inline "Something went wrong" text | "No documents yet" with create button |
-| Document editor | Pulse skeleton card | Inline "Document not found" | Blank editor ready to type |
-| AI generate | "Running…" on button, disabled state | Error silently clears `pendingAction` | "No {action} yet" + Generate button |
-| AI panel | Animated skeleton (4 rows, action tab must be selected) | "Couldn't load your previous results." + "Try again" | Per-action empty state with Generate CTA |
+| Document editor | Pulse skeleton card | Inline "Document not found" | Placeholder "Untitled document" in title; "Type '/' for commands or start writing" + subtle AI panel helper line in editor body |
+| AI generate | "Running…" on button, disabled state; Regenerate icon spins | Error silently clears `pendingAction` | "No {action} yet" + Generate button (disabled when doc empty) |
+| AI panel | Animated skeleton (4 rows, action tab must be selected) | "Couldn't load your previous results." + "Try again" | "Summarize, rewrite, or expand without leaving the editor." when no action selected; per-action empty state with Generate CTA |
 
 ---
 
@@ -262,7 +262,7 @@ _(none — all planned items shipped)_
 | `isAlreadyApplied` disables only "Replace content", not "Insert at cursor" | Replace is a terminal state — the result IS the document, re-applying is a no-op. Insert at cursor is additive — users may want multiple insertions at different cursor positions, so it stays enabled. `isAlreadyApplied = displayed.id === replacedGenerationId`; derived inline, no new state or props | "Copy" also stays enabled; helper text below buttons explains the disabled state to users |
 | OpenAI timeout set to 15s | Vercel serverless functions have a max execution time; a hung OpenAI call would silently consume it. 15s is tight enough to fail fast without cutting off normal generations (~3–8s). Timeout errors surface a distinct user message ("AI took too long to respond") rather than the generic failure copy | Aggressive timeout may occasionally reject slow-but-valid responses; can be raised if needed |
 | Slash command event bus instead of separate React root | Creating a `createRoot` inside a Tiptap extension render callback is fragile (async mount, separate React tree, no access to parent context). An event bus (`onSlashEvent`) lets the extension emit open/update/close signals that a normal React component subscribes to via `useEffect` | Global singleton callback — only one editor instance can use slash commands at a time; sufficient for single-document editing |
-| `@tiptap/extension-placeholder` for empty editor hint | CSS-only `.is-editor-empty` placeholder was unreliable — Tiptap v3 applies the class on the `<p>` element, not `ProseMirror`. The official Placeholder extension adds `data-placeholder` attribute reliably | Extra dependency; CSS targets `p.is-editor-empty:first-child::before` with `content: attr(data-placeholder)` |
+| `@tiptap/extension-placeholder` for empty editor hint | CSS-only `.is-editor-empty` placeholder was unreliable — Tiptap v3 applies the class on the `<p>` element, not `ProseMirror`. The official Placeholder extension adds `data-placeholder` attribute reliably | Extra dependency; CSS targets `p.is-editor-empty:first-child::before` with `content: attr(data-placeholder)`; a second React-rendered helper line below the editor uses `editor?.isEmpty` |
 
 ---
 
@@ -314,6 +314,7 @@ _(none — all planned items shipped)_
 - [x] UI polish — color refinement: sidebar `#FFFBE8`, AI panel `#FFFCEE`, document page bg `#FFFEF9`; removed empty `Header` component; Tiptap `immediatelyRender: false` for SSR
 - [x] UI polish — "Back to workspace" link moved outside editor card onto page background; `ArrowLeft` → `ChevronLeft`; `text-sm font-medium` for bolder treatment
 - [x] Feature — slash command menu: type `/` to open a filtered dropdown (Text, H1-H3, lists, quote, code block, divider); `@tiptap/suggestion` extension + event bus + `SlashCommandMenu` React component; `@tiptap/extension-placeholder` for empty editor hint
+- [x] Polish — empty state mood pass: title placeholder "Untitled document"; editor helper line about AI panel; refined AI panel no-action copy; three-dot menu quieted (30% → 100% on hover); Regenerate upgraded to bordered pill with icon; PREVIOUS history cards wider with larger text
 
 ---
 

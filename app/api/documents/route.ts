@@ -5,7 +5,7 @@ import { requireCurrentDbUser } from "@/lib/auth"
 
 const createDocumentSchema = z.object({
     workspaceId: z.string().min(1),
-    title: z.string().trim().max(255).optional().default("Untitled"),
+    title: z.string().trim().max(255).optional().default(""),
 })
 
 export async function GET(req: Request) {

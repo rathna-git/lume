@@ -254,8 +254,9 @@ function AiPanel({
                                 <button
                                     onClick={() => onGenerate(selectedAction)}
                                     disabled={anyPending || !content.trim()}
-                                    className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2 py-1 transition-colors hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
                                 >
+                                    <RotateCcw size={11} className={isPending ? "animate-spin" : ""} />
                                     {isPending ? "Running…" : "Regenerate"}
                                 </button>
                             )}
@@ -393,17 +394,17 @@ function AiPanel({
                                     <button
                                         key={g.id}
                                         onClick={() => onSelectGeneration(g.id)}
-                                        className={`text-left rounded-lg px-3 py-2.5 transition-colors border shrink-0 w-[calc(50%-0.25rem)] ${
+                                        className={`text-left rounded-lg px-3.5 py-3 transition-colors border shrink-0 w-[200px] ${
                                             displayed?.id === g.id
                                                 ? "border-border bg-muted"
                                                 : "border-border hover:bg-muted/60"
                                         }`}
                                     >
-                                        <span className="text-[10px] text-muted-foreground/50 block mb-0.5">
+                                        <span className="text-[11px] text-muted-foreground/50 block mb-1">
                                             {relativeTime(g.createdAt)}
                                         </span>
-                                        <span className="text-xs text-muted-foreground line-clamp-2">
-                                            {g.output?.text?.slice(0, 80) ?? "—"}
+                                        <span className="text-[0.8125rem] leading-snug text-muted-foreground line-clamp-3">
+                                            {g.output?.text?.slice(0, 120) ?? "—"}
                                         </span>
                                     </button>
                                 ))}
@@ -423,8 +424,8 @@ function AiPanel({
             )}
 
             {!selectedAction && (
-                <p className="text-xs text-muted-foreground/50 leading-relaxed">
-                    Select an action to view or generate AI output for this document.
+                <p className="text-xs text-muted-foreground/35 leading-relaxed">
+                    Summarize, rewrite, or expand without leaving the editor.
                 </p>
             )}
         </div>
@@ -448,7 +449,7 @@ function DocumentEditor({
 
     const generations = generationsData ?? []
 
-    const [title, setTitle] = useState(doc.title)
+    const [title, setTitle] = useState(doc.title === "Untitled" ? "" : doc.title)
     const [content, setContent] = useState(doc.content ?? "")
     const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle")
     const [selectedAction, setSelectedAction] = useState<AiAction | null>(null)
@@ -495,7 +496,7 @@ function DocumentEditor({
             StarterKit,
             SlashCommandExtension,
             Placeholder.configure({
-                placeholder: "Type '/' for commands or start writing…",
+                placeholder: "Type '/' for commands or start writing",
             }),
         ],
         content: doc.content ?? "",
@@ -646,7 +647,7 @@ function DocumentEditor({
                                 <button
                                     onClick={() => setDocMenuOpen(v => !v)}
                                     aria-label="Document actions"
-                                    className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-muted/60 transition-colors"
+                                    className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground/30 hover:text-foreground hover:bg-muted/60 transition-colors"
                                 >
                                     <MoreHorizontal size={15} />
                                 </button>
@@ -676,7 +677,7 @@ function DocumentEditor({
                         type="text"
                         value={title}
                         onChange={handleTitleChange}
-                        placeholder="Untitled"
+                        placeholder="Untitled document"
                         className="w-full font-serif text-3xl text-foreground tracking-tight placeholder:text-muted-foreground/40 bg-transparent border-none outline-none resize-none mb-2"
                     />
 
@@ -782,6 +783,11 @@ function DocumentEditor({
                         )}
                         <EditorContent editor={editor} />
                         <SlashCommandMenu editor={editor} />
+                        {editor?.isEmpty && (
+                            <p className="text-xs text-muted-foreground/30 mt-4 leading-relaxed">
+                                Use the AI panel to summarize, rewrite, or expand once you have a draft.
+                            </p>
+                        )}
                     </div>
 
                     </div> {/* end writing canvas */}

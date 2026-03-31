@@ -4,6 +4,30 @@
 
 ---
 
+## 2026-03-31
+
+### Polish — Document Editor Empty State
+
+Visual mood pass for the empty document editor. All changes scoped to polish — no layout redesign, no new features.
+
+- **Title placeholder**: New documents are now created with an empty title (API default changed from `"Untitled"` to `""`). Title input shows placeholder "Untitled document" instead of a saved-looking value. Existing docs with title `"Untitled"` also render as placeholder.
+- **Editor helper line**: A second subtle line appears below the empty editor: "Use the AI panel to summarize, rewrite, or expand once you have a draft." Disappears as soon as content is typed.
+- **Editor placeholder**: Removed trailing ellipsis — now reads "Type '/' for commands or start writing"
+- **AI panel copy**: No-action-selected state simplified to a single line: "Summarize, rewrite, or expand without leaving the editor."
+- **Three-dot menu**: Resting opacity lowered from 60% to 30%; fully visible on hover/focus. Quieter in empty state without losing discoverability.
+- **AI actions on empty docs**: Already handled — Generate button disabled via `!content.trim()`; no change needed.
+- **Regenerate button**: Upgraded from ghost text link to a bordered pill with `RotateCcw` icon (spins while running). More visible and clearly clickable.
+- **PREVIOUS history cards**: Wider fixed-width cards (200px), larger text preview (13px, 3-line clamp, 120 char slice), more padding and breathing room.
+
+### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Title placeholder, empty editor helper line, AI panel copy, three-dot menu opacity, Regenerate button styling, history card sizing |
+| `app/api/documents/route.ts` | Default title changed from `"Untitled"` to `""` |
+
+---
+
 ## 2026-03-30
 
 ### Feature — Slash Command Menu
