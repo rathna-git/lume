@@ -266,98 +266,45 @@ _(none — all planned items shipped)_
 
 ---
 
-## Implementation Order
+## Completed
 
-- [x] Next.js scaffold + dependencies
-- [x] Brand system (fonts, colors, animations)
-- [x] Logo component + landing page
-- [x] Shared env/config setup
-- [x] `lib/prisma.ts` singleton
-- [x] Prisma schema
-- [x] First migration
-- [x] TanStack Query provider
-- [x] Clerk setup in root layout
-- [x] Auth pages (sign-in / sign-up)
-- [x] Middleware — route protection
-- [x] Protected app shell (sidebar)
-- [x] Server-side user bootstrap (create DB user on first request)
-- [x] Default workspace creation
-- [x] Workspace API routes
-- [x] Workspace pages
-- [x] Document API routes (GET list, POST create)
-- [x] Workspace detail page (document list)
-- [x] Document editor + autosave
-- [x] AI route (POST generate — summarize / rewrite / expand)
-- [x] Document delete
-- [x] Workspace PATCH route + rename UI
-- [x] Workspace DELETE route + delete UI (cascade via Prisma)
-- [x] AI generations read route (GET — auth + ownership + newest-first)
-- [x] `useAiGenerations` hook (`staleTime: Infinity`, invalidated after mutation)
-- [x] Two-surface editor layout (editor card + persistent AI panel)
-- [x] Action-driven AI panel (tabs select view; Generate / Regenerate explicit; staleness via `inputSnapshot`)
-- [x] UI polish — Tiptap editor typography (line-height, heading hierarchy, list rhythm, block spacing)
-- [x] UI polish — editor writing canvas constrained to `max-w-[680px]`; card/title/back-link vertical spacing refined
-- [x] UI polish — AI panel spacing and readability; collapsible result section via `resultCollapsed`
-- [x] UI polish — "Insert below" renamed to "Insert at cursor"; `editor.commands.insertContent()` inserts at preserved `editor.state.selection` regardless of focus
-- [x] UI polish — `isAlreadyApplied` disables "Replace content" only (terminal state); "Insert at cursor" stays enabled (additive); helper text shown
-- [x] UI polish — `sonner` toast notifications for Replace, Insert at cursor, Copy, Revert; Lume-themed via `toastOptions.style` + CSS icon override; `bottom-right` position
-- [x] UI polish — AI panel history list changed to horizontal scroll; two cards visible, `ChevronRight` fade overlay when `olderGenerations.length > 2`; "Undo with Cmd+Z" hint below action buttons
-- [x] UI polish — bubble menu visual refinement: solid `bg-card`, softer shadow/border, `rounded-md` buttons, soft active tint (`bg-foreground/10`), cleaner icon colors, `animate-in fade-in zoom-in-95` entry animation on pill and overflow panel
-- [x] Rate limiting — `lib/rate-limit.ts` in-memory per-user limiter; 12 req/min sliding window; 429 returned before any OpenAI or DB work
-- [x] UI polish — AI action tab buttons now show icons (`BookText` / `PenLine` / `ChevronsUpDown`) via `ACTION_ICON` map alongside `ACTION_LABEL`
-- [x] UI polish — workspace header three-dot menu: `MoreHorizontal` button replaces inline Pencil/Trash2; hidden by default, fades in on hover/focus; dropdown with Rename + Delete items
-- [x] UI polish — visual depth pass: `<main>` set to `bg-white`; document cards cycle through 4 accent colors (amber/teal/violet/rose) via `accentIndex`; warm brown-tinted shadow lifts cards; colored hover shadow per accent
-- [x] Feature — documents sorted by `updatedAt DESC` on workspace page; cards show relative "Last modified" time with exact timestamp on hover; editor page shows exact timestamp with `Calendar` icon under title
-- [x] UI polish — document editor three-dot menu: `MoreHorizontal` replaces bare "Delete" text; always-visible dropdown with `Trash2` Delete item; future-ready for Share/Import actions
-- [x] UI polish — colored icons on AI panel: action tabs (amber/teal/violet) + apply buttons (Replace amber, Insert teal, Copy violet, Revert rose); text stays neutral
-- [x] Fix — React 19 read-only `useRef` assignments wrapped in `useEffect`; `save` wrapped in `useCallback`
-- [x] UI polish — color refinement: sidebar `#FFFBE8`, AI panel `#FFFCEE`, document page bg `#FFFEF9`; removed empty `Header` component; Tiptap `immediatelyRender: false` for SSR
-- [x] UI polish — "Back to workspace" link moved outside editor card onto page background; `ArrowLeft` → `ChevronLeft`; `text-sm font-medium` for bolder treatment
-- [x] Feature — slash command menu: type `/` to open a filtered dropdown (Text, H1-H3, lists, quote, code block, divider); `@tiptap/suggestion` extension + event bus + `SlashCommandMenu` React component; `@tiptap/extension-placeholder` for empty editor hint
-- [x] Polish — empty state mood pass: title placeholder "Untitled document"; editor helper line about AI panel; refined AI panel no-action copy; three-dot menu quieted (30% → 100% on hover); Regenerate upgraded to bordered pill with icon; PREVIOUS history cards wider with larger text
+Key milestones shipped to date:
+
+- Next.js scaffold, brand system, landing page, Clerk auth, Prisma schema + migrations
+- Workspace CRUD (create, rename, delete with cascade) + document CRUD (create, edit, delete with confirmation dialog)
+- Tiptap rich text editor with autosave, bubble menu (Bold/Italic/Strike/Code + overflow panel), slash command menu (`/` to insert blocks)
+- AI generation flow — Summarize / Rewrite / Expand via OpenAI GPT-4o; persisted generations with `inputSnapshot` staleness detection
+- Action-driven AI panel (tabs, Generate/Regenerate, Replace/Insert at cursor/Copy, Revert to original, collapsible results, horizontal history scroll)
+- Markdown rendering in AI panel (react-markdown) + `marked.parse()` for Replace/Insert
+- Rate limiting (in-memory, 12 req/min) + 15s OpenAI timeout + error logging
+- Document sorting by `updatedAt DESC` with relative timestamps
+- Deployment to Vercel — all features verified end-to-end
+- UI polish passes — editor typography, warm color palette, empty state mood pass, workspace/document three-dot menus, colored AI panel icons, toast notifications, visual depth on document cards
 
 ---
 
-## Pending Work (Ordered by Importance)
+## Remaining for V1 Release
 
-### High Priority
+- [ ] **Better new-document flow (v1 simple safeguard)** — keep the current immediate-create architecture, but prevent junk empty documents from accumulating (e.g. auto-delete untitled documents with no content after a short period, or skip persisting until the user types a title or content)
+- [ ] **Strengthen separator between title/metadata and document body** — the current `border-t` divider is too subtle; needs more visual weight to anchor the writing area
 
-- [x] Add document delete feature
-- [x] Add workspace PATCH route (rename + description update)
-- [x] Add workspace rename UI flow
-- [x] Add workspace DELETE route
-- [x] Add workspace delete UI flow
-- [x] Add AI generations read route (`GET /api/documents/[id]/generations`) — returns all generations for a document, newest first; auth via document ownership
-- [x] Add `useAiGenerations(documentId)` TanStack Query hook — fetches from the above route; invalidated after successful AI mutation
-- [x] Surface latest persisted AI generation in the document editor — persistent right-side AI panel replaces below-fold result block
-- [x] Invalidate AI generations query after successful AI mutation
+No other major functional gaps remain for a v1 release. The core writing + AI workflow is complete.
 
-### Medium Priority
+---
 
-- [x] Deployment pass — deployed to https://lume-psi-teal.vercel.app/; all features verified end-to-end in prod
-- [x] Add AI history panel per document — action-driven panel shows latest persisted result per action type; history list shows older results per action with relative timestamps and snippet previews
-- [x] Add explicit regenerate flow separate from viewing existing results
-- [x] Add loading / empty / error states for AI history retrieval
-- [x] Audit persisted server data currently held only in local UI state
+## Post-V1 / V1.1
 
-### Lower Priority
-
-- [x] Render AI panel output as markdown (react-markdown) — bold, code, lists display correctly in panel; precursor to rich text editor
-- [x] Replace `<textarea>` editor with Tiptap rich text editor — StarterKit, custom `BubbleMenuReact` (portal-based, Tiptap v3 has no React wrapper), selection bubble menu with Bold/Italic/Strike/Code + overflow panel (Paragraph, H1-H3, lists, blockquote, code block, divider, undo/redo); content stored as HTML; plain text extracted via `textBetween` for AI and staleness comparisons; overflow panel side-floats via render prop + `position: absolute`; `marked.parse()` converts AI markdown to HTML on replace/insert; `originalHtmlRef` preserves formatting on revert; `replacedGenerationId` tracks replace state for revert button + staleness; OpenAI system message ensures markdown output on all generations
-- [x] Replace `confirm()` on document delete with a proper confirmation dialog (same pattern as workspace delete)
-- [x] Conditionally adjust workspace delete dialog copy — omit "and all documents inside it" when workspace is empty; reads `documents.length` from loaded `useDocuments` query
+- [ ] **Better new-document flow (v1.1 true draft mode)** — "New Document" opens an unsaved draft editor first; a real `Document` record is only created on first meaningful save (title or content). Preferred long-term flow, but not required if the v1 safeguard ships first
 - [ ] Add filtering / sorting for AI generations
 - [ ] Define retention / versioning strategy for AI outputs
 - [ ] Harden Clerk webhook sync flow post-MVP
-- [ ] Future: migrate document content storage to AWS S3 — store content as files in S3, save S3 URL in the Neon `Document` table instead of storing raw text in the DB; improves scalability for large documents
-- [x] Add rate limiting to `POST /api/ai/generate` — in-memory per-user limiter (12 req/min); per-instance on Vercel, sufficient for v1
 - [ ] **Rate limiting v2** — replace in-memory limiter with a distributed solution (e.g. Upstash Redis) so the limit is enforced globally across all Vercel instances
-- [x] Add timeout to OpenAI API call — 15s timeout (`{ timeout: 15_000 }`); timeout errors return a distinct user-friendly message
-- [x] Add error logging in API route catch blocks — `console.error` in `POST /api/ai/generate` catch; logs `generationId`, `documentId`, `action`, error message to Vercel function logs
-- [x] `useDeleteDocument` should remove `["aiGenerations", documentId]` from query cache on success — prevents stale data if user navigates back
-- [x] Clean up debounce timeout on editor unmount — `useEffect` cleanup calls `clearTimeout(debounceRef.current)` to prevent stale save after navigation
-- [x] Disable "Replace content" when generation is already applied (`isAlreadyApplied = displayed.id === replacedGenerationId`); "Insert at cursor" intentionally stays enabled (additive action); helper text shown; "Copy" unaffected
-- [x] **Revert to original (v1)** — after "Replace content" is clicked, show a "Revert to original" button that restores the editor to its pre-replace HTML (captured in `originalHtmlRef`); button visible when `replacedGenerationId === displayed.id`; disappears on further edits or insert below; triggers autosave on revert
-- [ ] **Version history (v2)** — full document timeline across edits; allows users to browse and restore any prior state of the document, not just the last AI replace
-- [ ] **Image paste — Phase 1 (base64)** — install `@tiptap/extension-image`; add `editorProps.handlePaste` to intercept clipboard image files, convert to base64 data URL via `FileReader`, insert as image node; acceptable short-term but bloats `Document.content` in DB
-- [ ] **Image paste — Phase 2 (S3 upload)** — add `POST /api/upload` route returning a permanent URL; replace `FileReader.readAsDataURL` with a fetch to the upload endpoint; aligns with planned migration of document content storage to AWS S3
+- [ ] **Image paste — Phase 1 (base64)** — install `@tiptap/extension-image`; `handlePaste` to intercept clipboard images, convert to base64 data URL, insert as image node; short-term solution that bloats `Document.content`
+
+---
+
+## Longer-Term / V2+
+
+- [ ] **Version history** — full document timeline across edits; browse and restore any prior state, not just the last AI replace
+- [ ] **Image paste — Phase 2 (S3 upload)** — `POST /api/upload` route returning a permanent URL; replaces base64 approach
+- [ ] **Migrate document content storage to AWS S3** — store content as files in S3, save URL in the `Document` table instead of raw text; improves scalability for large documents
