@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-04-01
+
+### Polish — Workspace Card Refinements
+
+- **Stronger card tints**: Bumped tinted background opacity so amber/teal/violet/rose colors are clearly visible at rest.
+- **Content preview on cards**: Cards now show a 2-line snippet — `summary` if available, otherwise first 120 chars of document content (HTML-stripped). Gives cards substance beyond just title + date.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/document/document-card.tsx` | Stronger tint opacity, content preview fallback from summary or content |
+| `app/api/documents/route.ts` | Added `content` to document list select for card previews |
+| `hooks/use-documents.ts` | Added `content` field to `Document` type |
+
+---
+
 ## 2026-03-31
 
 ### Polish — Workspace Page Visual Parity

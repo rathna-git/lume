@@ -35,6 +35,7 @@ export async function GET(req: Request) {
             id: true,
             title: true,
             summary: true,
+            content: true,
             createdAt: true,
             updatedAt: true,
         },

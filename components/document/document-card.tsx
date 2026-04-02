@@ -9,10 +9,10 @@ interface DocumentCardProps {
 
 // Each entry: [rest-bg, hover-bg, border-color]
 const CARD_ACCENTS = [
-    ["bg-amber-50/40",  "hover:bg-amber-50/70",  "hover:border-amber-200/60"],
-    ["bg-teal-50/30",   "hover:bg-teal-50/60",   "hover:border-teal-200/60"],
-    ["bg-violet-50/30", "hover:bg-violet-50/60",  "hover:border-violet-200/60"],
-    ["bg-rose-50/30",   "hover:bg-rose-50/60",    "hover:border-rose-200/60"],
+    ["bg-amber-50/60",  "hover:bg-amber-50/80",  "hover:border-amber-200/60"],
+    ["bg-teal-50/50",   "hover:bg-teal-50/70",   "hover:border-teal-200/60"],
+    ["bg-violet-50/50", "hover:bg-violet-50/70",  "hover:border-violet-200/60"],
+    ["bg-rose-50/50",   "hover:bg-rose-50/70",    "hover:border-rose-200/60"],
 ] as const
 
 function relativeTime(dateStr: string): string {
@@ -45,9 +45,9 @@ export function DocumentCard({ document, workspaceId, accentIndex = 0 }: Documen
             <h3 className="font-medium text-foreground text-[0.95rem] tracking-tight truncate">
                 {document.title || "Untitled"}
             </h3>
-            {document.summary && (
-                <p className="text-[0.8125rem] text-muted-foreground/70 leading-relaxed line-clamp-2">
-                    {document.summary}
+            {(document.summary || document.content) && (
+                <p className="text-[0.8125rem] text-muted-foreground/60 leading-relaxed line-clamp-2">
+                    {document.summary || document.content?.replace(/<[^>]*>/g, "").slice(0, 120)}
                 </p>
             )}
             <p

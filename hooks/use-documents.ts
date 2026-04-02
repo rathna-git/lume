@@ -6,6 +6,7 @@ export interface Document {
     id: string
     title: string
     summary: string | null
+    content: string | null
     createdAt: string
     updatedAt: string
 }
