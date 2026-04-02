@@ -193,7 +193,7 @@ AiGeneration
 | `POST /api/webhooks/clerk`              | API            | Sync Clerk user to DB _(not implemented — server-side bootstrap used instead)_ |
 | `GET/POST /api/workspaces`              | API            | List / create workspaces                                                       |
 | `GET/PATCH/DELETE /api/workspaces/[id]` | API            | Single workspace                                                               |
-| `GET/POST /api/documents`               | API            | List / create documents                                                        |
+| `GET/POST /api/documents`               | API            | List (includes `content` for card previews) / create documents                 |
 | `GET/PATCH/DELETE /api/documents/[id]`  | API            | Single document                                                                |
 | `POST /api/ai/generate`                 | API            | AI content actions                                                             |
 | `GET /api/documents/[id]/generations`   | API            | Fetch saved AI generations for a document, newest first                        |
@@ -205,7 +205,7 @@ AiGeneration
 | Screen          | Loading                                                     | Error                                                | Empty                                                                                                                           |
 | --------------- | ----------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Workspace list  | Skeleton cards                                              | Inline "Something went wrong" text                   | "No workspaces yet" CTA                                                                                                         |
-| Document list   | Skeleton cards                                              | Inline "Something went wrong" text                   | "No documents yet" — softened empty state with quieter copy                                                                     |
+| Document list   | Skeleton cards                                              | Inline "Something went wrong" text                   | "No documents yet" — softened empty state; cards show content preview snippet                                                   |
 | Document editor | Pulse skeleton card                                         | Inline "Document not found"                          | Placeholder "Untitled document" in title; "Type '/' for commands or start writing" + subtle AI panel helper line in editor body |
 | AI generate     | "Running…" on button, disabled state; Regenerate icon spins | Error silently clears `pendingAction`                | "No {action} yet" + Generate button (disabled when doc empty)                                                                   |
 | AI panel        | Animated skeleton (4 rows, action tab must be selected)     | "Couldn't load your previous results." + "Try again" | "Summarize, rewrite, or expand without leaving the editor." when no action selected; per-action empty state with Generate CTA   |
