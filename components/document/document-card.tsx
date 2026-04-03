@@ -43,15 +43,19 @@ export function DocumentCard({ document, workspaceId, accentIndex = 0 }: Documen
             className={`group flex flex-col gap-1.5 ${restBg} ${hoverBg} ${hoverBorder} border border-border/40 rounded-xl px-5 py-5 shadow-[0_1px_4px_rgba(107,79,58,0.06)] hover:shadow-[0_4px_16px_rgba(107,79,58,0.10)] transition-all duration-200`}
         >
             <h3 className="font-medium text-foreground text-[0.95rem] tracking-tight truncate">
-                {document.title || "Untitled"}
+                {document.title || "Untitled document"}
             </h3>
-            {(document.summary || document.content) && (
+            {(document.summary || document.content) ? (
                 <p className="text-[0.8125rem] text-muted-foreground/60 leading-relaxed line-clamp-2">
                     {document.summary || document.content?.replace(/<[^>]*>/g, "").slice(0, 120)}
                 </p>
+            ) : (
+                <p className="text-[0.8125rem] text-muted-foreground/40 leading-relaxed italic">
+                    Start writing…
+                </p>
             )}
             <p
-                className="text-xs text-muted-foreground/50 mt-auto pt-1"
+                className="text-xs text-muted-foreground/55 mt-auto pt-2"
                 title={exactDate(document.updatedAt)}
             >
                 {relativeTime(document.updatedAt)}

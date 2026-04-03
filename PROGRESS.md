@@ -18,6 +18,17 @@
 | ---- | ----- |
 | `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Header restructured to single column, button moved inside identity block, doc count removed, container widened |
 
+### Polish — Document Card Typography Hierarchy
+
+- **Date spacing**: Increased top padding (`pt-1` → `pt-2`) for intentional separation from description; nudged opacity for slight legibility improvement.
+- **Empty card treatment**: "Untitled" → "Untitled document"; added subtle italic "Start writing…" line so empty cards don't feel broken.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/document/document-card.tsx` | Date spacing/opacity, empty card fallback text |
+
 ---
 
 ## 2026-04-01
