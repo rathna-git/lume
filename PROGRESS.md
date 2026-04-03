@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-04-02
+
+### Polish — Workspace Header Layout
+
+- **"New Document" button moved into identity block**: Button now sits below the workspace title/description instead of floating on the far right via `justify-between`. Header is a single cohesive column.
+- **Removed document count**: Stripped the `N documents` line — unnecessary noise.
+- **Wider container**: Bumped from `max-w-4xl` to `max-w-5xl` to give the card grid more room.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/page.tsx` | Header restructured to single column, button moved inside identity block, doc count removed, container widened |
+
+---
+
 ## 2026-04-01
 
 ### Polish — Workspace Card Refinements

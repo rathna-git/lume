@@ -104,7 +104,7 @@ export default function WorkspaceDetailPage({
     const isError = workspaceError || docsError
 
     return (
-        <div className="max-w-4xl mx-auto px-6 py-10">
+        <div className="max-w-5xl mx-auto px-6 py-10">
             {/* Back link */}
             <Link
                 href="/workspaces"
@@ -115,76 +115,70 @@ export default function WorkspaceDetailPage({
             </Link>
 
             {/* Header */}
-            <div className="flex items-start justify-between pb-8 mb-8 border-b border-border/40">
-                <div>
-                    {workspaceLoading ? (
-                        <div className="animate-pulse">
-                            <div className="h-3 bg-muted rounded w-16 mb-2" />
-                            <div className="h-8 bg-muted rounded w-48 mb-2" />
-                            <div className="h-3 bg-muted rounded w-64" />
-                        </div>
-                    ) : workspace ? (
-                        <>
-                            <div className="group flex items-center gap-3 mb-1.5">
-                                <span className="text-3xl leading-none">{workspace.emoji ?? "📝"}</span>
-                                <h1 className="font-serif text-3xl text-foreground tracking-tight leading-none">
-                                    {workspace.name}
-                                </h1>
-                                <div className="relative mt-1">
-                                    <button
-                                        onClick={() => setMenuOpen(v => !v)}
-                                        aria-label="Workspace actions"
-                                        className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground/30 hover:text-foreground hover:bg-muted/60 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-150"
-                                    >
-                                        <MoreHorizontal size={15} />
-                                    </button>
-                                    {menuOpen && (
-                                        <>
-                                            <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                                            <div className="absolute left-0 top-full mt-1 z-20 bg-card border border-border rounded-lg shadow-md py-1 min-w-[168px]">
-                                                <button
-                                                    onClick={() => { setMenuOpen(false); handleOpenEdit() }}
-                                                    className="w-full text-left text-sm px-3 py-2 text-foreground/80 hover:text-foreground hover:bg-muted/60 transition-colors flex items-center gap-2"
-                                                >
-                                                    <Pencil size={13} />
-                                                    Rename
-                                                </button>
-                                                <button
-                                                    onClick={() => { setMenuOpen(false); setDeleteOpen(true) }}
-                                                    className="w-full text-left text-sm px-3 py-2 text-destructive/80 hover:text-destructive hover:bg-destructive/5 transition-colors flex items-center gap-2"
-                                                >
-                                                    <Trash2 size={13} />
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
+            <div className="pb-8 mb-8 border-b border-border/40">
+                {workspaceLoading ? (
+                    <div className="animate-pulse">
+                        <div className="h-3 bg-muted rounded w-16 mb-2" />
+                        <div className="h-8 bg-muted rounded w-48 mb-2" />
+                        <div className="h-3 bg-muted rounded w-64" />
+                    </div>
+                ) : workspace ? (
+                    <>
+                        <div className="group flex items-center gap-3 mb-1.5">
+                            <span className="text-3xl leading-none">{workspace.emoji ?? "📝"}</span>
+                            <h1 className="font-serif text-3xl text-foreground tracking-tight leading-none">
+                                {workspace.name}
+                            </h1>
+                            <div className="relative mt-1">
+                                <button
+                                    onClick={() => setMenuOpen(v => !v)}
+                                    aria-label="Workspace actions"
+                                    className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground/30 hover:text-foreground hover:bg-muted/60 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-150"
+                                >
+                                    <MoreHorizontal size={15} />
+                                </button>
+                                {menuOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                                        <div className="absolute left-0 top-full mt-1 z-20 bg-card border border-border rounded-lg shadow-md py-1 min-w-[168px]">
+                                            <button
+                                                onClick={() => { setMenuOpen(false); handleOpenEdit() }}
+                                                className="w-full text-left text-sm px-3 py-2 text-foreground/80 hover:text-foreground hover:bg-muted/60 transition-colors flex items-center gap-2"
+                                            >
+                                                <Pencil size={13} />
+                                                Rename
+                                            </button>
+                                            <button
+                                                onClick={() => { setMenuOpen(false); setDeleteOpen(true) }}
+                                                className="w-full text-left text-sm px-3 py-2 text-destructive/80 hover:text-destructive hover:bg-destructive/5 transition-colors flex items-center gap-2"
+                                            >
+                                                <Trash2 size={13} />
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
+                        </div>
 
-                            {workspace.description && (
-                                <p className="text-sm text-muted-foreground font-light">
-                                    {workspace.description}
-                                </p>
-                            )}
-                            {documents && documents.length > 0 && (
-                                <p className="text-xs text-muted-foreground/50 mt-2">
-                                    {documents.length} document{documents.length === 1 ? "" : "s"}
-                                </p>
-                            )}
-                        </>
-                    ) : null}
-                </div>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 text-muted-foreground hover:text-foreground"
-                    onClick={handleNewDocument}
-                    disabled={isCreating}
-                >
-                    <Plus size={14} />
-                    {isCreating ? "Creating…" : "New Document"}
-                </Button>
+                        {workspace.description && (
+                            <p className="text-sm text-muted-foreground font-light">
+                                {workspace.description}
+                            </p>
+                        )}
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 text-muted-foreground hover:text-foreground mt-3"
+                            onClick={handleNewDocument}
+                            disabled={isCreating}
+                        >
+                            <Plus size={14} />
+                            {isCreating ? "Creating…" : "New Document"}
+                        </Button>
+                    </>
+                ) : null}
             </div>
 
             {/* Loading */}
