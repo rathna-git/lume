@@ -4,6 +4,25 @@
 
 ---
 
+## 2026-04-10
+
+### Landing Page Hero — Oura-inspired landscape scene
+
+- **Hybrid CSS+HTML+SVG hero**: Replaced the dark minimal hero with a full-viewport landscape scene inspired by Oura's "Made for Members" design.
+- **Sky**: CSS `linear-gradient` (coral → lavender → slate → near-black) — no SVG scaling issues on wide screens.
+- **Sun**: HTML div sized with `30vh`, radial gradient fill + glow box-shadow, positioned to tuck behind the hills.
+- **Hills**: Separate SVG with `preserveAspectRatio="none"` — three wave layers that always stretch full width regardless of viewport.
+- **Wordmark + tagline**: "Lume" as large serif italic text floating in the sky, tagline below in matching style.
+- **Nav**: Overlaid with `LumeLogo` dark variant (white text on gradient sky).
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Hero section rewritten; features + footer unchanged |
+
+---
+
 ## 2026-04-02
 
 ### Polish — Workspace Header Layout
