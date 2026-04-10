@@ -15,11 +15,21 @@
 - **Tagline**: Serif italic tagline floating in the sky; no wordmark — nav logo is the only branding.
 - **Nav**: Overlaid with `LumeLogo` dark variant (white text on gradient sky).
 
+### Landing Hero — Animations & Typography
+
+- **Cormorant Garamond font**: Added as `font-display-serif` for the tagline and CTA — thin, high-contrast serif matching the Oura reference aesthetic. Existing `font-serif` (DM Serif Display) unchanged elsewhere.
+- **Staggered float-in**: Tagline and CTA fade up on load with gentle staggered timing (2.5s duration, soft cubic-bezier easing).
+- **Sun rise**: Sun starts 30px lower and rises to final position over 6s — calm, visible sunrise effect.
+- **Parallax hills**: New `ParallaxHills` client component — hill layers shift at different scroll speeds (0.02–0.08 factors) for depth. Uses `requestAnimationFrame` + passive scroll listener.
+
 #### Files Modified
 
 | File | Notes |
 | ---- | ----- |
-| `app/page.tsx` | Hero section rewritten; features + footer unchanged |
+| `app/page.tsx` | Hero animations applied; hills replaced with `<ParallaxHills />`; tagline + CTA use Cormorant Garamond |
+| `app/layout.tsx` | Added Cormorant Garamond font import + CSS variable |
+| `app/globals.css` | Added `--font-display-serif` theme token + `lume-sun-rise` keyframes |
+| `components/landing/parallax-hills.tsx` | New client component — scroll-based parallax on 4 hill layers |
 
 ---
 

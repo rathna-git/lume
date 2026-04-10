@@ -9,6 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
+  --font-display-serif: var(--font-display-serif);
   --font-mono: var(--font-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -248,4 +249,9 @@
 @keyframes lume-float-in {
   from { opacity: 0; transform: translateY(20px) scale(0.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes lume-sun-rise {
+  from { transform: translateY(30px); }
+  to   { transform: translateY(0); }
 }

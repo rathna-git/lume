@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { DM_Sans, DM_Serif_Display } from "next/font/google"
+import { DM_Sans, DM_Serif_Display, Cormorant_Garamond } from "next/font/google"
 import { Providers } from "@/components/providers"
 import { ClerkProvider } from "@clerk/nextjs"
 import "./globals.css"
@@ -17,6 +17,13 @@ const dmSerif = DM_Serif_Display({
   style: ["normal", "italic"],
 })
 
+const cormorant = Cormorant_Garamond({
+  variable: "--font-display-serif",
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  style: ["normal", "italic"],
+})
+
 export const metadata: Metadata = {
   title: "Lume — AI Content Workspace",
   description: "Think clearly. Write better. Learn faster.",
@@ -30,7 +37,7 @@ export default function RootLayout({
   return (
     <ClerkProvider signInFallbackRedirectUrl="/workspaces" signUpFallbackRedirectUrl="/workspaces">
     <html lang="en">
-      <body className={`${dmSans.variable} ${dmSerif.variable} antialiased`}>
+      <body className={`${dmSans.variable} ${dmSerif.variable} ${cormorant.variable} antialiased`}>
         <Providers>
           {children}
         </Providers>

@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, Sparkles, FileText, Zap } from "lucide-react"
 import { LumeLogo } from "@/components/logo"
+import { ParallaxHills } from "@/components/landing/parallax-hills"
 
 const features = [
   {
@@ -53,19 +54,28 @@ export default function Home() {
         </header>
 
         {/* Tagline — floating in the sky */}
-        <div className="absolute top-[22%] left-0 right-0 z-10 text-center px-6">
+        <div
+          className="absolute top-[22%] left-0 right-0 z-10 text-center px-6"
+          style={{ animation: "lume-float-in 2.5s 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
+        >
           <p
-            className="font-serif italic text-white/75"
+            className="font-display-serif italic text-white/75 font-light"
             style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)" }}
           >
             Think clearly. Write better. Learn faster.
           </p>
         </div>
 
-        {/* Sun container */}
+        {/* Sun container — outer div centers, inner div animates */}
         <div
           className="absolute left-1/2 -translate-x-1/2 z-5"
           style={{ top: "42%", width: "36vh", height: "36vh" }}
+        >
+        <div
+          className="w-full h-full"
+          style={{
+            animation: "lume-sun-rise 6s cubic-bezier(0.16,1,0.3,1) both",
+          }}
         >
           {/* Sun glow */}
           <div
@@ -83,40 +93,19 @@ export default function Home() {
             }}
           />
         </div>
+        </div>
 
-        {/* Hills — stretched SVG, always full width */}
-        <svg
-          className="absolute bottom-0 left-0 w-full h-[52vh] pointer-events-none z-6"
-          viewBox="0 0 1440 500"
-          preserveAspectRatio="none"
-        >
-          {/* Far back hills — subtle depth */}
-          <path
-            d="M0,200 C100,155 200,130 320,140 C440,150 520,185 660,175 C800,165 880,130 1020,138 C1160,146 1300,175 1440,185 L1440,500 L0,500 Z"
-            fill="#1E2B1A"
-          />
-          {/* Back hills */}
-          <path
-            d="M0,240 C80,190 180,155 300,165 C420,175 500,220 660,210 C820,200 900,160 1060,168 C1220,176 1360,210 1440,225 L1440,500 L0,500 Z"
-            fill="#182315"
-          />
-          {/* Mid hills — more dramatic curves */}
-          <path
-            d="M0,300 C60,260 160,225 290,235 C420,245 520,290 680,280 C840,270 940,230 1100,238 C1260,246 1380,275 1440,290 L1440,500 L0,500 Z"
-            fill="#111A0E"
-          />
-          {/* Front hills */}
-          <path
-            d="M0,380 C90,345 210,315 370,325 C530,335 640,370 810,360 C980,350 1100,320 1270,328 C1370,333 1420,350 1440,360 L1440,500 L0,500 Z"
-            fill="#090E09"
-          />
-        </svg>
+        {/* Hills — parallax on scroll */}
+        <ParallaxHills />
 
         {/* CTA — below the hills, on the dark ground */}
-        <div className="absolute bottom-[4%] left-0 right-0 z-10 flex flex-col items-center gap-2 px-6">
+        <div
+          className="absolute bottom-[4%] left-0 right-0 z-10 flex flex-col items-center gap-2 px-6"
+          style={{ animation: "lume-float-in 2.5s 1s cubic-bezier(0.16,1,0.3,1) both" }}
+        >
           <Link
             href="/sign-up"
-            className="flex items-center gap-2 text-base font-light text-white/70 hover:text-white/90 transition-colors tracking-wide"
+            className="flex items-center gap-2 text-base font-display-serif italic font-light text-white/70 hover:text-white/90 transition-colors tracking-wide"
           >
             Start for free <ArrowRight size={14} className="mt-px" />
           </Link>
