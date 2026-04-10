@@ -52,32 +52,26 @@ export default function Home() {
           </nav>
         </header>
 
-        {/* Wordmark + tagline — floating in the sky */}
-        <div className="absolute top-[18%] left-0 right-0 z-10 text-center px-6">
-          <h1
-            className="font-serif italic text-white/90 mb-3"
-            style={{ fontSize: "clamp(3rem, 8vw, 5.5rem)" }}
-          >
-            Lume
-          </h1>
+        {/* Tagline — floating in the sky */}
+        <div className="absolute top-[22%] left-0 right-0 z-10 text-center px-6">
           <p
-            className="font-serif italic text-white/65"
-            style={{ fontSize: "clamp(1rem, 2vw, 1.35rem)" }}
+            className="font-serif italic text-white/75"
+            style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)" }}
           >
             Think clearly. Write better. Learn faster.
           </p>
         </div>
 
-        {/* Sun + curved text container */}
+        {/* Sun container */}
         <div
           className="absolute left-1/2 -translate-x-1/2 z-5"
-          style={{ top: "38%", width: "30vh", height: "30vh" }}
+          style={{ top: "42%", width: "36vh", height: "36vh" }}
         >
           {/* Sun glow */}
           <div
-            className="absolute -inset-[35%] rounded-full"
+            className="absolute -inset-[40%] rounded-full"
             style={{
-              background: "radial-gradient(circle, #F5A62340 0%, #F5A62315 40%, transparent 70%)",
+              background: "radial-gradient(circle, #F5A62338 0%, #F5A62318 35%, transparent 65%)",
             }}
           />
           {/* Sun disc */}
@@ -85,41 +79,46 @@ export default function Home() {
             className="w-full h-full rounded-full"
             style={{
               background: "radial-gradient(ellipse at 38% 35%, #F7C948, #F5A623 50%, #E8724A)",
-              boxShadow: "0 0 60px #F5A62344, 0 0 120px #F5A62322",
+              boxShadow: "0 0 80px #F5A62350, 0 0 160px #F5A62325",
             }}
           />
         </div>
 
         {/* Hills — stretched SVG, always full width */}
         <svg
-          className="absolute bottom-0 left-0 w-full h-[45vh] pointer-events-none z-6"
-          viewBox="0 0 1440 400"
+          className="absolute bottom-0 left-0 w-full h-[52vh] pointer-events-none z-6"
+          viewBox="0 0 1440 500"
           preserveAspectRatio="none"
         >
+          {/* Far back hills — subtle depth */}
+          <path
+            d="M0,200 C100,155 200,130 320,140 C440,150 520,185 660,175 C800,165 880,130 1020,138 C1160,146 1300,175 1440,185 L1440,500 L0,500 Z"
+            fill="#1E2B1A"
+          />
           {/* Back hills */}
           <path
-            d="M0,180 C120,120 240,90 360,100 C480,110 540,160 720,150 C900,140 960,100 1080,105 C1200,110 1340,145 1440,160 L1440,400 L0,400 Z"
-            fill="#1A2417"
+            d="M0,240 C80,190 180,155 300,165 C420,175 500,220 660,210 C820,200 900,160 1060,168 C1220,176 1360,210 1440,225 L1440,500 L0,500 Z"
+            fill="#182315"
           />
-          {/* Mid hills */}
+          {/* Mid hills — more dramatic curves */}
           <path
-            d="M0,240 C80,200 200,165 340,175 C480,185 580,230 740,220 C900,210 1000,170 1140,178 C1280,186 1380,215 1440,230 L1440,400 L0,400 Z"
+            d="M0,300 C60,260 160,225 290,235 C420,245 520,290 680,280 C840,270 940,230 1100,238 C1260,246 1380,275 1440,290 L1440,500 L0,500 Z"
             fill="#111A0E"
           />
           {/* Front hills */}
           <path
-            d="M0,310 C100,275 230,250 400,260 C570,270 660,305 830,295 C1000,285 1120,255 1290,262 C1370,266 1420,280 1440,290 L1440,400 L0,400 Z"
+            d="M0,380 C90,345 210,315 370,325 C530,335 640,370 810,360 C980,350 1100,320 1270,328 C1370,333 1420,350 1440,360 L1440,500 L0,500 Z"
             fill="#090E09"
           />
         </svg>
 
-        {/* CTA — above the hills */}
-        <div className="absolute bottom-[8%] left-0 right-0 z-10 flex justify-center px-6">
+        {/* CTA — below the hills, on the dark ground */}
+        <div className="absolute bottom-[4%] left-0 right-0 z-10 flex flex-col items-center gap-2 px-6">
           <Link
             href="/sign-up"
-            className="flex items-center gap-2 text-sm font-light text-white/60 hover:text-white/90 transition-colors tracking-wide"
+            className="flex items-center gap-2 text-base font-light text-white/70 hover:text-white/90 transition-colors tracking-wide"
           >
-            Start for free <ArrowRight size={13} className="mt-px" />
+            Start for free <ArrowRight size={14} className="mt-px" />
           </Link>
         </div>
       </section>
