@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-04-11
+
+### Landing Hero — Hills & CTA Polish
+
+- **Hill gradients refined**: Each hill now has a distinct light-to-dark gradient using `gradientUnits="userSpaceOnUse"` — warm olive-sage ridges (`#96A862`) catching sunset light, fading to near-black bases. Clear color separation between all three layers creates visible depth.
+- **Hill curves redrawn**: Switched from quadratic (`Q`) to cubic bezier (`C`) curves for smoother, more organic shapes. Back hill has gentle wide rolling, mid hill slopes up from the left with its own rhythm, front hill barely undulates — each layer has a distinct silhouette.
+- **Expanded hill area**: ViewBox increased to `0 0 1440 600`, height to `60vh` — more vertical space for layers to breathe and overlap the sun naturally.
+- **CTA font matched to tagline**: Both now use `font-display-serif italic font-light` for visual consistency. CTA bumped to `text-xl` for more prominence.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/landing/parallax-hills.tsx` | Rewritten hill paths (cubic beziers), expanded viewBox/height, refined per-hill gradients with stronger ridge-to-base contrast |
+| `app/page.tsx` | CTA font matched to tagline (`italic font-light`), size bumped to `text-xl` |
+
+---
+
 ## 2026-04-10
 
 ### Landing Page Hero — Oura-inspired landscape scene

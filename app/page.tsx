@@ -105,9 +105,9 @@ export default function Home() {
         >
           <Link
             href="/sign-up"
-            className="flex items-center gap-2 text-base font-display-serif italic font-light text-white/70 hover:text-white/90 transition-colors tracking-wide"
+            className="flex items-center gap-3 text-xl font-display-serif italic font-light text-white/80 hover:text-white transition-colors tracking-wide"
           >
-            Start for free <ArrowRight size={14} className="mt-px" />
+            Start for free <ArrowRight size={18} className="mt-px" />
           </Link>
         </div>
       </section>
