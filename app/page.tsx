@@ -68,8 +68,8 @@ export default function Home() {
 
         {/* Sun container — outer div centers, inner div animates */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 z-5"
-          style={{ top: "42%", width: "36vh", height: "36vh" }}
+          className="absolute left-1/2 -translate-x-1/2 z-5 top-[39%] md:top-[42%]"
+          style={{ width: "36vh", height: "36vh" }}
         >
         <div
           className="w-full h-full"

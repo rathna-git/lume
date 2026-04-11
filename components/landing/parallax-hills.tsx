@@ -28,7 +28,7 @@ export function ParallaxHills() {
 
   return (
     <svg
-      className="absolute bottom-0 left-0 w-full h-[60vh] pointer-events-none z-6"
+      className="absolute bottom-0 left-0 w-full h-[55vh] md:h-[60vh] pointer-events-none z-6"
       viewBox="0 0 1440 600"
       preserveAspectRatio="none"
     >
