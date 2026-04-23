@@ -11,11 +11,19 @@
 - **Switched headline to DM Sans**: Changed "Think clearly. Write better. Learn faster." from DM Serif Display (`font-serif italic`) to DM Sans (`font-sans font-light tracking-tight`). Matches the rest of the UI — nav, subheadline, buttons, and app body text all use DM Sans.
 - **Cleaner, more modern feel**: Light weight (300) with tight tracking replaces the serif italic, giving the hero a unified product-page look instead of a mixed serif/sans-serif typographic voice.
 
+### Landing — Feature section polish
+
+- **Section intro added**: "BUILT FOR WRITING" eyebrow label + supporting line *"Lume keeps your drafts, revisions, and AI help in one focused workspace."* centered above the feature cards.
+- **Card copy tightened**: Headings refined to "Structured workspaces", "AI that works with your draft", "Rewrite, summarize, and refine". Body copy shortened for faster scanning.
+- **Card layout updated**: Switched from fused grid (shared border, `gap-px`) to spaced individual cards (`gap-4`, each with `rounded-xl` border). Icons centered within cards.
+- **Readability improved**: Card headings at `white/90`, body at `white/55`, supporting line at `white/55`. Card icon swapped from `Zap` to `PenLine` for writing-oriented feel.
+- **Footer spacing increased**: Section bottom padding bumped to `pb-48` for more breathing room before footer.
+
 #### Files Modified
 
 | File | Notes |
 | ---- | ----- |
-| `app/page.tsx` | Headline `<h1>` class changed from `font-serif italic` to `font-sans font-light tracking-tight` |
+| `app/page.tsx` | Headline font changed; feature section intro added; card copy/layout/contrast refined; footer spacing increased |
 
 ---
 
@@ -34,21 +42,21 @@
 
 | File | Notes |
 | ---- | ----- |
-| `app/page.tsx` | Hero content block restructured: `<h1>` headline, subheadline, inline CTA; detached bottom CTA removed; font-serif for headline; responsive top positioning |
+| `app/page.tsx` | Hero content block restructured: `<h1>` headline, subheadline, inline CTA; detached bottom CTA removed; responsive top positioning |
 
 ### Landing Hero — Hills & CTA Polish
 
 - **Hill gradients refined**: Each hill now has a distinct light-to-dark gradient using `gradientUnits="userSpaceOnUse"` — warm olive-sage ridges (`#96A862`) catching sunset light, fading to near-black bases. Clear color separation between all three layers creates visible depth.
 - **Hill curves redrawn**: Switched from quadratic (`Q`) to cubic bezier (`C`) curves for smoother, more organic shapes. Back hill has gentle wide rolling, mid hill slopes up from the left with its own rhythm, front hill barely undulates — each layer has a distinct silhouette.
 - **Expanded hill area**: ViewBox increased to `0 0 1440 600`, height to `60vh` — more vertical space for layers to breathe and overlap the sun naturally.
-- **CTA font matched to tagline**: Both now use `font-display-serif italic font-light` for visual consistency. CTA bumped to `text-xl` for more prominence.
+- **CTA font matched to tagline**: ~~Both used `font-display-serif italic font-light`~~ — later changed: headline switched to DM Sans light (4/23), CTA uses `font-light tracking-wide` pill style.
 
 #### Files Modified
 
 | File | Notes |
 | ---- | ----- |
 | `components/landing/parallax-hills.tsx` | Rewritten hill paths (cubic beziers), expanded viewBox/height, refined per-hill gradients with stronger ridge-to-base contrast |
-| `app/page.tsx` | CTA font matched to tagline (`italic font-light`), size bumped to `text-xl` |
+| `app/page.tsx` | CTA and hill styling updated |
 
 ---
 

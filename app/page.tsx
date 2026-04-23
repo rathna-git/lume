@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Sparkles, FileText, Zap } from "lucide-react"
+import { ArrowRight, Sparkles, FileText, PenLine } from "lucide-react"
 import { LumeLogo } from "@/components/logo"
 import { ParallaxHills } from "@/components/landing/parallax-hills"
 
@@ -8,19 +8,19 @@ const features = [
     icon: FileText,
     title: "Structured workspaces",
     description:
-      "Organize your thinking into clean, focused workspaces. Every project, every idea — in its place.",
+      "Organize drafts, projects, and ideas into focused workspaces.",
   },
   {
     icon: Sparkles,
-    title: "AI that understands context",
+    title: "AI that works with your draft",
     description:
-      "Generate, summarize, rewrite, and expand. Lume's AI works with your content, not around it.",
+      "Summarize, rewrite, and expand directly from the document you're working in.",
   },
   {
-    icon: Zap,
-    title: "Instant clarity",
+    icon: PenLine,
+    title: "Rewrite, summarize, and refine",
     description:
-      "Turn rough notes into polished writing. Transform complex sources into sharp, usable knowledge.",
+      "Turn rough notes into clearer writing and sharpen your thinking over time.",
   },
 ]
 
@@ -113,18 +113,26 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section id="features" className="max-w-4xl mx-auto px-6 pb-32">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/4 border border-white/4 rounded-2xl overflow-hidden">
+      <section id="features" className="max-w-4xl mx-auto px-6 pb-48">
+        <div className="text-center mb-8">
+          <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/45 mb-3">
+            Built for writing
+          </p>
+          <p className="text-sm text-white/55 font-light max-w-lg mx-auto leading-relaxed">
+            Lume keeps your drafts, revisions, and AI help in one focused workspace.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map(({ icon: Icon, title, description }) => (
-            <div key={title} className="bg-[#0F0C09] p-8 hover:bg-white/2 transition-colors">
+            <div key={title} className="bg-white/3 border border-white/4 rounded-xl p-8 text-center hover:bg-white/5 transition-colors">
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center mb-5"
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-5 mx-auto"
                 style={{ background: "linear-gradient(135deg, #F7C94818, #E8724A12)" }}
               >
                 <Icon size={15} className="text-lume-amber" />
               </div>
-              <h3 className="font-medium text-white/85 mb-2 text-sm tracking-wide">{title}</h3>
-              <p className="text-sm text-white/35 font-light leading-relaxed">{description}</p>
+              <h3 className="font-medium text-white/90 mb-2 text-sm tracking-wide">{title}</h3>
+              <p className="text-sm text-white/55 font-light leading-relaxed">{description}</p>
             </div>
           ))}
         </div>
