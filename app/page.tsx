@@ -53,17 +53,29 @@ export default function Home() {
           </nav>
         </header>
 
-        {/* Tagline — floating in the sky */}
+        {/* Hero content — headline, subheadline, CTA */}
         <div
-          className="absolute top-[22%] left-0 right-0 z-10 text-center px-6"
+          className="absolute top-[13%] md:top-[18%] left-0 right-0 z-10 text-center px-6 flex flex-col items-center"
           style={{ animation: "lume-float-in 2.5s 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
         >
-          <p
-            className="font-display-serif italic text-white/75 font-light"
-            style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)" }}
+          <h1
+            className="font-serif italic text-white"
+            style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", textShadow: "0 1px 30px rgba(0,0,0,0.15)" }}
           >
             Think clearly. Write better. Learn faster.
+          </h1>
+          <p
+            className="mt-4 text-white/70 font-light max-w-xl leading-relaxed"
+            style={{ fontSize: "clamp(0.875rem, 1.4vw, 1.05rem)" }}
+          >
+            A calm writing workspace for drafting, rewriting, and learning with AI.
           </p>
+          <Link
+            href="/sign-up"
+            className="mt-6 flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 border border-white/25 hover:border-white/40 hover:bg-white/10 transition-all text-sm text-white/80 hover:text-white font-light tracking-wide backdrop-blur-sm"
+          >
+            Start writing <ArrowRight size={14} className="mt-px" />
+          </Link>
         </div>
 
         {/* Sun container — outer div centers, inner div animates */}
@@ -98,18 +110,6 @@ export default function Home() {
         {/* Hills — parallax on scroll */}
         <ParallaxHills />
 
-        {/* CTA — below the hills, on the dark ground */}
-        <div
-          className="absolute bottom-[4%] left-0 right-0 z-10 flex flex-col items-center gap-2 px-6"
-          style={{ animation: "lume-float-in 2.5s 1s cubic-bezier(0.16,1,0.3,1) both" }}
-        >
-          <Link
-            href="/sign-up"
-            className="flex items-center gap-3 text-xl font-display-serif italic font-light text-white/80 hover:text-white transition-colors tracking-wide"
-          >
-            Start for free <ArrowRight size={18} className="mt-px" />
-          </Link>
-        </div>
       </section>
 
       {/* Features */}

@@ -6,6 +6,21 @@
 
 ## 2026-04-11
 
+### Landing Hero — Product messaging & CTA hierarchy
+
+- **Hero restructured for clarity**: Replaced the decorative floating tagline + detached bottom CTA with a unified hero content block (headline → subheadline → CTA) centered in the sky above the sun. The page now reads as a product homepage, not just a brand poster.
+- **Headline strengthened**: Promoted from `<p>` to `<h1>`, scaled up with `clamp(1.6rem, 3.5vw, 2.4rem)`, subtle text-shadow for readability against the sky gradient.
+- **Font unified**: Switched headline from Cormorant Garamond (`font-display-serif`) to DM Serif Display (`font-serif`) — same family as the Lume logo wordmark. Consistent serif voice across the hero.
+- **Subheadline added**: *"A calm writing workspace for drafting, rewriting, and learning with AI."* — explains what Lume is in one line. `text-white/70`, responsive font size.
+- **CTA hierarchy fixed**: Removed detached "Start for free" from bottom of hero. Moved CTA into the content block as "Start writing" — differentiated from header's "Get started". Subtle pill button with `bg-white/5`, `border-white/25`, backdrop blur.
+- **Responsive positioning**: Hero content block at `top-[13%] md:top-[18%]` — more breathing room between CTA and sun on smaller viewports.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Hero content block restructured: `<h1>` headline, subheadline, inline CTA; detached bottom CTA removed; font-serif for headline; responsive top positioning |
+
 ### Landing Hero — Hills & CTA Polish
 
 - **Hill gradients refined**: Each hill now has a distinct light-to-dark gradient using `gradientUnits="userSpaceOnUse"` — warm olive-sage ridges (`#96A862`) catching sunset light, fading to near-black bases. Clear color separation between all three layers creates visible depth.
