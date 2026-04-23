@@ -19,11 +19,18 @@
 - **Readability improved**: Card headings at `white/90`, body at `white/55`, supporting line at `white/55`. Card icon swapped from `Zap` to `PenLine` for writing-oriented feel.
 - **Footer spacing increased**: Section bottom padding bumped to `pb-48` for more breathing room before footer.
 
+### App — Content area background unified
+
+- **Hardcoded backgrounds replaced**: Dashboard main content (`bg-white`), document editor page (`bg-[#FFFEF9]` x3), and AI panel (`bg-[#FFFCEE]`) all switched to semantic tokens (`bg-background` / `bg-card`). Eliminates five different white shades across the app interior.
+- **Consistent warm cream surface**: All content areas now use `bg-background` (`#FFF8F0`), with cards/panels using `bg-card` (`#ffffff`).
+
 #### Files Modified
 
 | File | Notes |
 | ---- | ----- |
 | `app/page.tsx` | Headline font changed; feature section intro added; card copy/layout/contrast refined; footer spacing increased |
+| `app/(dashboard)/layout.tsx` | `bg-white` → `bg-background` on main content area |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `bg-[#FFFEF9]` → `bg-background` (3x); `bg-[#FFFCEE]` → `bg-card` on AI panel |
 
 ---
 

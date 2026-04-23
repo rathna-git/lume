@@ -621,7 +621,7 @@ function DocumentEditor({
         : []
 
     return (
-        <div className="min-h-full bg-[#FFFEF9] p-4 md:p-6">
+        <div className="min-h-full bg-background p-4 md:p-6">
             <div className="max-w-[1400px] mx-auto">
                 <Link
                     href={`/workspaces/${workspaceId}`}
@@ -794,7 +794,7 @@ function DocumentEditor({
                 </div>
 
                 {/* AI panel surface */}
-                <div className="w-full lg:w-[380px] lg:shrink-0 bg-[#FFFCEE] rounded-2xl border border-border shadow-sm p-6 lg:sticky lg:top-6">
+                <div className="w-full lg:w-[380px] lg:shrink-0 bg-card rounded-2xl border border-border shadow-sm p-6 lg:sticky lg:top-6">
                     <div className="flex items-center gap-1.5 mb-5">
                         <Sparkles size={13} className="text-lume-amber" />
                         <p className="text-xs font-medium text-foreground">AI Assistant</p>
@@ -858,7 +858,7 @@ export default function DocumentEditorPage({
 
     if (isLoading) {
         return (
-            <div className="min-h-full bg-[#FFFEF9] p-4 md:p-6">
+            <div className="min-h-full bg-background p-4 md:p-6">
                 <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border shadow-sm px-8 py-8 animate-pulse">
                     <div className="h-3 bg-muted rounded w-24 mb-10" />
                     <div className="h-8 bg-muted rounded w-1/2 mb-6" />
@@ -874,7 +874,7 @@ export default function DocumentEditorPage({
 
     if (isError || !doc) {
         return (
-            <div className="min-h-full bg-[#FFFEF9] p-4 md:p-6">
+            <div className="min-h-full bg-background p-4 md:p-6">
                 <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border shadow-sm px-8 py-8">
                     <Link
                         href={`/workspaces/${workspaceId}`}
