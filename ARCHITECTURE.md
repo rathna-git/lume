@@ -290,7 +290,7 @@ Key milestones shipped to date:
 
 ### Public-facing / product presentation
 
-- [x] **Landing page reflects what Lume actually is now** — hero redesigned with Oura-inspired landscape scene (gradient sky, sun, hills) + entrance animations + DM Serif Display headline matching logo; unified hero content block with product subheadline and "Start writing" CTA; responsive positioning for mobile/desktop
+- [x] **Landing page reflects what Lume actually is now** — hero redesigned with Oura-inspired landscape scene (gradient sky, sun, hills) + entrance animations; DM Sans light headline matching app UI font; unified hero content block with product subheadline and "Start writing" CTA; responsive positioning for mobile/desktop
 - [x] **Workspace page no longer feels weaker than editor page** — visual polish pass: tinted document cards, outline CTA, document count, header separator, tighter layout, softer empty state, quieter menu
 - [ ] **Sidebar feels intentional and complete** — refine the app shell so the sidebar no longer feels like scaffolding; navigation, spacing, and overall presence should match the polish of the editor experience
 - [ ] **Product copy is consistent across the app** — align wording across landing page, workspace page, editor empty states, and AI panel so the product speaks in one voice

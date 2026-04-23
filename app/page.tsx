@@ -59,7 +59,7 @@ export default function Home() {
           style={{ animation: "lume-float-in 2.5s 0.3s cubic-bezier(0.16,1,0.3,1) both" }}
         >
           <h1
-            className="font-serif italic text-white"
+            className="font-sans font-light tracking-tight text-white"
             style={{ fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", textShadow: "0 1px 30px rgba(0,0,0,0.15)" }}
           >
             Think clearly. Write better. Learn faster.

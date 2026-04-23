@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-04-23
+
+### Landing Hero — Headline font modernized
+
+- **Switched headline to DM Sans**: Changed "Think clearly. Write better. Learn faster." from DM Serif Display (`font-serif italic`) to DM Sans (`font-sans font-light tracking-tight`). Matches the rest of the UI — nav, subheadline, buttons, and app body text all use DM Sans.
+- **Cleaner, more modern feel**: Light weight (300) with tight tracking replaces the serif italic, giving the hero a unified product-page look instead of a mixed serif/sans-serif typographic voice.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Headline `<h1>` class changed from `font-serif italic` to `font-sans font-light tracking-tight` |
+
+---
+
 ## 2026-04-11
 
 ### Landing Hero — Product messaging & CTA hierarchy
