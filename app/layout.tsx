@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider signInFallbackRedirectUrl="/workspaces" signUpFallbackRedirectUrl="/workspaces">
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${dmSans.variable} ${dmSerif.variable} ${cormorant.variable} antialiased`}>
         <Providers>
           {children}

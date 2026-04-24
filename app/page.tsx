@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRight, Sparkles, FileText, PenLine } from "lucide-react"
 import { LumeLogo } from "@/components/logo"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { ParallaxHills } from "@/components/landing/parallax-hills"
 
 const features = [
@@ -38,6 +39,7 @@ export default function Home() {
         <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 py-6 max-w-6xl mx-auto">
           <LumeLogo size="md" variant="dark" />
           <nav className="flex items-center gap-6">
+            <ThemeToggle className="text-white/50 hover:text-white/80 hover:bg-white/10" />
             <Link
               href="/sign-in"
               className="text-sm text-white/50 hover:text-white/80 transition-colors font-light tracking-wide"

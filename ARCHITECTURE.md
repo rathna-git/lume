@@ -12,6 +12,7 @@
 | ---------------- | ---------------------------------- |
 | Framework        | Next.js 16, App Router, TypeScript |
 | Styling          | Tailwind CSS v4, shadcn/ui         |
+| Theming          | next-themes (class-based, dark default) |
 | Auth             | Clerk                              |
 | Database         | PostgreSQL + Prisma v6             |
 | Server state     | TanStack Query v5                  |
@@ -59,7 +60,8 @@ app/
 components/
 ├── ui/                             ← shadcn primitives (button, dialog, input)
 ├── logo.tsx                        ← LumeMark + LumeLogo
-├── providers.tsx                   ← TanStack Query provider + devtools (dev only)
+├── providers.tsx                   ← ThemeProvider (next-themes) + TanStack Query provider + devtools
+├── theme-toggle.tsx               ← sun/moon dark/light mode toggle (client)
 ├── landing/
 │   └── parallax-hills.tsx          ← scroll-based parallax on hero hill layers (client)
 ├── layout/
@@ -283,6 +285,7 @@ Key milestones shipped to date:
 - Document sorting by `updatedAt DESC` with relative timestamps
 - Deployment to Vercel — all features verified end-to-end
 - UI polish passes — editor typography, warm color palette, empty state mood pass, workspace/document three-dot menus, colored AI panel icons, toast notifications, visual depth on document cards, workspace page visual parity with editor
+- Dark mode / light mode — next-themes with class-based toggling; dark default using landing page `#090E09`; sun/moon toggle on all pages; theme-aware sidebar, toasts, and semantic CSS tokens
 
 ---
 

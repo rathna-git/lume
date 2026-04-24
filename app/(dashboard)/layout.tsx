@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Sidebar } from "@/components/layout/sidebar"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Toaster } from "sonner"
 
 export default async function DashboardLayout({
@@ -40,7 +41,10 @@ export default async function DashboardLayout({
         <div className="flex h-screen bg-background">
             <Sidebar />
             <div className="flex flex-col flex-1 min-w-0">
-<main className="flex-1 overflow-y-auto bg-background">
+                <div className="flex items-center justify-end px-6 h-14 shrink-0 border-b border-border">
+                    <ThemeToggle />
+                </div>
+                <main className="flex-1 overflow-y-auto bg-background">
                     {children}
                 </main>
             </div>
@@ -49,11 +53,11 @@ export default async function DashboardLayout({
                 duration={2500}
                 toastOptions={{
                     style: {
-                        background: '#FFF8F0',
-                        border: '1px solid #F0E8DF',
-                        color: '#1A1410',
+                        background: 'var(--background)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--foreground)',
                         fontSize: '0.8125rem',
-                        boxShadow: '0 2px 8px rgba(26,20,16,0.07)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                     },
                 }}
             />

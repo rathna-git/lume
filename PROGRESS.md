@@ -4,6 +4,35 @@
 
 ---
 
+## 2026-04-24
+
+### Dark mode / light mode toggle
+
+- **Dark mode as default**: Added `next-themes` with `ThemeProvider` (attribute: `class`, default: `dark`). Dark mode uses `#090E09` from the landing page hero gradient as the base background, creating visual cohesion between the landing page and the app interior.
+- **Dark theme tokens updated**: All dark-mode CSS custom properties rewritten around `#090E09` — background, card (`#111611`), sidebar (`#060A06`), borders (`#1E231E`), muted surfaces (`#181D18`). Accent colors (amber, gold, dusk) unchanged.
+- **Light mode sidebar unified**: Light sidebar background changed from pale yellow (`#FFFBE8`) to warm white (`#FFF8F0`), matching the main background token.
+- **Theme toggle component**: New `ThemeToggle` component with sun (dark mode) and moon (light mode) icons from lucide-react. Includes hydration-safe mounting guard.
+- **Toggle placement**: Top-right on all pages — dashboard layout header bar (visible on workspaces, workspace detail, document editor, settings), landing page nav, and auth pages (sign-in/sign-up).
+- **Sidebar theme-aware**: Logo variant switches between `"dark"` (white text) and `"light"` (dark text) based on `resolvedTheme`. Sidebar borders use `border-sidebar-border` for proper dark/light separation.
+- **Toaster theme-aware**: Toast notifications use `var(--background)`, `var(--border)`, `var(--foreground)` instead of hardcoded light colors.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `package.json` | Added `next-themes` dependency |
+| `components/providers.tsx` | Wrapped with `ThemeProvider` (dark default, class attribute) |
+| `app/layout.tsx` | Added `suppressHydrationWarning` to `<html>` |
+| `app/globals.css` | Dark theme tokens → `#090E09` family; light sidebar → `#FFF8F0` |
+| `components/theme-toggle.tsx` | New — sun/moon toggle component |
+| `components/layout/sidebar.tsx` | Theme-aware logo variant + `border-sidebar-border` |
+| `app/(dashboard)/layout.tsx` | Header bar with `ThemeToggle`; Toaster uses semantic CSS vars |
+| `app/page.tsx` | `ThemeToggle` added to landing nav |
+| `app/(auth)/sign-in/[[...sign-in]]/page.tsx` | `ThemeToggle` top-right + `bg-background` |
+| `app/(auth)/sign-up/[[...sign-up]]/page.tsx` | `ThemeToggle` top-right + `bg-background` |
+
+---
+
 ## 2026-04-23
 
 ### Landing Hero — Headline font modernized

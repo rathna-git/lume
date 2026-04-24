@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LayoutGrid, Settings } from "lucide-react"
 import { UserButton } from "@clerk/nextjs"
+import { useTheme } from "next-themes"
 import { LumeLogo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 
@@ -14,12 +15,13 @@ const navItems = [
 
 export function Sidebar() {
     const pathname = usePathname()
+    const { resolvedTheme } = useTheme()
 
     return (
-        <aside className="w-56 flex flex-col border-r border-border bg-sidebar shrink-0">
+        <aside className="w-56 flex flex-col border-r border-sidebar-border bg-sidebar shrink-0">
             {/* Logo */}
-            <div className="px-5 h-14 flex items-center border-b border-border">
-                <LumeLogo size="sm" variant="light" />
+            <div className="px-5 h-14 flex items-center border-b border-sidebar-border">
+                <LumeLogo size="sm" variant={resolvedTheme === "dark" ? "dark" : "light"} />
             </div>
 
             {/* Nav */}
@@ -45,7 +47,7 @@ export function Sidebar() {
             </nav>
 
             {/* User */}
-            <div className="px-5 py-4 border-t border-border">
+            <div className="px-5 py-4 border-t border-sidebar-border">
                 <UserButton />
             </div>
         </aside>
