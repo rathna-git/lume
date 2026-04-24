@@ -6,6 +6,19 @@
 
 ## 2026-04-24
 
+### Document cards — Notion-inspired accent bar redesign
+
+- **Accent bar**: Replaced faded translucent card backgrounds with a colored accent bar (`h-10`) at the top of each card, inspired by Notion's page covers.
+- **Soft palette**: 6 rotating muted accent colors (`rose`, `amber`, `teal`, `violet`, `blue`, `emerald` at `300/40`) — faded and gentle in both light and dark mode.
+- **Dark mode fix**: Cards now use `bg-card` instead of light-only tinted backgrounds, making them clearly visible in dark mode.
+- **Text readability**: Title uses `text-card-foreground`, preview text at full `text-muted-foreground` opacity (was `/60`), date at `/70` (was `/55`).
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/document/document-card.tsx` | Accent bar, `bg-card` background, improved text contrast |
+
 ### Dark mode / light mode toggle
 
 - **Dark mode as default**: Added `next-themes` with `ThemeProvider` (attribute: `class`, default: `dark`). Dark mode uses `#090E09` from the landing page hero gradient as the base background, creating visual cohesion between the landing page and the app interior.

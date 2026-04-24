@@ -7,12 +7,14 @@ interface DocumentCardProps {
     accentIndex?: number
 }
 
-// Each entry: [rest-bg, hover-bg, border-color]
+// Accent bar colors — soft, muted tones like Notion covers
 const CARD_ACCENTS = [
-    ["bg-amber-50/60",  "hover:bg-amber-50/80",  "hover:border-amber-200/60"],
-    ["bg-teal-50/50",   "hover:bg-teal-50/70",   "hover:border-teal-200/60"],
-    ["bg-violet-50/50", "hover:bg-violet-50/70",  "hover:border-violet-200/60"],
-    ["bg-rose-50/50",   "hover:bg-rose-50/70",    "hover:border-rose-200/60"],
+    "bg-rose-300/40",
+    "bg-amber-300/40",
+    "bg-teal-300/40",
+    "bg-violet-300/40",
+    "bg-blue-300/40",
+    "bg-emerald-300/40",
 ] as const
 
 function relativeTime(dateStr: string): string {
@@ -35,31 +37,36 @@ function exactDate(dateStr: string): string {
 }
 
 export function DocumentCard({ document, workspaceId, accentIndex = 0 }: DocumentCardProps) {
-    const [restBg, hoverBg, hoverBorder] = CARD_ACCENTS[accentIndex % CARD_ACCENTS.length]
+    const accent = CARD_ACCENTS[accentIndex % CARD_ACCENTS.length]
 
     return (
         <Link
             href={`/workspaces/${workspaceId}/documents/${document.id}`}
-            className={`group flex flex-col gap-1.5 ${restBg} ${hoverBg} ${hoverBorder} border border-border/40 rounded-xl px-5 py-5 shadow-[0_1px_4px_rgba(107,79,58,0.06)] hover:shadow-[0_4px_16px_rgba(107,79,58,0.10)] transition-all duration-200`}
+            className="group flex flex-col bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200"
         >
-            <h3 className="font-medium text-foreground text-[0.95rem] tracking-tight truncate">
-                {document.title || "Untitled document"}
-            </h3>
-            {(document.summary || document.content) ? (
-                <p className="text-[0.8125rem] text-muted-foreground/60 leading-relaxed line-clamp-2">
-                    {document.summary || document.content?.replace(/<[^>]*>/g, "").slice(0, 120)}
+            {/* Accent bar */}
+            <div className={`h-10 ${accent}`} />
+
+            <div className="flex flex-col gap-1.5 px-5 py-4">
+                <h3 className="font-medium text-card-foreground text-[0.95rem] tracking-tight truncate">
+                    {document.title || "Untitled document"}
+                </h3>
+                {(document.summary || document.content) ? (
+                    <p className="text-[0.8125rem] text-muted-foreground leading-relaxed line-clamp-2">
+                        {document.summary || document.content?.replace(/<[^>]*>/g, "").slice(0, 120)}
+                    </p>
+                ) : (
+                    <p className="text-[0.8125rem] text-muted-foreground/60 leading-relaxed italic">
+                        Start writing…
+                    </p>
+                )}
+                <p
+                    className="text-xs text-muted-foreground/70 mt-auto pt-2"
+                    title={exactDate(document.updatedAt)}
+                >
+                    {relativeTime(document.updatedAt)}
                 </p>
-            ) : (
-                <p className="text-[0.8125rem] text-muted-foreground/40 leading-relaxed italic">
-                    Start writing…
-                </p>
-            )}
-            <p
-                className="text-xs text-muted-foreground/55 mt-auto pt-2"
-                title={exactDate(document.updatedAt)}
-            >
-                {relativeTime(document.updatedAt)}
-            </p>
+            </div>
         </Link>
     )
 }
