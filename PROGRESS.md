@@ -6,6 +6,37 @@
 
 ## 2026-04-24
 
+### Light mode backgrounds unified to white
+
+- **`--background` token updated**: Changed from `#FFF8F0` (warm cream) to `#ffffff`. Propagates to every page that uses `bg-background`: auth pages, dashboard main content, and toasts.
+- **Landing page**: Outer wrapper changed to `bg-white`; gradient bridge end stop updated to match (`#ffffff`, was `#F0F5F0`).
+- **Supersedes prior entry**: The 2026-04-23 note "All content areas now use `bg-background` (`#FFF8F0`)" is no longer accurate — `bg-background` is now pure white.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/globals.css` | `--background: #FFF8F0` → `#ffffff` |
+| `app/page.tsx` | Outer wrapper `bg-white`; gradient bridge end stops → `#ffffff` |
+
+---
+
+### Landing page — light mode below the hero
+
+- **Features section now light**: In light mode the area below the hero renders on a warm white background instead of carrying over the dark hero treatment.
+- **Gradient bridge**: Added a `dark:hidden` div (18 rem tall) with a 21-stop gradient from `#090E09` (hero bottom) through forest greens to `#ffffff`. Stops computed via piecewise linear interpolation through original key color anchors — each adjacent pair has equal channel deltas, eliminating banding.
+- **Dark mode layout parity**: Matching `hidden dark:block` spacer div (same 18 rem) so the feature section sits at an identical vertical position in both modes. Without this, the dark-mode feature section was visibly higher than light mode.
+- **Feature section overlap**: `relative z-10 -mt-16 pt-4` — section slides up to overlap the gradient, blending the transition into the card grid rather than creating a hard seam.
+- **Dual-mode text/card styling**: Feature labels and descriptions use `dark:text-white/X text-stone-X` pairs. Feature cards use `dark:bg-white/3 bg-white/70 dark:border-white/4 border border-black/6`.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Gradient bridge divs (light + dark spacer); feature section `-mt-16 z-10`; dual-mode text and card colors throughout features section |
+
+---
+
 ### Sidebar logo hydration fix
 
 - **Root cause**: `LumeLogo` variant was driven by `resolvedTheme` directly, causing a server/client mismatch — server renders dark, client reads theme cookie and switches to light before React finishes hydrating.

@@ -1,72 +1,87 @@
-Update the app so the public landing page stays exactly as it is, and the protected app interior uses light mode by default for MVP.
+We are doing a final polish pass on the section below the hero on the Lume landing page.
 
-Important constraints:
-- Do NOT delete any existing dark mode tokens, variants, CSS variables, or `dark:` utility classes.
-- Do NOT remove the existing dark-mode infrastructure.
-- Do NOT add a theme toggle yet.
-- Do NOT implement theme persistence yet.
-- The goal is only to make the protected app experience default to light mode for now, while preserving all dark-mode groundwork for later.
+Context:
+- This section now has:
+  - a small section intro: “Built for writing ->”
+  - one supporting line below it
+  - three feature cards
+  - footer/divider below
+- The section is much better now and more product-accurate
+- We do NOT want to redesign it
+- This is the final refinement pass only
 
-Goals:
-- Keep `/` unchanged as a fixed dark marketing page.
-- Keep all existing dark-theme setup intact for future use.
-- Make authenticated app pages look polished in light mode now.
-- Avoid destructive refactors.
+Goal:
+Tighten copy, improve hierarchy and readability slightly, and give the section a more finished feel before moving on.
 
-Please make these changes carefully:
+Please make these changes:
 
-1. Identify the protected app layout and shared app UI files, especially:
-- `app/(dashboard)/layout.tsx`
-- sidebar/header/app-shell components
-- any shared wrappers used by workspace/settings/document pages
+1. Keep the section intro
+- Keep:
+  - “Built for writing”. Add a chevron before it. do not want an arrow"
+- Give it a subtle contrast lift so it reads as a section label more clearly
+- Important:
+  - do NOT use a bright accent color
+  - do NOT make it look like a badge, chip, or button
+  - just make it slightly warmer / slightly more visible than surrounding copy
+- It should still feel understated and elegant
 
-2. Update the protected app interior so light mode is the active/default presentation for MVP:
-- page background should use Lume warm/light styling
-- cards/panels should use white or light surfaces
-- primary text should use dark ink
-- borders should be soft and warm
-- muted text should be softer neutral/brown
-- accents should use gold/amber sparingly
+2. Tighten the supporting line
+Current direction is good but can be slightly tighter.
 
-3. Preserve all existing dark-mode setup:
-- keep `.dark` CSS support
-- keep `dark:` utility classes already present
-- keep any theme-aware class structure
-- do not delete future-ready variants just because they are not being used right now
+Preferred version:
+- “Lume keeps your drafts, revisions, and AI help in one focused workspace.”
 
-4. Do NOT build:
-- theme toggle UI
-- theme switching logic
-- localStorage/cookie theme persistence
-- system theme detection behavior
-unless something minimal is already required by the current setup
+Use this or a very close refinement if it reads better in context.
 
-5. If the protected app currently uses hardcoded dark backgrounds or dark text combinations, adjust them so light mode is the default MVP presentation, but do this in a way that still allows dark mode to be enabled later with minimal work.
+3. Tighten the feature card body copy
+Keep the current three card titles if they still read best:
+- add spaces between the blocks
+- move the icons to the center
+- Structured workspaces
+- AI that works with your draft
+- Rewrite, summarize, and refine
 
-6. Keep styling aligned with the Lume brand:
-- warm editorial workspace
-- serif for major headings only
-- sans for UI/body
-- generous spacing
-- soft borders
-- subtle shadows
-- calm, premium feel
+Refine the body copy to be cleaner and faster to scan.
 
-7. Do NOT touch:
-- landing page hero styling
-- homepage dark aesthetic
-- routes
-- business logic
-- unrelated files
+Preferred direction:
 
-8. After editing, summarize:
-- which files were changed
-- what was adjusted to make light mode the MVP default
-- which dark-mode classes/variants were intentionally preserved
-- anything that should be revisited later when we add a theme toggle
+Structured workspaces
+- “Organize drafts, projects, and ideas into focused workspaces.”
 
-Important:
-- Minimal, non-destructive changes only
-- Preserve project structure
-- Do not do large refactors
-- Keep future dark mode support intact
+AI that works with your draft
+- “Summarize, rewrite, and expand directly from the document you’re working in.”
+
+Rewrite, summarize, and refine
+- “Turn rough notes into clearer writing and sharpen your thinking over time.”
+
+Use these or very close refinements if spacing/layout requires slight changes.
+
+4. Improve readability slightly
+- Increase text contrast a touch across this section
+- Focus especially on:
+  - supporting line
+  - card body copy
+  - card titles if needed
+- Keep the dark premium mood
+- Do not brighten the section dramatically
+- Do not make the text harsh white or overly high contrast
+
+5. Improve spacing before the footer
+- Add a bit more breathing room between the feature section and the footer/divider area
+- The section should feel complete before the footer begins
+- Keep the page calm and spacious
+
+Constraints:
+- No redesign
+- No layout overhaul
+- No new sections
+- No bright accent styling
+- Keep the dark, calm, premium Lume aesthetic
+- Keep the current structure intact
+
+After implementation, please provide:
+- a summary of exactly what changed
+- the final supporting line used
+- the final body copy for the three feature cards
+- how readability/hierarchy improved
+- files touched

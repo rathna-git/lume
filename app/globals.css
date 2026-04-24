@@ -65,7 +65,7 @@
 
 /* ── Light theme (shadcn semantic tokens) ── */
 :root {
-  --background: #FFF8F0;
+  --background: #ffffff;
   --foreground: #1A1410;
   --card: #ffffff;
   --card-foreground: #1A1410;

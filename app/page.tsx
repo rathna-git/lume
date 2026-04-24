@@ -27,7 +27,7 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#090E09] text-white">
+    <div className="min-h-screen dark:bg-[#090E09] bg-white">
       {/* Hero — full viewport landscape scene */}
       <section
         className="relative w-full h-screen overflow-hidden"
@@ -114,36 +114,55 @@ export default function Home() {
 
       </section>
 
+      {/* Gradient bridge — light: smooth green fade, dark: consistent spacer */}
+      <div
+        className="dark:hidden w-full"
+        style={{
+          height: "18rem",
+          background: "linear-gradient(to bottom, #090E09 0%, #0B110B 5%, #0C150C 10%, #0F1A0F 15%, #132013 20%, #172617 25%, #1E301E 30%, #243924 35%, #2D462D 40%, #375437 45%, #446344 50%, #547354 55%, #668466 60%, #799679 65%, #8CA68C 70%, #A1B6A1 75%, #B4C6B4 80%, #C6D4C6 85%, #D5E1D5 90%, #EEEEEE 95%, #ffffff 100%)",
+        }}
+      />
+      <div
+        className="hidden dark:block w-full"
+        style={{
+          height: "18rem",
+          background: "linear-gradient(to bottom, #090E09 0%, #0b110b 15%, #0e160e 30%, #111a11 45%, #0e160e 60%, #0b110b 75%, #090E09 100%)",
+        }}
+      />
+
       {/* Features */}
-      <section id="features" className="max-w-4xl mx-auto px-6 pb-48">
+      <section id="features" className="relative z-10 max-w-4xl mx-auto px-6 pb-48 -mt-16 pt-4">
         <div className="text-center mb-8">
-          <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/45 mb-3">
+          <p className="text-[0.65rem] uppercase tracking-[0.2em] dark:text-white/45 text-stone-500 mb-3">
             Built for writing
           </p>
-          <p className="text-sm text-white/55 font-light max-w-lg mx-auto leading-relaxed">
+          <p className="text-sm dark:text-white/55 text-stone-500 font-light max-w-lg mx-auto leading-relaxed">
             Lume keeps your drafts, revisions, and AI help in one focused workspace.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {features.map(({ icon: Icon, title, description }) => (
-            <div key={title} className="bg-white/3 border border-white/4 rounded-xl p-8 text-center hover:bg-white/5 transition-colors">
+            <div
+              key={title}
+              className="dark:bg-white/3 bg-white/70 dark:border-white/4 border border-black/6 rounded-xl p-8 text-center dark:hover:bg-white/5 hover:bg-white/90 transition-colors"
+            >
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center mb-5 mx-auto"
                 style={{ background: "linear-gradient(135deg, #F7C94818, #E8724A12)" }}
               >
                 <Icon size={15} className="text-lume-amber" />
               </div>
-              <h3 className="font-medium text-white/90 mb-2 text-sm tracking-wide">{title}</h3>
-              <p className="text-sm text-white/55 font-light leading-relaxed">{description}</p>
+              <h3 className="font-medium dark:text-white/90 text-stone-800 mb-2 text-sm tracking-wide">{title}</h3>
+              <p className="text-sm dark:text-white/55 text-stone-500 font-light leading-relaxed">{description}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/4 px-8 py-8 max-w-6xl mx-auto flex items-center justify-between">
+      <footer className="dark:border-white/4 border-t border-black/8 px-8 py-8 max-w-6xl mx-auto flex items-center justify-between">
         <LumeLogo size="sm" variant="gradient" />
-        <p className="text-[0.65rem] tracking-[0.15em] uppercase text-white/20">
+        <p className="text-[0.65rem] tracking-[0.15em] uppercase dark:text-white/20 text-stone-300">
           lumenotes.com
         </p>
       </footer>
