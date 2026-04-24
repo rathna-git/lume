@@ -7,6 +7,7 @@ import { UserButton } from "@clerk/nextjs"
 import { useTheme } from "next-themes"
 import { LumeLogo } from "@/components/logo"
 import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react"
 
 const navItems = [
     { label: "Workspaces", href: "/workspaces", icon: LayoutGrid },
@@ -16,12 +17,14 @@ const navItems = [
 export function Sidebar() {
     const pathname = usePathname()
     const { resolvedTheme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => setMounted(true), [])
 
     return (
         <aside className="w-56 flex flex-col border-r border-sidebar-border bg-sidebar shrink-0">
             {/* Logo */}
             <div className="px-5 h-14 flex items-center border-b border-sidebar-border">
-                <LumeLogo size="sm" variant={resolvedTheme === "dark" ? "dark" : "light"} />
+                <LumeLogo size="sm" variant={mounted && resolvedTheme === "light" ? "light" : "dark"} />
             </div>
 
             {/* Nav */}

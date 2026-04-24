@@ -6,6 +6,17 @@
 
 ## 2026-04-24
 
+### Sidebar logo hydration fix
+
+- **Root cause**: `LumeLogo` variant was driven by `resolvedTheme` directly, causing a server/client mismatch — server renders dark, client reads theme cookie and switches to light before React finishes hydrating.
+- **Fix**: Added `mounted` guard (same pattern as `ThemeToggle`) — logo defaults to `"dark"` until mounted, then switches to the correct theme-aware variant.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/layout/sidebar.tsx` | `mounted` guard on `LumeLogo` variant to prevent hydration mismatch |
+
 ### Document cards — Notion-inspired accent bar redesign
 
 - **Accent bar**: Replaced faded translucent card backgrounds with a colored accent bar (`h-10`) at the top of each card, inspired by Notion's page covers.
