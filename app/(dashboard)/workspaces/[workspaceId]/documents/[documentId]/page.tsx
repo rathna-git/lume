@@ -186,21 +186,22 @@ function AiPanel({
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Action tabs */}
+            {/* Action chips */}
             <div>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-2.5">
                     Actions
                 </p>
-                <div className="flex flex-col gap-1.5">
+                <div className="flex gap-2 flex-wrap">
                     {(["summarize", "rewrite", "expand"] as const).map((action) => (
                         <button
                             key={action}
                             onClick={() => onSelectAction(action)}
-                            className={`text-xs rounded-lg px-3 py-2 text-left transition-colors border flex items-center gap-2 ${
+                            className={cn(
+                                "text-xs rounded-full px-3 py-1.5 transition-colors border flex items-center gap-1.5",
                                 selectedAction === action
                                     ? "border-border bg-muted text-foreground font-medium"
                                     : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                            }`}
+                            )}
                         >
                             {ACTION_ICON[action]}
                             {ACTION_LABEL[action]}

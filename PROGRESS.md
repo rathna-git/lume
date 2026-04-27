@@ -6,6 +6,56 @@
 
 ## 2026-04-27
 
+### App shell redesign — neutral palette, full sidebar IA, AI panel chip buttons
+
+#### Background
+The app interior was using warm beige/cream tokens (`#FFF8F0`, `#F2EDE8`, `#F0E8DF`) inherited from the landing page brand palette. This made the authenticated app feel too warm for a focused writing tool. The sidebar also had minimal navigation (Workspaces + Settings only) with no document context.
+
+#### CSS token changes (`app/globals.css` — light theme only, dark theme unchanged)
+- `--sidebar: #FFF8F0` → `#ffffff` — sidebar is now clean white
+- `--sidebar-border: #F0E8DF` → `#e5e7eb` — neutral border (no warm tint)
+- `--sidebar-accent: #F2EDE8` → `#f3f4f6`
+- `--muted: #F2EDE8` → `#f5f5f5`
+- `--muted-foreground: #6B4F3A` → `#6b7280` — neutral gray instead of warm brown
+- `--border: #F0E8DF` → `#e5e7eb`
+- `--secondary: #F2EDE8` → `#f5f5f5`
+- `--input: #F0E8DF` → `#e5e7eb`
+- Amber accent tokens (`--primary`, `--accent`, `--ring`) unchanged — amber is still the only brand color accent
+
+#### Sidebar rewrite (`components/layout/sidebar.tsx`)
+- **"New document" button**: Added near the top. If on a workspace route, creates a document in that workspace (uses existing `useCreateDocument` hook + router push). Otherwise navigates to `/workspaces` to pick one.
+- **Navigation IA**: Workspaces, Documents, Search, Templates, Settings.
+  - Workspaces: active on workspace list + workspace detail pages
+  - Documents: active on document editor pages; links to `/workspaces` (no dedicated `/documents` route yet)
+  - Search: disabled placeholder — TODO comment, no route yet
+  - Templates: disabled placeholder — TODO comment, no route yet
+  - Settings: active on `/settings`
+- **Workspace/document tree**: Rendered contextually when on any `/workspaces/[id]` route. Fetches workspace name + emoji via existing `/api/workspaces/[id]` endpoint; fetches document list via `useDocuments`. Active document highlighted with amber `bg-primary/10 text-primary`.
+- **Lower section**: "Shared with me" and "Trash" — disabled placeholders with TODO comments. No broken routes introduced.
+- **User profile**: Anchored at bottom with top border, unchanged Clerk `UserButton`.
+
+#### AI panel action buttons (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+- Changed action buttons from vertical `flex-col` list (full-width bordered rows) to horizontal `flex-wrap` rounded-full chip buttons — matches the reference UI and feels more inline/lightweight.
+
+#### Sidebar items that are intentional placeholders
+| Item | State | Reason |
+|---|---|---|
+| Search | Disabled (opacity 40, cursor-not-allowed) | No search route/feature yet |
+| Templates | Disabled (opacity 40, cursor-not-allowed) | No templates feature yet |
+| Documents | Enabled, links to /workspaces | No dedicated /documents route; serves as proxy |
+| Shared with me | Disabled (opacity 35, cursor-not-allowed) | Feature not built |
+| Trash | Disabled (opacity 35, cursor-not-allowed) | Feature not built |
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/globals.css` | Light theme: sidebar white, neutral muted/border/input tokens, neutral muted-foreground |
+| `components/layout/sidebar.tsx` | Full rewrite: new-doc button, 5-item nav with active states, contextual workspace tree, lower placeholders, user profile |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | AI panel action buttons: vertical list → horizontal chips |
+
+---
+
 ### Landing page — gradient bridge & feature section polish
 
 - **Gradient bridge height**: 18 rem → 28 rem. Extra height gives the 21-stop green-to-white journey more room; the white zone now starts at 21 rem (75%), leaving a clean buffer before the feature section arrives.
