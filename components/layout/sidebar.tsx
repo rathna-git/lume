@@ -114,9 +114,9 @@ export function Sidebar() {
     const onSettingsPage = pathname.startsWith("/settings")
 
     return (
-        <aside className="w-56 flex flex-col border-r border-sidebar-border bg-sidebar shrink-0">
+        <aside className="w-56 flex flex-col border-r border-neutral-200 dark:border-sidebar-border bg-white dark:bg-sidebar shrink-0">
             {/* Logo */}
-            <div className="px-5 h-14 flex items-center border-b border-sidebar-border">
+            <div className="px-5 h-14 flex items-center border-b border-neutral-200 dark:border-sidebar-border">
                 <LumeLogo size="sm" variant={mounted && resolvedTheme === "light" ? "light" : "dark"} />
             </div>
 
@@ -211,7 +211,7 @@ export function Sidebar() {
             </div>
 
             {/* User profile */}
-            <div className="px-5 py-4 border-t border-sidebar-border">
+            <div className="px-5 py-4 border-t border-neutral-200 dark:border-sidebar-border">
                 <UserButton />
             </div>
         </aside>

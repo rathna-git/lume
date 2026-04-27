@@ -6,6 +6,23 @@
 
 ## 2026-04-27
 
+### Sidebar background hardcoded to white
+
+#### Problem
+The sidebar used `bg-sidebar` which resolves through a CSS variable chain (`--color-sidebar` → `var(--sidebar)` → `#ffffff`). Despite the CSS variable being correct, Tailwind v4's `@theme inline` indirect resolution can fail to reflect in a cached `.next` build, causing the sidebar to appear off-white/warm.
+
+#### Fix (`components/layout/sidebar.tsx`)
+- `bg-sidebar` → `bg-white dark:bg-sidebar` — light mode is now hardcoded white, no variable chain
+- All three `border-sidebar-border` instances → `border-neutral-200 dark:border-sidebar-border` — neutral border in light mode, preserves dark mode token
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/layout/sidebar.tsx` | Sidebar `<aside>`: explicit `bg-white` + `border-neutral-200` in light mode |
+
+---
+
 ### App shell redesign — neutral palette, full sidebar IA, AI panel chip buttons
 
 #### Background
