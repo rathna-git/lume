@@ -6,6 +6,43 @@
 
 ## 2026-04-27
 
+### Sidebar polish — spacing, button style, nav colors, user profile
+
+#### Changes (`components/layout/sidebar.tsx`)
+
+**New document button**
+- Height raised to `h-10` (~40px)
+- Amber border (`border-amber-200`) and amber hover state (`bg-amber-50`, `text-amber-700`, `border-amber-300`)
+- Padding above increased to `pt-4` for breathing room
+
+**Nav items**
+- Active: `bg-amber-50 text-amber-700` in light mode (was `bg-primary/10 text-primary`) — explicit amber, not variable-resolved
+- Inactive: `text-neutral-500` + `hover:bg-neutral-100 hover:text-neutral-900` — readable, neutral
+- Disabled (Search, Templates): `text-neutral-300 dark:text-neutral-600` — intentional, not broken-looking
+
+**Lower section (Shared with me, Trash)**
+- `text-neutral-400 dark:text-neutral-600` — was `text-muted-foreground/35` (potentially warm)
+- Section border: `border-neutral-100` instead of `border-border/50`
+
+**WorkspaceTree**
+- Section label: `text-neutral-400` — neutral muted
+- Workspace parent row: `text-neutral-700`, `hover:bg-neutral-100`
+- Doc list border: `border-neutral-200` — hardcoded neutral
+- Active doc: amber dot (`bg-primary`) replaces FileText icon; amber text
+- Inactive docs: `text-neutral-500`, `hover:bg-neutral-100`
+
+**User profile**
+- `UserButton` now accompanied by name + email (guarded by `mounted && user` to avoid hydration flash)
+- Container: `flex items-center gap-3`, `py-3`
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `components/layout/sidebar.tsx` | Spacing, button style, nav/tree colors, user profile name+email |
+
+---
+
 ### Sidebar background hardcoded to white
 
 #### Problem
