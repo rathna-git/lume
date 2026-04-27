@@ -118,22 +118,22 @@ export default function Home() {
       <div
         className="dark:hidden w-full"
         style={{
-          height: "18rem",
-          background: "linear-gradient(to bottom, #090E09 0%, #0B110B 5%, #0C150C 10%, #0F1A0F 15%, #132013 20%, #172617 25%, #1E301E 30%, #243924 35%, #2D462D 40%, #375437 45%, #446344 50%, #547354 55%, #668466 60%, #799679 65%, #8CA68C 70%, #A1B6A1 75%, #B4C6B4 80%, #C6D4C6 85%, #D5E1D5 90%, #EEEEEE 95%, #ffffff 100%)",
+          height: "28rem",
+          background: "linear-gradient(to bottom, #090E09 0%, #0B110B 3.8%, #0C150C 7.5%, #0F1A0F 11.3%, #132013 15%, #172617 18.8%, #1E301E 22.5%, #243924 26.3%, #2D462D 30%, #375437 33.8%, #446344 37.5%, #547354 41.3%, #668466 45%, #799679 48.8%, #8CA68C 52.5%, #A1B6A1 56.3%, #B4C6B4 60%, #C6D4C6 63.8%, #D5E1D5 67.5%, #EEEEEE 71.3%, #ffffff 75%, #ffffff 100%)",
         }}
       />
       <div
         className="hidden dark:block w-full"
         style={{
-          height: "18rem",
+          height: "28rem",
           background: "linear-gradient(to bottom, #090E09 0%, #0b110b 15%, #0e160e 30%, #111a11 45%, #0e160e 60%, #0b110b 75%, #090E09 100%)",
         }}
       />
 
       {/* Features */}
-      <section id="features" className="relative z-10 max-w-4xl mx-auto px-6 pb-48 -mt-16 pt-4">
-        <div className="text-center mb-8">
-          <p className="text-[0.65rem] uppercase tracking-[0.2em] dark:text-white/45 text-stone-500 mb-3">
+      <section id="features" className="relative z-10 max-w-4xl mx-auto px-6 pb-48 -mt-40 pt-2">
+        <div className="text-center mb-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] dark:text-white/60 text-stone-500 mb-3">
             Built for writing
           </p>
           <p className="text-sm dark:text-white/55 text-stone-500 font-light max-w-lg mx-auto leading-relaxed">
@@ -144,7 +144,7 @@ export default function Home() {
           {features.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="dark:bg-white/3 bg-white/70 dark:border-white/4 border border-black/6 rounded-xl p-8 text-center dark:hover:bg-white/5 hover:bg-white/90 transition-colors"
+              className="dark:bg-white/3 bg-white dark:border-white/4 border border-black/8 rounded-xl p-8 text-center shadow-sm dark:hover:bg-white/5 hover:shadow-md transition-shadow"
             >
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center mb-5 mx-auto"

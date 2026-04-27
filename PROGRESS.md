@@ -4,6 +4,32 @@
 
 ---
 
+## 2026-04-27
+
+### Landing page — gradient bridge & feature section polish
+
+- **Gradient bridge height**: 18 rem → 28 rem. Extra height gives the 21-stop green-to-white journey more room; the white zone now starts at 21 rem (75%), leaving a clean buffer before the feature section arrives.
+- **Gradient rescaled (no banding)**: The original 21 smooth stops are remapped to occupy 0–75% of the 28 rem bridge (same colours, same uniform channel deltas — no compression). Stops 75–100% are pure `#ffffff`. Previous attempt to compress the fade into 15 percentage points caused visible banding; this avoids that entirely.
+- **Dark spacer**: 18 rem → 28 rem to match light mode height and keep both modes at identical vertical positions.
+- **Feature section `bg-white` removed**: With the gradient already `#ffffff` where the section starts, an explicit background was redundant and created a hard rectangular edge.
+- **Feature cards**: `bg-white/70` → `bg-white shadow-sm`; border `border-black/6` → `border-black/8`; hover switches from a bg tint to `hover:shadow-md transition-shadow` — gives cards a clear lift on a white background.
+
+### Landing page — "Built for writing" heading repositioned
+
+- **Section pulled up**: `-mt-16` → `-mt-40` — the feature section now starts at ~18 rem into the gradient (64%, light-sage `#C6D4C6` zone). Heading floats inside the colour transition rather than appearing on blank white below it.
+- **Heading weight**: `text-[0.65rem]` (no weight) → `text-xs font-semibold`. Larger and heavier so the label reads against the coloured gradient background.
+- **Opacity bumped in dark mode**: `dark:text-white/45` → `dark:text-white/60` — more legible against the near-black dark spacer at the same depth.
+- **`mb-8` → `mb-10`** on the heading block; `pt-4` → `pt-2` on section — tighter top spacing now that the heading sits in the gradient, not on white.
+- **Consistent across modes**: Both light and dark spacers are 28 rem; `-mt-40` applies identically, so heading depth is the same in both themes.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Gradient bridge 28 rem, rescaled 21-stop stops, dark spacer 28 rem, section `-mt-40 pt-2`, heading `text-xs font-semibold`, card `shadow-sm hover:shadow-md` |
+
+---
+
 ## 2026-04-24
 
 ### Light mode backgrounds unified to white
