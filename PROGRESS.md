@@ -30,6 +30,53 @@
 
 ---
 
+### Landing page — nav "Get started" button text color fix
+
+- In light mode the button was inheriting dark text even though the hero background is always dark (gradient sky). Added explicit `text-white/80 hover:text-white` so both modes render consistently.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Added `text-white/80 hover:text-white` to nav "Get started" link |
+
+---
+
+### Landing page — feature section copy, contrast, and spacing polish
+
+- **Section label**: Added `›` chevron prefix; contrast lifted `dark:text-white/60 → /70`, `text-stone-500 → stone-600` — reads as a section marker without using accent colour or badge styling.
+- **Supporting line**: Contrast lifted `dark:text-white/55 → /65`, `text-stone-500 → stone-600`.
+- **Feature cards**: Grid gap `gap-4 → gap-6`; icon `mb-5 → mb-6`, title `mb-2 → mb-3` — more breathing room within each card.
+- **Card body copy**: Contrast lifted `dark:text-white/55 → /65`, `text-stone-500 → stone-600`.
+- **Section bottom**: `pb-48 → pb-60`; intro block `mb-10 → mb-12` — more space before the footer divider.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Section label chevron + contrast; card gap/spacing; body copy contrast; section padding |
+
+---
+
+### Landing page — hero-to-feature transition replaced with clean section break
+
+Multiple approaches were tried and abandoned (layered mist/haze with blurred radial gradients, value tuning passes) — all produced a "dark strip / gray gap / white section" feel that couldn't be resolved by further tuning.
+
+Final approach: removed the gradient bridge entirely and used layout instead.
+
+- **Gradient bridge removed**: Both the 28 rem light-mode layered bridge and the 28 rem dark-mode spacer div deleted.
+- **`-mt-40` removed**: The negative margin that overlapped the feature section into the bridge is gone.
+- **Inset shadow wrapper**: A full-width `<div>` with `shadow-[inset_0_14px_32px_-10px_rgba(0,0,0,0.07)] dark:shadow-none` wraps the feature section — creates a barely-visible depth cue at the very top edge of the white section without adding a visible band or gradient field.
+- **Top padding tightened**: `pt-20 md:pt-28 → pt-12 md:pt-16` — section intro and cards sit closer to the hero, transition feels more intentional.
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Removed gradient bridge divs; removed `-mt-40`; added inset shadow wrapper; reduced top padding |
+
+---
+
 ## 2026-04-24
 
 ### Light mode backgrounds unified to white

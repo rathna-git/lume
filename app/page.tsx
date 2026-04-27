@@ -48,7 +48,7 @@ export default function Home() {
             </Link>
             <Link
               href="/sign-up"
-              className="text-sm px-4 py-2 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/10 transition-all font-light tracking-wide backdrop-blur-sm"
+              className="text-sm px-4 py-2 rounded-full border border-white/20 hover:border-white/40 hover:bg-white/10 transition-all font-light tracking-wide backdrop-blur-sm text-white/80 hover:text-white"
             >
               Get started
             </Link>
@@ -114,50 +114,36 @@ export default function Home() {
 
       </section>
 
-      {/* Gradient bridge — light: smooth green fade, dark: consistent spacer */}
-      <div
-        className="dark:hidden w-full"
-        style={{
-          height: "28rem",
-          background: "linear-gradient(to bottom, #090E09 0%, #0B110B 3.8%, #0C150C 7.5%, #0F1A0F 11.3%, #132013 15%, #172617 18.8%, #1E301E 22.5%, #243924 26.3%, #2D462D 30%, #375437 33.8%, #446344 37.5%, #547354 41.3%, #668466 45%, #799679 48.8%, #8CA68C 52.5%, #A1B6A1 56.3%, #B4C6B4 60%, #C6D4C6 63.8%, #D5E1D5 67.5%, #EEEEEE 71.3%, #ffffff 75%, #ffffff 100%)",
-        }}
-      />
-      <div
-        className="hidden dark:block w-full"
-        style={{
-          height: "28rem",
-          background: "linear-gradient(to bottom, #090E09 0%, #0b110b 15%, #0e160e 30%, #111a11 45%, #0e160e 60%, #0b110b 75%, #090E09 100%)",
-        }}
-      />
-
       {/* Features */}
-      <section id="features" className="relative z-10 max-w-4xl mx-auto px-6 pb-48 -mt-40 pt-2">
-        <div className="text-center mb-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] dark:text-white/60 text-stone-500 mb-3">
-            Built for writing
+      <div className="shadow-[inset_0_14px_32px_-10px_rgba(0,0,0,0.07)] dark:shadow-none">
+      <section id="features" className="relative z-10 max-w-4xl mx-auto px-6 pb-60 pt-12 md:pt-16">
+        <div className="text-center mb-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] dark:text-white/70 text-stone-600 mb-3">
+            › Built for writing
           </p>
-          <p className="text-sm dark:text-white/55 text-stone-500 font-light max-w-lg mx-auto leading-relaxed">
+          <p className="text-sm dark:text-white/65 text-stone-600 font-light max-w-lg mx-auto leading-relaxed">
             Lume keeps your drafts, revisions, and AI help in one focused workspace.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
               className="dark:bg-white/3 bg-white dark:border-white/4 border border-black/8 rounded-xl p-8 text-center shadow-sm dark:hover:bg-white/5 hover:shadow-md transition-shadow"
             >
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center mb-5 mx-auto"
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-6 mx-auto"
                 style={{ background: "linear-gradient(135deg, #F7C94818, #E8724A12)" }}
               >
                 <Icon size={15} className="text-lume-amber" />
               </div>
-              <h3 className="font-medium dark:text-white/90 text-stone-800 mb-2 text-sm tracking-wide">{title}</h3>
-              <p className="text-sm dark:text-white/55 text-stone-500 font-light leading-relaxed">{description}</p>
+              <h3 className="font-medium dark:text-white/90 text-stone-800 mb-3 text-sm tracking-wide">{title}</h3>
+              <p className="text-sm dark:text-white/65 text-stone-600 font-light leading-relaxed">{description}</p>
             </div>
           ))}
         </div>
       </section>
+      </div>
 
       {/* Footer */}
       <footer className="dark:border-white/4 border-t border-black/8 px-8 py-8 max-w-6xl mx-auto flex items-center justify-between">
