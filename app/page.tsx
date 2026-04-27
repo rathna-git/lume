@@ -116,9 +116,9 @@ export default function Home() {
 
       {/* Features */}
       <div className="shadow-[inset_0_14px_32px_-10px_rgba(0,0,0,0.07)] dark:shadow-none">
-      <section id="features" className="relative z-10 max-w-4xl mx-auto px-6 pb-60 pt-12 md:pt-16">
-        <div className="text-center mb-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] dark:text-white/70 text-stone-600 mb-3">
+      <section id="features" className="relative z-10 max-w-4xl mx-auto px-6 pb-20 md:pb-28 pt-12 md:pt-16">
+        <div className="text-center mb-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] dark:text-white/75 text-stone-700 mb-3">
             › Built for writing
           </p>
           <p className="text-sm dark:text-white/65 text-stone-600 font-light max-w-lg mx-auto leading-relaxed">
@@ -129,13 +129,15 @@ export default function Home() {
           {features.map(({ icon: Icon, title, description }) => (
             <div
               key={title}
-              className="dark:bg-white/3 bg-white dark:border-white/4 border border-black/8 rounded-xl p-8 text-center shadow-sm dark:hover:bg-white/5 hover:shadow-md transition-shadow"
+              className="relative bg-[#FDFAF7] dark:bg-[#111810] border border-stone-300 dark:border-white/9 rounded-xl p-8 text-center shadow-sm dark:hover:bg-[#141C11] hover:shadow-md transition-shadow"
             >
+              {/* Inner top highlight — subtle tactile signature */}
+              <div className="absolute top-0 inset-x-0 h-px bg-white/80 dark:bg-white/[0.07] rounded-t-xl" />
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center mb-6 mx-auto"
-                style={{ background: "linear-gradient(135deg, #F7C94818, #E8724A12)" }}
+                className="w-9 h-9 rounded-xl flex items-center justify-center mb-6 mx-auto"
+                style={{ background: "linear-gradient(135deg, #F7C94828, #E8724A1C)" }}
               >
-                <Icon size={15} className="text-lume-amber" />
+                <Icon size={16} className="text-lume-amber" />
               </div>
               <h3 className="font-medium dark:text-white/90 text-stone-800 mb-3 text-sm tracking-wide">{title}</h3>
               <p className="text-sm dark:text-white/65 text-stone-600 font-light leading-relaxed">{description}</p>

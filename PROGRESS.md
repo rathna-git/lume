@@ -77,6 +77,37 @@ Final approach: removed the gradient bridge entirely and used layout instead.
 
 ---
 
+### Landing page — feature card warming pass
+
+- **Card background**: `bg-white` → `bg-[#FDFAF7]` (warm ivory, barely perceptible) / `dark:bg-white/3` → `dark:bg-[#111810]` (warm dark olive, slightly elevated against page bg)
+- **Card border**: `border-black/8` → `border-stone-200` / `dark:border-white/4` — warm-toned border instead of neutral black tint
+- **Signature detail**: Added a `h-px bg-white/80 dark:bg-white/[0.07]` inner top-edge highlight as an absolutely positioned child — gives cards a subtle tactile/glass quality in both modes
+- **Icon container**: `w-8 h-8 rounded-lg` → `w-9 h-9 rounded-xl`; gradient alphas bumped `#F7C94818, #E8724A12` → `#F7C94828, #E8724A1C` — warmer, slightly more present
+- **Icon size**: `size={15}` → `size={16}` — proportional to larger container
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Warm ivory bg, warm dark bg, stone border, inner highlight, icon container |
+
+---
+
+### Landing page — card definition and section rhythm tightening
+
+- **Card border**: `border-stone-200` → `border-stone-300` / `dark:border-white/[0.07]` → `dark:border-white/9` — one step more defined, cards no longer feel too soft
+- **Section bottom padding**: `pb-60` → `pb-20 md:pb-28` — removes ~160px of empty space; footer now closes the section naturally
+- **Intro block margin**: `mb-12` → `mb-10` — tighter gap between intro and card grid
+- **Section label contrast**: `text-stone-600 dark:text-white/70` → `text-stone-700 dark:text-white/75` — label holds its own against the more defined cards
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/page.tsx` | Card border strength; section bottom padding; intro margin; label contrast |
+
+---
+
 ## 2026-04-24
 
 ### Light mode backgrounds unified to white
