@@ -622,20 +622,20 @@ function DocumentEditor({
         : []
 
     return (
-        <div className="min-h-full bg-background p-4 md:p-6">
+        <div className="min-h-full bg-background p-6 md:p-8">
             <div className="max-w-[1400px] mx-auto">
                 <Link
                     href={`/workspaces/${workspaceId}`}
-                    className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-3"
+                    className="inline-flex items-center gap-1.5 text-xs text-neutral-400 dark:text-muted-foreground hover:text-neutral-700 dark:hover:text-foreground transition-colors mb-5"
                 >
-                    <ChevronLeft size={14} />
+                    <ChevronLeft size={13} />
                     Back to workspace
                 </Link>
 
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
 
                 {/* Editor surface */}
-                <div className="flex-1 min-w-0 bg-card rounded-2xl border border-border shadow-sm px-8 py-10">
+                <div className="flex-1 min-w-0 bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm px-8 py-10">
                     {/* Save status + menu */}
                     <div className="flex items-center justify-end mb-8">
                         <div className="flex items-center gap-3">
@@ -683,13 +683,13 @@ function DocumentEditor({
                     />
 
                     {/* Last modified */}
-                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground/50 mb-5">
+                    <p className="flex items-center gap-1.5 text-xs text-neutral-400 dark:text-muted-foreground/50 mb-5">
                         <Calendar size={11} />
                         Last modified · {formatExactDate(doc.updatedAt)}
                     </p>
 
                     {/* Divider */}
-                    <div className="border-t border-border mb-8" />
+                    <div className="border-t border-neutral-200 dark:border-border mb-8" />
 
                     {/* Tiptap editor */}
                     <div className="tiptap-editor">
@@ -795,7 +795,7 @@ function DocumentEditor({
                 </div>
 
                 {/* AI panel surface */}
-                <div className="w-full lg:w-[380px] lg:shrink-0 bg-card rounded-2xl border border-border shadow-sm p-6 lg:sticky lg:top-6">
+                <div className="w-full lg:w-[380px] lg:shrink-0 bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm p-6 lg:sticky lg:top-6">
                     <div className="flex items-center gap-1.5 mb-5">
                         <Sparkles size={13} className="text-lume-amber" />
                         <p className="text-xs font-medium text-foreground">AI Assistant</p>
@@ -859,8 +859,8 @@ export default function DocumentEditorPage({
 
     if (isLoading) {
         return (
-            <div className="min-h-full bg-background p-4 md:p-6">
-                <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border shadow-sm px-8 py-8 animate-pulse">
+            <div className="min-h-full bg-background p-6 md:p-8">
+                <div className="max-w-3xl mx-auto bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm px-8 py-8 animate-pulse">
                     <div className="h-3 bg-muted rounded w-24 mb-10" />
                     <div className="h-8 bg-muted rounded w-1/2 mb-6" />
                     <div className="space-y-2">
@@ -875,8 +875,8 @@ export default function DocumentEditorPage({
 
     if (isError || !doc) {
         return (
-            <div className="min-h-full bg-background p-4 md:p-6">
-                <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-border shadow-sm px-8 py-8">
+            <div className="min-h-full bg-background p-6 md:p-8">
+                <div className="max-w-3xl mx-auto bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm px-8 py-8">
                     <Link
                         href={`/workspaces/${workspaceId}`}
                         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-8"

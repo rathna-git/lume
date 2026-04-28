@@ -6,6 +6,34 @@
 
 ## 2026-04-27
 
+### Document editor polish — card, back link, borders, metadata
+
+#### Changes (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
+| Area | Before | After |
+|---|---|---|
+| Outer padding | `p-4 md:p-6` | `p-6 md:p-8` — more air around cards |
+| Back link | `text-sm font-medium text-muted-foreground mb-3` | `text-xs text-neutral-400 mb-5 ChevronLeft size-13` — compact, neutral, more space before cards |
+| Editor card | `bg-card border-border` | `bg-white dark:bg-card border-neutral-200 dark:border-border` — explicit white + neutral border |
+| AI panel | same | same |
+| Metadata date | `text-muted-foreground/50` | `text-neutral-400 dark:text-muted-foreground/50` — explicit neutral |
+| Title/content divider | `border-border` | `border-neutral-200 dark:border-border` |
+| Loading/error states | `p-4 bg-card border-border` | `p-6 bg-white dark:bg-card border-neutral-200 dark:border-border` — consistent with main card |
+
+#### No changes
+- Tiptap editor, autosave, AI behavior — untouched
+- Typography in `globals.css` — already neutral (`var(--muted)` = `#f5f5f5`)
+- Writing canvas `max-w-[680px]` — already correct
+- AI panel width `lg:w-[380px]` — already correct
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Padding, back link, card + divider border colors, metadata color |
+
+---
+
 ### Sidebar polish — spacing, button style, nav colors, user profile
 
 #### Changes (`components/layout/sidebar.tsx`)

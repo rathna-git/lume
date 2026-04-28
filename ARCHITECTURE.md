@@ -65,7 +65,7 @@ components/
 ├── landing/
 │   └── parallax-hills.tsx          ← scroll-based parallax on hero hill layers (client)
 ├── layout/
-│   └── sidebar.tsx                 ← nav + active state + Clerk UserButton
+│   └── sidebar.tsx                 ← full nav IA (5 items + disabled placeholders), new-doc button, contextual workspace+doc tree, user name/email + UserButton
 ├── workspace/
 │   └── workspace-card.tsx          ← clickable card linking to workspace
 └── document/
@@ -286,6 +286,9 @@ Key milestones shipped to date:
 - Deployment to Vercel — all features verified end-to-end
 - UI polish passes — editor typography, warm color palette, empty state mood pass, workspace/document three-dot menus, colored AI panel icons, toast notifications, visual depth on document cards, workspace page visual parity with editor
 - Dark mode / light mode — next-themes with class-based toggling; dark default using landing page `#090E09`; sun/moon toggle on all pages; theme-aware sidebar, toasts, and semantic CSS tokens
+- App shell neutral palette — light theme tokens neutralized (warm beige → white/neutral grays); dark theme unchanged; sidebar and editor card borders hardcoded to `neutral-200` to bypass CSS variable chain
+- Sidebar full IA + polish — new-doc button (amber border, h-10), 5-item nav with amber active states, contextual workspace+doc tree (amber dot on active doc), user name+email + UserButton at bottom
+- Document editor card polish — outer padding `p-6 md:p-8`, back link compact and neutral, card borders `neutral-200`, metadata `text-neutral-400`, AI panel chip buttons
 
 ---
 
@@ -295,7 +298,7 @@ Key milestones shipped to date:
 
 - [x] **Landing page reflects what Lume actually is now** — hero redesigned with Oura-inspired landscape scene (gradient sky, sun, hills) + entrance animations; DM Sans light headline matching app UI font; unified hero content block with product subheadline and "Start writing" CTA; responsive positioning for mobile/desktop; feature section with "Built for writing" intro, product-specific card copy, and spaced card layout
 - [x] **Workspace page no longer feels weaker than editor page** — visual polish pass: tinted document cards, outline CTA, document count, header separator, tighter layout, softer empty state, quieter menu
-- [ ] **Sidebar feels intentional and complete** — refine the app shell so the sidebar no longer feels like scaffolding; navigation, spacing, and overall presence should match the polish of the editor experience
+- [x] **Sidebar feels intentional and complete** — full nav IA (Workspaces / Documents / Search / Templates / Settings), new-doc button with amber accent, contextual workspace+doc tree, user name+email at bottom; disabled items use neutral-400 instead of warm/opaque colors; white bg and neutral-200 borders hardcoded to bypass CSS variable chain
 - [ ] **Product copy is consistent across the app** — align wording across landing page, workspace page, editor empty states, and AI panel so the product speaks in one voice
 
 ### Product behavior
