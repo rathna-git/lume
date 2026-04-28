@@ -6,6 +6,34 @@
 
 ## 2026-04-27
 
+### AI panel polish — vertical actions, result card, hierarchical bottom actions
+
+#### Changes (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
+| Area | Before | After |
+|---|---|---|
+| Action layout | Horizontal chips (`rounded-full`) | Full-width vertical stacked buttons (`rounded-xl`, `py-2.5`) |
+| Selected action state | `bg-muted border-border` | `bg-amber-50 border-amber-200` (light) / `bg-amber-950/20 border-amber-900/40` (dark) |
+| Stale warning | Italic muted paragraph | Info callout: neutral-50 bg, `Info` icon, neutral border, calm prose |
+| AI output | Raw scrollable div | Bordered result card: `rounded-xl border-neutral-200 bg-neutral-50 px-4 py-3` |
+| Bottom action hierarchy | Three equal outlined buttons | Amber filled (Insert at cursor) → outlined secondary (Replace content) → outlined tertiary (Copy) |
+| Footer text | None | "AI can make mistakes. Verify important information." + subtle "Undo with Cmd+Z" |
+
+#### Fixes (same session)
+- Copy button was missing border — added `border border-neutral-200 dark:border-border` + hover bg
+- Copy button text was muted (`text-neutral-400`) — raised to `text-neutral-600` to match Replace content
+
+#### No behavior changes
+- Action selection, generate/regenerate, persisted generations, staleness detection, replace/insert/copy/revert — all untouched
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | `AiPanel` component — layout, stale callout, result card, bottom actions |
+
+---
+
 ### Document editor polish — card, back link, borders, metadata
 
 #### Changes (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)

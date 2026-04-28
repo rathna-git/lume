@@ -289,6 +289,7 @@ Key milestones shipped to date:
 - App shell neutral palette — light theme tokens neutralized (warm beige → white/neutral grays); dark theme unchanged; sidebar and editor card borders hardcoded to `neutral-200` to bypass CSS variable chain
 - Sidebar full IA + polish — new-doc button (amber border, h-10), 5-item nav with amber active states, contextual workspace+doc tree (amber dot on active doc), user name+email + UserButton at bottom
 - Document editor card polish — outer padding `p-6 md:p-8`, back link compact and neutral, card borders `neutral-200`, metadata `text-neutral-400`, AI panel chip buttons
+- AI panel polish — action chips → full-width vertical stacked buttons with amber selected state; stale warning → info callout with `Info` icon; AI output → bordered result card (`neutral-50` bg, `rounded-xl`); bottom actions: amber filled primary (Insert at cursor), outlined secondary (Replace content), outlined tertiary (Copy); footer disclaimer text added
 
 ---
 
