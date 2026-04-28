@@ -360,7 +360,7 @@ function AiPanel({
                                                 {/* Tertiary action */}
                                                 <button
                                                     onClick={() => onCopy(displayed.output!.text)}
-                                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs border border-neutral-200 dark:border-border text-neutral-400 dark:text-muted-foreground/60 hover:text-neutral-700 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/60 transition-colors"
+                                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs border border-neutral-200 dark:border-border text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/60 transition-colors"
                                                 >
                                                     <ClipboardCopy size={12} />
                                                     Copy
