@@ -4,7 +4,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ChevronLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown, Trash2, Replace, TextCursorInput, ClipboardCopy, RotateCcw } from "lucide-react"
+import { ChevronLeft, Bold, Italic, Strikethrough, Code, MoreHorizontal, Sparkles, Pilcrow, Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code2, Minus, Undo2, Redo2, ChevronDown, ChevronRight, Calendar, BookText, PenLine, ChevronsUpDown, Trash2, Replace, TextCursorInput, ClipboardCopy, RotateCcw, Info } from "lucide-react"
 import { marked } from "marked"
 import { toast } from "sonner"
 import { useEditor, EditorContent, type Editor } from "@tiptap/react"
@@ -186,21 +186,21 @@ function AiPanel({
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Action chips */}
+            {/* Action buttons — vertical stacked */}
             <div>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-2.5">
                     Actions
                 </p>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex flex-col gap-1.5">
                     {(["summarize", "rewrite", "expand"] as const).map((action) => (
                         <button
                             key={action}
                             onClick={() => onSelectAction(action)}
                             className={cn(
-                                "text-xs rounded-full px-3 py-1.5 transition-colors border flex items-center gap-1.5",
+                                "w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm transition-colors border",
                                 selectedAction === action
-                                    ? "border-border bg-muted text-foreground font-medium"
-                                    : "border-border text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                                    ? "border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 font-medium"
+                                    : "border-neutral-200 dark:border-border text-neutral-500 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/60"
                             )}
                         >
                             {ACTION_ICON[action]}
@@ -300,11 +300,14 @@ function AiPanel({
                         {displayed?.output?.text && (
                             <>
                                 {isStale && (
-                                    <p className="text-[0.8rem] text-muted-foreground/50 italic leading-relaxed">
-                                        This result may be outdated. It was generated from an earlier version of this document.
-                                    </p>
+                                    <div className="flex items-start gap-2 rounded-lg bg-neutral-50 dark:bg-muted/40 border border-neutral-200 dark:border-border px-3 py-2.5">
+                                        <Info size={12} className="text-neutral-400 dark:text-muted-foreground/60 shrink-0 mt-0.5" />
+                                        <p className="text-[0.73rem] text-neutral-500 dark:text-muted-foreground/70 leading-relaxed">
+                                            This result may be outdated. It was generated from an earlier version of this document.
+                                        </p>
+                                    </div>
                                 )}
-                                <div className="max-h-[40vh] overflow-y-auto">
+                                <div className="max-h-[40vh] overflow-y-auto rounded-xl border border-neutral-200 dark:border-border bg-neutral-50 dark:bg-muted/20 px-4 py-3">
                                     <div className="prose-ai text-[0.875rem] leading-relaxed text-foreground">
                                         <ReactMarkdown
                                             components={{
@@ -331,55 +334,61 @@ function AiPanel({
                                         </ReactMarkdown>
                                     </div>
                                 </div>
-                                <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                                <div className="flex flex-col gap-2 pt-4 border-t border-neutral-200 dark:border-border">
                                     {(() => {
                                         const isAlreadyApplied = displayed.id === replacedGenerationId
                                         return (
                                             <>
-                                                <button
-                                                    onClick={() => onReplace(displayed.output!.text, displayed.id)}
-                                                    disabled={isAlreadyApplied}
-                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground flex items-center gap-2"
-                                                >
-                                                    <Replace size={12} className="text-amber-500" />
-                                                    Replace content
-                                                </button>
+                                                {/* Primary action */}
                                                 <button
                                                     onClick={() => onInsertAtCursor(displayed.output!.text)}
                                                     disabled={isAlreadyApplied}
-                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground flex items-center gap-2"
+                                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                                 >
-                                                    <TextCursorInput size={12} className="text-teal-500" />
+                                                    <TextCursorInput size={12} />
                                                     Insert at cursor
                                                 </button>
+                                                {/* Secondary action */}
+                                                <button
+                                                    onClick={() => onReplace(displayed.output!.text, displayed.id)}
+                                                    disabled={isAlreadyApplied}
+                                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs border border-neutral-200 dark:border-border text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/60 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                                >
+                                                    <Replace size={12} />
+                                                    Replace content
+                                                </button>
+                                                {/* Tertiary action */}
                                                 <button
                                                     onClick={() => onCopy(displayed.output!.text)}
-                                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 flex items-center gap-2"
+                                                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-neutral-400 dark:text-muted-foreground/60 hover:text-neutral-700 dark:hover:text-foreground transition-colors"
                                                 >
-                                                    <ClipboardCopy size={12} className="text-violet-500" />
+                                                    <ClipboardCopy size={12} />
                                                     Copy
                                                 </button>
                                                 {displayed.inputSnapshot && isAlreadyApplied && (
                                                     <button
                                                         onClick={() => onRevert()}
-                                                        className="text-xs text-muted-foreground/60 hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 flex items-center gap-2"
+                                                        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-neutral-400 dark:text-muted-foreground/60 hover:text-rose-500 dark:hover:text-rose-400 border border-neutral-200 dark:border-border transition-colors"
                                                     >
-                                                        <RotateCcw size={12} className="text-rose-400" />
+                                                        <RotateCcw size={12} />
                                                         Revert to original
                                                     </button>
                                                 )}
                                                 {isAlreadyApplied && (
-                                                    <p className="text-[0.75rem] text-muted-foreground/50 leading-relaxed pt-0.5">
+                                                    <p className="text-[0.7rem] text-neutral-400 dark:text-muted-foreground/50 leading-relaxed">
                                                         This result is already applied to the document.
                                                     </p>
                                                 )}
+                                                <p className="text-[0.65rem] text-neutral-400 dark:text-muted-foreground/40 leading-relaxed mt-1">
+                                                    AI can make mistakes. Verify important information.
+                                                </p>
+                                                <p className="text-[0.65rem] text-neutral-400/60 dark:text-muted-foreground/25 text-center">
+                                                    Undo with Cmd+Z
+                                                </p>
                                             </>
                                         )
                                     })()}
                                 </div>
-                                <p className="text-[0.7rem] text-muted-foreground/60 mt-3 text-right">
-                                    Undo with Cmd+Z
-                                </p>
                             </>
                         )}
 
