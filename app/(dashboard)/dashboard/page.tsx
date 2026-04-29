@@ -136,15 +136,15 @@ export default function HomePage() {
     const container = {
         hidden: {},
         show: {
-            transition: { staggerChildren: shouldReduceMotion ? 0 : 0.12 },
+            transition: { staggerChildren: shouldReduceMotion ? 0 : 0.22 },
         },
     }
     const item = {
-        hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 16 },
+        hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
         show: {
             opacity: 1,
             y: 0,
-            transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
+            transition: { duration: 1.0, ease: [0, 0, 0.58, 1] as const },
         },
     }
 

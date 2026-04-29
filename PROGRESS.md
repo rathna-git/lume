@@ -16,7 +16,8 @@ Added subtle motion polish to the authenticated app using Framer Motion. Replace
 - `useReducedMotion()` hook used to respect `prefers-reduced-motion` — disables `y` offset and `staggerChildren` when set
 - Outer wrapper: `<motion.div variants={container} initial="hidden" animate="show">`
 - Three staggered children: greeting, stats row, main grid — each a `<motion.div variants={item}>`
-- Easing: expo-out `[0.16, 1, 0.3, 1]` (`as const` required for Framer Motion v12 `BezierDefinition` tuple type), duration `0.65s`, stagger `0.12s`
+- Easing: standard ease-out `[0, 0, 0.58, 1]` (`as const` required for Framer Motion v12 `BezierDefinition` tuple type), duration `1.0s`, stagger `0.22s`, y offset `20px`
+- Previously used expo-out `[0.16, 1, 0.3, 1]` — this curve spends ~80% of its energy in the first 20% of the duration, making the animation feel instant regardless of `duration`. Switched to standard ease-out which distributes motion evenly across the full second so the animation is visibly present
 - Removed all custom CSS animation classes (`animate-enter`, `animate-enter-delay-1`, `animate-enter-delay-2`) that were added and then superseded
 
 #### Hover transitions
