@@ -6,6 +6,28 @@
 
 ## 2026-04-29
 
+### Sidebar document navigation
+
+Added real document navigation to the sidebar workspace tree. Previously the tree showed workspace name + documents but had a hard 12-doc cap, used implicit `text-primary` for the active doc, and had no inline creation entry point.
+
+#### Changes (`components/layout/sidebar.tsx`)
+
+| Area | Before | After |
+|---|---|---|
+| Doc list cap | `slice(0, 12)` | All documents shown |
+| Active doc style | `text-primary font-medium` | `bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 font-medium` |
+| Active dot color | `bg-primary` | `bg-amber-500 dark:bg-amber-400` — explicit amber |
+| + New page button | Missing from tree | Added at bottom of doc list; shares `onNewDocument` / `isCreating` from parent Sidebar |
+| Always-visible doc child area | Wrapped in `documents?.length > 0` guard | Always rendered (border-l + New page button visible even with 0 docs) |
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `components/layout/sidebar.tsx` | WorkspaceTree props, active amber styling, removed slice cap, added + New page button |
+
+---
+
 ### AI panel sticky height fix
 
 The AI panel was already `position: sticky` but had no height constraint, so it grew taller than the viewport on long documents — action buttons and history were off-screen.

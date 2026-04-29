@@ -30,9 +30,13 @@ interface WorkspaceData {
 function WorkspaceTree({
     workspaceId,
     currentDocId,
+    onNewDocument,
+    isCreating,
 }: {
     workspaceId: string
     currentDocId: string | null
+    onNewDocument: () => void
+    isCreating: boolean
 }) {
     const { data: workspace } = useQuery<WorkspaceData>({
         queryKey: ["workspace", workspaceId],
@@ -60,28 +64,34 @@ function WorkspaceTree({
                 <span className="truncate font-medium text-[0.8125rem]">{workspace.name}</span>
             </Link>
             {/* Document children */}
-            {documents && documents.length > 0 && (
-                <div className="ml-4 pl-2.5 border-l border-neutral-200 dark:border-border space-y-0.5">
-                    {documents.slice(0, 12).map(doc => (
-                        <Link
-                            key={doc.id}
-                            href={`/workspaces/${workspaceId}/documents/${doc.id}`}
-                            className={cn(
-                                "flex items-center gap-2 px-2 py-1 rounded-md text-xs transition-colors",
-                                doc.id === currentDocId
-                                    ? "text-primary font-medium"
-                                    : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-800 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted/70"
-                            )}
-                        >
-                            {doc.id === currentDocId
-                                ? <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                                : <FileText size={11} className="shrink-0 opacity-40" />
-                            }
-                            <span className="truncate">{doc.title || "Untitled"}</span>
-                        </Link>
-                    ))}
-                </div>
-            )}
+            <div className="ml-4 pl-2.5 border-l border-neutral-200 dark:border-border space-y-0.5">
+                {documents && documents.map(doc => (
+                    <Link
+                        key={doc.id}
+                        href={`/workspaces/${workspaceId}/documents/${doc.id}`}
+                        className={cn(
+                            "flex items-center gap-2 px-2 py-1 rounded-md text-xs transition-colors",
+                            doc.id === currentDocId
+                                ? "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 font-medium"
+                                : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-800 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted/70"
+                        )}
+                    >
+                        {doc.id === currentDocId
+                            ? <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 shrink-0" />
+                            : <FileText size={11} className="shrink-0 opacity-40" />
+                        }
+                        <span className="truncate">{doc.title || "Untitled"}</span>
+                    </Link>
+                ))}
+                <button
+                    onClick={onNewDocument}
+                    disabled={isCreating}
+                    className="flex items-center gap-2 px-2 py-1 rounded-md text-xs w-full text-neutral-400 dark:text-muted-foreground/60 hover:text-neutral-700 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <Plus size={11} className="shrink-0" />
+                    <span>{isCreating ? "Creating…" : "New page"}</span>
+                </button>
+            </div>
         </div>
     )
 }
@@ -203,7 +213,12 @@ export function Sidebar() {
                 {/* Workspace/document tree — shown when in workspace context */}
                 {workspaceId && (
                     <div className="pt-3 mt-1 border-t border-neutral-100 dark:border-border/50">
-                        <WorkspaceTree workspaceId={workspaceId} currentDocId={documentId} />
+                        <WorkspaceTree
+                            workspaceId={workspaceId}
+                            currentDocId={documentId}
+                            onNewDocument={handleNewDocument}
+                            isCreating={isCreating}
+                        />
                     </div>
                 )}
             </nav>

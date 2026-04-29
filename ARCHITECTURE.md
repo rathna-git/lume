@@ -65,7 +65,7 @@ components/
 ├── landing/
 │   └── parallax-hills.tsx          ← scroll-based parallax on hero hill layers (client)
 ├── layout/
-│   └── sidebar.tsx                 ← full nav IA (5 items + disabled placeholders), new-doc button, contextual workspace+doc tree, user name/email + UserButton
+│   └── sidebar.tsx                 ← full nav IA (5 items + disabled placeholders), new-doc button (amber border, h-10), contextual workspace+doc tree (amber active state, all docs, + New page inline), user name/email + UserButton
 ├── workspace/
 │   └── workspace-card.tsx          ← clickable card linking to workspace
 └── document/
@@ -292,6 +292,7 @@ Key milestones shipped to date:
 - AI panel polish — action chips → full-width vertical stacked buttons with amber selected state; stale warning → info callout with `Info` icon; AI output → bordered result card (`neutral-50` bg, `rounded-xl`); bottom actions: amber filled primary (Insert at cursor), outlined secondary (Replace content), outlined tertiary (Copy); footer disclaimer text added
 - Visual alignment pass — column gap raised to `gap-6 lg:gap-8`; sticky offset corrected to `lg:top-8`; all `border-border` inside AiPanel → `border-neutral-200 dark:border-border`; hover states use explicit neutral; Regenerate button radius normalized to `rounded-lg`
 - AI panel sticky height fix — `lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto` added so the panel never grows taller than the viewport; action buttons and history always reachable without page scroll
+- Sidebar document navigation — workspace tree now shows all documents (no cap), active doc uses explicit amber bg/text/dot, and a `+ New page` button lives inline at the bottom of the tree (wired to the existing `createDocument` mutation)
 
 ---
 
