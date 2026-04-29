@@ -804,7 +804,7 @@ function DocumentEditor({
                 </div>
 
                 {/* AI panel surface */}
-                <div className="w-full lg:w-[380px] lg:shrink-0 bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm p-6 lg:sticky lg:top-8">
+                <div className="w-full lg:w-[380px] lg:shrink-0 bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm p-6 lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
                     <div className="flex items-center gap-1.5 mb-5">
                         <Sparkles size={13} className="text-lume-amber" />
                         <p className="text-xs font-medium text-foreground">AI Assistant</p>
