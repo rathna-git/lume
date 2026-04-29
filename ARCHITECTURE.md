@@ -32,7 +32,9 @@ app/
 │   └── sign-up/[[...sign-up]]/page.tsx
 ├── (dashboard)/
 │   ├── layout.tsx                  ← app shell + user bootstrap
-│   ├── page.tsx                    ← Home dashboard (greeting, recent pages, workspaces, quick actions)
+│   ├── page.tsx                    ← redirect → /dashboard
+│   ├── dashboard/
+│   │   └── page.tsx                ← Home dashboard (greeting, recent pages, workspaces, quick actions; two-col layout)
 │   ├── workspaces/
 │   │   ├── page.tsx                ← workspace list + create dialog
 │   │   └── [workspaceId]/
@@ -44,7 +46,7 @@ app/
 │       └── page.tsx                ← placeholder settings page
 ├── api/
 │   ├── workspaces/
-│   │   ├── route.ts                ← GET list, POST create
+│   │   ├── route.ts                ← GET list (includes `_count.documents` per workspace), POST create
 │   │   └── [workspaceId]/route.ts  ← GET, PATCH, DELETE
 │   ├── documents/
 │   │   ├── route.ts                ← GET list, POST create
@@ -188,7 +190,8 @@ AiGeneration
 
 | Route                                   | Type           | Description                                                                    |
 | --------------------------------------- | -------------- | ------------------------------------------------------------------------------ |
-| `/`                                     | Public page    | Landing page (unauthenticated); Home dashboard via `(dashboard)/page.tsx` (authenticated) |
+| `/`                                     | Public page    | Landing page (unauthenticated); redirects to `/dashboard` when authenticated              |
+| `/dashboard`                            | Protected page | Home dashboard — greeting, recent pages, workspaces, quick actions                       |
 | `/sign-in`                              | Auth page      | Clerk sign-in                                                                  |
 | `/sign-up`                              | Auth page      | Clerk sign-up                                                                  |
 | `/workspaces`                           | Protected page | Workspace list                                                                 |
@@ -295,7 +298,8 @@ Key milestones shipped to date:
 - Visual alignment pass — column gap raised to `gap-6 lg:gap-8`; sticky offset corrected to `lg:top-8`; all `border-border` inside AiPanel → `border-neutral-200 dark:border-border`; hover states use explicit neutral; Regenerate button radius normalized to `rounded-lg`
 - AI panel sticky height fix — `lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto` added so the panel never grows taller than the viewport; action buttons and history always reachable without page scroll
 - Sidebar document navigation — workspace tree now shows all documents (no cap), active doc uses explicit amber bg/text/dot, and a `+ New page` button lives inline at the bottom of the tree (wired to the existing `createDocument` mutation)
-- Home dashboard + IA cleanup — `(dashboard)/page.tsx` replaced redirect with a real Home page: time-of-day greeting with first name, recent pages list (latest 5 across all workspaces via new `GET /api/documents/recent`), workspaces grid, quick actions (New workspace dialog, New page in most-recent workspace); sidebar "Documents" nav removed, replaced with "Home" → `/`; top new-doc button removed
+- Home dashboard + IA cleanup — `GET /api/documents/recent` added (latest 5 docs with workspace info); `(dashboard)/dashboard/page.tsx` is the Home route at `/dashboard`; sidebar "Documents" nav removed, replaced with "Home" → `/dashboard`; `(dashboard)/page.tsx` is now a redirect; top new-doc button removed
+- Home dashboard polish — two-column layout (`max-w-5xl`), greeting subtitle, stats row (workspace + page counts from already-fetched data), recent pages in white bordered card with divider rows and skeleton loaders, workspaces as stacked cards with `_count.documents` page count, "New page in [emoji] [name]" quick action labeling; workspaces API updated to return `_count: { documents: true }`
 
 ---
 

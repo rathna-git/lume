@@ -6,6 +6,46 @@
 
 ## 2026-04-29
 
+### Home dashboard polish
+
+Polished the Home dashboard from a sparse flat layout into a more structured, production-ready page.
+
+#### Layout & visual changes
+
+- Page width widened from `max-w-3xl` → `max-w-5xl`
+- Two-column grid: recent pages + quick actions on the left (`lg:col-span-2`), workspaces sidebar on the right (`lg:col-span-1`)
+- Greeting subtitle added: "Pick up where you left off, or start something new." in muted neutral text
+- Stats row: `N workspaces · N recent pages` derived from already-fetched query data; no new API
+
+#### Recent pages
+
+- Wrapped in a white bordered card (`rounded-xl border border-neutral-200 dark:border-border bg-white dark:bg-card`)
+- Rows divided by `divide-y divide-neutral-100 dark:divide-border/50`
+- Skeleton loaders match card row shape (icon + title + meta)
+- Empty state: centered with `FileText` icon + calm copy
+
+#### Workspaces
+
+- Moved to right column as stacked cards (was a 2-col grid across full width)
+- Each card shows emoji + workspace name + page count ("3 pages")
+- Page count sourced from `_count.documents` — added to the `GET /api/workspaces` Prisma select and `Workspace` interface in `hooks/use-workspaces.ts`
+- Empty state: centered with `LayoutGrid` icon
+
+#### Quick actions
+
+- "New workspace" button kept as-is
+- "New page" button now labeled `New page in [emoji] [name]` using `recentDocs[0].workspace` for clear context
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `app/(dashboard)/dashboard/page.tsx` | Full polish rewrite |
+| `app/api/workspaces/route.ts` | Added `_count: { select: { documents: true } }` to Prisma select |
+| `hooks/use-workspaces.ts` | Added `_count: { documents: number }` to `Workspace` interface |
+
+---
+
 ### Home dashboard + IA cleanup
 
 Replaced the `/` authenticated redirect with a real Home dashboard. Cleaned up conflicting nav items in the sidebar.

@@ -9,6 +9,7 @@ export interface Workspace {
     emoji: string | null
     createdAt: string
     updatedAt: string
+    _count: { documents: number }
 }
 
 interface CreateWorkspaceInput {

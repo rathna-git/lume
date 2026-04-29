@@ -22,6 +22,7 @@ export async function GET() {
             emoji: true,
             createdAt: true,
             updatedAt: true,
+            _count: { select: { documents: true } },
         },
         orderBy: { updatedAt: "desc" },
     })
