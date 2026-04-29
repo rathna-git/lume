@@ -6,6 +6,50 @@
 
 ## 2026-04-29
 
+### Home dashboard + IA cleanup
+
+Replaced the `/` authenticated redirect with a real Home dashboard. Cleaned up conflicting nav items in the sidebar.
+
+#### Problem
+- Sidebar had both "Workspaces" and "Documents" — both linked to `/workspaces`, confusing IA
+- Top "New document" button was redundant with the "+ New page" that now lives in the workspace tree
+- Authenticated root `/` just redirected to `/workspaces` with no added value
+
+#### New API route (`app/api/documents/recent/route.ts`)
+- `GET /api/documents/recent` — returns latest 5 documents across all workspaces owned by the current user
+- Includes `workspace.id`, `workspace.name`, `workspace.emoji` for display and navigation
+- Ownership enforced: queries only documents whose workspace has `userId === current user`
+
+#### Home page (`app/(dashboard)/page.tsx`)
+- Time-of-day greeting with user's first name from Clerk (`Good morning/afternoon/evening, Rathna`)
+- **Recent pages** — latest 5 docs via `useRecentDocuments()`; each row shows title, workspace name+emoji, relative timestamp
+- **Workspaces** — responsive 2-col grid using `useWorkspaces()`; each card links to workspace detail
+- **Quick actions** — "New workspace" (inline dialog matching workspaces page pattern); "New page" visible only if a recent workspace exists (uses most-recently-edited workspace as context)
+- Skeleton loaders for both sections while data loads
+
+#### Sidebar changes (`components/layout/sidebar.tsx`)
+| Area | Before | After |
+|---|---|---|
+| Nav item 1 | "Documents" → `/workspaces` (confusing duplicate) | "Home" → `/` |
+| Nav item 2 | "Workspaces" → `/workspaces` | "Workspaces" → `/workspaces` (unchanged) |
+| Active state | `onDocumentPage`, `onWorkspacePage (excl. doc pages)` | `onHomePage = pathname === "/"`, `onWorkspacePage = pathname.startsWith("/workspaces")` |
+| Top button | "New document" amber bordered button | Removed — page creation lives in the workspace tree |
+
+#### New hook (`hooks/use-documents.ts`)
+- Added `useRecentDocuments()` — queries `["documents", "recent"]`; fetches `/api/documents/recent`
+- Added `RecentDocument` interface with workspace field
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `app/api/documents/recent/route.ts` | New — GET recent docs endpoint |
+| `hooks/use-documents.ts` | Added `RecentDocument`, `useRecentDocuments` |
+| `app/(dashboard)/page.tsx` | Replaced redirect with Home dashboard |
+| `components/layout/sidebar.tsx` | Nav IA update, removed top new-doc button |
+
+---
+
 ### Sidebar document navigation
 
 Added real document navigation to the sidebar workspace tree. Previously the tree showed workspace name + documents but had a hard 12-doc cap, used implicit `text-primary` for the active doc, and had no inline creation entry point.

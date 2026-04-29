@@ -49,6 +49,29 @@ export function useDocuments(workspaceId: string) {
     })
 }
 
+export interface RecentDocument {
+    id: string
+    title: string
+    updatedAt: string
+    workspace: {
+        id: string
+        name: string
+        emoji: string | null
+    }
+}
+
+export function useRecentDocuments() {
+    return useQuery({
+        queryKey: ["documents", "recent"] as const,
+        queryFn: async () => {
+            const res = await fetch("/api/documents/recent")
+            if (!res.ok) throw new Error("Failed to fetch recent documents")
+            const data = await res.json()
+            return data.documents as RecentDocument[]
+        },
+    })
+}
+
 export function useCreateDocument() {
     const queryClient = useQueryClient()
     return useMutation({

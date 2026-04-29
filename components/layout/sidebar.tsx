@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutGrid, Settings, FileText, Search, Layers, Users, Trash2, Plus } from "lucide-react"
+import { Home, LayoutGrid, Settings, FileText, Search, Layers, Users, Trash2, Plus } from "lucide-react"
 import { UserButton, useUser } from "@clerk/nextjs"
 import { useTheme } from "next-themes"
 import { useQuery } from "@tanstack/react-query"
@@ -125,8 +125,8 @@ export function Sidebar() {
     }
 
     // Active state helpers
-    const onDocumentPage = !!documentId
-    const onWorkspacePage = pathname.startsWith("/workspaces") && !onDocumentPage
+    const onHomePage = pathname === "/"
+    const onWorkspacePage = pathname.startsWith("/workspaces")
     const onSettingsPage = pathname.startsWith("/settings")
 
     return (
@@ -136,26 +136,22 @@ export function Sidebar() {
                 <LumeLogo size="sm" variant={mounted && resolvedTheme === "light" ? "light" : "dark"} />
             </div>
 
-            {/* New document button */}
-            <div className="px-3 pt-4 pb-2">
-                <button
-                    onClick={handleNewDocument}
-                    disabled={isCreating}
-                    className="w-full flex items-center gap-2 px-3 h-10 rounded-lg text-sm font-medium
-                        border border-amber-200 dark:border-amber-900/40
-                        text-neutral-500 dark:text-muted-foreground
-                        hover:border-amber-300 dark:hover:border-amber-700
-                        hover:bg-amber-50 dark:hover:bg-amber-950/20
-                        hover:text-amber-700 dark:hover:text-amber-400
-                        transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <Plus size={14} className="text-primary shrink-0" />
-                    {isCreating ? "Creating…" : "New document"}
-                </button>
-            </div>
-
             {/* Primary nav */}
-            <nav className="flex-1 overflow-y-auto px-3 pt-1 pb-2 space-y-0.5">
+            <nav className="flex-1 overflow-y-auto px-3 pt-3 pb-2 space-y-0.5">
+                {/* Home */}
+                <Link
+                    href="/"
+                    className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                        onHomePage
+                            ? "bg-amber-50 dark:bg-primary/10 text-amber-700 dark:text-primary font-medium"
+                            : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted"
+                    )}
+                >
+                    <Home size={16} />
+                    Home
+                </Link>
+
                 {/* Workspaces */}
                 <Link
                     href="/workspaces"
@@ -168,20 +164,6 @@ export function Sidebar() {
                 >
                     <LayoutGrid size={16} />
                     Workspaces
-                </Link>
-
-                {/* Documents — active on document editor pages */}
-                <Link
-                    href="/workspaces"
-                    className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-                        onDocumentPage
-                            ? "bg-amber-50 dark:bg-primary/10 text-amber-700 dark:text-primary font-medium"
-                            : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted"
-                    )}
-                >
-                    <FileText size={16} />
-                    Documents
                 </Link>
 
                 {/* Search — TODO: search feature not yet implemented */}

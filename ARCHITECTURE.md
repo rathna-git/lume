@@ -32,7 +32,7 @@ app/
 │   └── sign-up/[[...sign-up]]/page.tsx
 ├── (dashboard)/
 │   ├── layout.tsx                  ← app shell + user bootstrap
-│   ├── page.tsx                    ← redirects to /workspaces
+│   ├── page.tsx                    ← Home dashboard (greeting, recent pages, workspaces, quick actions)
 │   ├── workspaces/
 │   │   ├── page.tsx                ← workspace list + create dialog
 │   │   └── [workspaceId]/
@@ -48,6 +48,7 @@ app/
 │   │   └── [workspaceId]/route.ts  ← GET, PATCH, DELETE
 │   ├── documents/
 │   │   ├── route.ts                ← GET list, POST create
+│   │   ├── recent/route.ts         ← GET — latest 5 docs across all user workspaces, with workspace info
 │   │   └── [documentId]/
 │   │       ├── route.ts            ← GET, PATCH, DELETE
 │   │       └── generations/route.ts← GET — AI generations for document
@@ -65,7 +66,7 @@ components/
 ├── landing/
 │   └── parallax-hills.tsx          ← scroll-based parallax on hero hill layers (client)
 ├── layout/
-│   └── sidebar.tsx                 ← full nav IA (5 items + disabled placeholders), new-doc button (amber border, h-10), contextual workspace+doc tree (amber active state, all docs, + New page inline), user name/email + UserButton
+│   └── sidebar.tsx                 ← nav IA: Home / Workspaces / Search / Templates / Settings (Search+Templates disabled); contextual workspace+doc tree (amber active state, all docs, + New page inline); user name/email + UserButton
 ├── workspace/
 │   └── workspace-card.tsx          ← clickable card linking to workspace
 └── document/
@@ -82,7 +83,7 @@ lib/
 
 hooks/
 ├── use-workspaces.ts               ← useWorkspaces, useCreateWorkspace, useUpdateWorkspace, useDeleteWorkspace
-├── use-documents.ts                ← useDocuments, useCreateDocument
+├── use-documents.ts                ← useDocuments, useCreateDocument, useRecentDocuments
 ├── use-document.ts                 ← useDocument, useUpdateDocument, useDeleteDocument
 └── use-ai.ts                       ← useGenerateAi, useAiGenerations
 
@@ -187,7 +188,7 @@ AiGeneration
 
 | Route                                   | Type           | Description                                                                    |
 | --------------------------------------- | -------------- | ------------------------------------------------------------------------------ |
-| `/`                                     | Public page    | Landing page                                                                   |
+| `/`                                     | Public page    | Landing page (unauthenticated); Home dashboard via `(dashboard)/page.tsx` (authenticated) |
 | `/sign-in`                              | Auth page      | Clerk sign-in                                                                  |
 | `/sign-up`                              | Auth page      | Clerk sign-up                                                                  |
 | `/workspaces`                           | Protected page | Workspace list                                                                 |
@@ -201,6 +202,7 @@ AiGeneration
 | `GET/PATCH/DELETE /api/documents/[id]`  | API            | Single document                                                                |
 | `POST /api/ai/generate`                 | API            | AI content actions                                                             |
 | `GET /api/documents/[id]/generations`   | API            | Fetch saved AI generations for a document, newest first                        |
+| `GET /api/documents/recent`             | API            | Latest 5 documents across all user workspaces, ordered by `updatedAt DESC`; includes `workspace.id/name/emoji`; ownership enforced |
 
 ---
 
@@ -287,12 +289,13 @@ Key milestones shipped to date:
 - UI polish passes — editor typography, warm color palette, empty state mood pass, workspace/document three-dot menus, colored AI panel icons, toast notifications, visual depth on document cards, workspace page visual parity with editor
 - Dark mode / light mode — next-themes with class-based toggling; dark default using landing page `#090E09`; sun/moon toggle on all pages; theme-aware sidebar, toasts, and semantic CSS tokens
 - App shell neutral palette — light theme tokens neutralized (warm beige → white/neutral grays); dark theme unchanged; sidebar and editor card borders hardcoded to `neutral-200` to bypass CSS variable chain
-- Sidebar full IA + polish — new-doc button (amber border, h-10), 5-item nav with amber active states, contextual workspace+doc tree (amber dot on active doc), user name+email + UserButton at bottom
+- Sidebar IA + polish — Home/Workspaces/Search/Templates/Settings nav (Search+Templates disabled); contextual workspace+doc tree (amber active state, all docs, + New page inline); user name+email + UserButton at bottom; top new-doc button removed (page creation lives in the workspace tree)
 - Document editor card polish — outer padding `p-6 md:p-8`, back link compact and neutral, card borders `neutral-200`, metadata `text-neutral-400`, AI panel chip buttons
 - AI panel polish — action chips → full-width vertical stacked buttons with amber selected state; stale warning → info callout with `Info` icon; AI output → bordered result card (`neutral-50` bg, `rounded-xl`); bottom actions: amber filled primary (Insert at cursor), outlined secondary (Replace content), outlined tertiary (Copy); footer disclaimer text added
 - Visual alignment pass — column gap raised to `gap-6 lg:gap-8`; sticky offset corrected to `lg:top-8`; all `border-border` inside AiPanel → `border-neutral-200 dark:border-border`; hover states use explicit neutral; Regenerate button radius normalized to `rounded-lg`
 - AI panel sticky height fix — `lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto` added so the panel never grows taller than the viewport; action buttons and history always reachable without page scroll
 - Sidebar document navigation — workspace tree now shows all documents (no cap), active doc uses explicit amber bg/text/dot, and a `+ New page` button lives inline at the bottom of the tree (wired to the existing `createDocument` mutation)
+- Home dashboard + IA cleanup — `(dashboard)/page.tsx` replaced redirect with a real Home page: time-of-day greeting with first name, recent pages list (latest 5 across all workspaces via new `GET /api/documents/recent`), workspaces grid, quick actions (New workspace dialog, New page in most-recent workspace); sidebar "Documents" nav removed, replaced with "Home" → `/`; top new-doc button removed
 
 ---
 
