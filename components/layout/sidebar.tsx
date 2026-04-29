@@ -125,7 +125,7 @@ export function Sidebar() {
     }
 
     // Active state helpers
-    const onHomePage = pathname === "/"
+    const onHomePage = pathname === "/dashboard"
     const onWorkspacePage = pathname.startsWith("/workspaces")
     const onSettingsPage = pathname.startsWith("/settings")
 
@@ -140,7 +140,7 @@ export function Sidebar() {
             <nav className="flex-1 overflow-y-auto px-3 pt-3 pb-2 space-y-0.5">
                 {/* Home */}
                 <Link
-                    href="/"
+                    href="/dashboard"
                     className={cn(
                         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
                         onHomePage
