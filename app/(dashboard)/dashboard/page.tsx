@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { motion, useReducedMotion } from "framer-motion"
 import { FileText, Plus, LayoutGrid } from "lucide-react"
 import { useUser } from "@clerk/nextjs"
 import { useRecentDocuments, useCreateDocument } from "@/hooks/use-documents"
@@ -131,31 +132,52 @@ export default function HomePage() {
     const workspaceCount = workspaces?.length ?? 0
     const recentCount = recentDocs?.length ?? 0
 
+    const shouldReduceMotion = useReducedMotion()
+    const container = {
+        hidden: {},
+        show: {
+            transition: { staggerChildren: shouldReduceMotion ? 0 : 0.12 },
+        },
+    }
+    const item = {
+        hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 16 },
+        show: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
+        },
+    }
+
     return (
-        <div className="max-w-5xl mx-auto px-8 py-12">
+        <motion.div
+            className="max-w-5xl mx-auto px-8 py-12"
+            variants={container}
+            initial="hidden"
+            animate="show"
+        >
             {/* Greeting */}
-            <div className="mb-10">
+            <motion.div className="mb-10" variants={item}>
                 <h1 className="font-serif text-3xl text-foreground tracking-tight">
                     {getGreeting()}{firstName ? `, ${firstName}` : ""}
                 </h1>
                 <p className="mt-1.5 text-sm text-neutral-400 dark:text-muted-foreground">
                     Pick up where you left off, or start something new.
                 </p>
-            </div>
+            </motion.div>
 
             {/* Stats row */}
             {!loadingWorkspaces && !loadingRecent && (workspaceCount > 0 || recentCount > 0) && (
-                <div className="flex items-center gap-5 mb-8 text-xs text-neutral-400 dark:text-muted-foreground/60">
+                <motion.div className="flex items-center gap-5 mb-8 text-xs text-neutral-400 dark:text-muted-foreground/60" variants={item}>
                     {workspaceCount > 0 && (
                         <span>{workspaceCount} workspace{workspaceCount !== 1 ? "s" : ""}</span>
                     )}
                     {recentCount > 0 && (
                         <span>{recentCount} recent page{recentCount !== 1 ? "s" : ""}</span>
                     )}
-                </div>
+                </motion.div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-6" variants={item}>
                 {/* Left column: Recent pages + Quick actions */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Recent pages card */}
@@ -189,7 +211,7 @@ export default function HomePage() {
                                         <Link
                                             key={doc.id}
                                             href={`/workspaces/${doc.workspace.id}/documents/${doc.id}`}
-                                            className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-muted/30 transition-colors"
+                                            className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-muted/30 transition-colors duration-150"
                                         >
                                             <FileText size={14} className="text-neutral-300 dark:text-muted-foreground/40 shrink-0" />
                                             <span className="flex-1 text-sm text-neutral-700 dark:text-foreground truncate min-w-0">
@@ -216,7 +238,7 @@ export default function HomePage() {
                         <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => setWorkspaceDialogOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors duration-150"
                             >
                                 <Plus size={14} />
                                 New workspace
@@ -264,7 +286,7 @@ export default function HomePage() {
                                     <Link
                                         key={ws.id}
                                         href={`/workspaces/${ws.id}`}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-xl border border-neutral-200 dark:border-border bg-white dark:bg-card hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors"
+                                        className="flex items-center gap-3 px-4 py-3 rounded-xl border border-neutral-200 dark:border-border bg-white dark:bg-card hover:bg-neutral-50 dark:hover:bg-muted/40 hover:border-neutral-300 dark:hover:border-border/80 hover:shadow-sm hover:-translate-y-px transition-all duration-150 ease-out"
                                     >
                                         <span className="text-xl leading-none shrink-0">{ws.emoji ?? "📝"}</span>
                                         <div className="min-w-0 flex-1">
@@ -281,9 +303,9 @@ export default function HomePage() {
                         )}
                     </section>
                 </div>
-            </div>
+            </motion.div>
 
             <CreateWorkspaceDialog open={workspaceDialogOpen} onOpenChange={setWorkspaceDialogOpen} />
-        </div>
+        </motion.div>
     )
 }

@@ -58,7 +58,7 @@ function WorkspaceTree({
             {/* Workspace parent row */}
             <Link
                 href={`/workspaces/${workspaceId}`}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors text-neutral-700 dark:text-foreground/75 hover:bg-neutral-100 dark:hover:bg-muted hover:text-neutral-900 dark:hover:text-foreground mb-1"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors duration-150 text-neutral-700 dark:text-foreground/75 hover:bg-neutral-100 dark:hover:bg-muted hover:text-neutral-900 dark:hover:text-foreground mb-1"
             >
                 <span className="text-sm leading-none shrink-0">{workspace.emoji ?? "📝"}</span>
                 <span className="truncate font-medium text-[0.8125rem]">{workspace.name}</span>
@@ -70,7 +70,7 @@ function WorkspaceTree({
                         key={doc.id}
                         href={`/workspaces/${workspaceId}/documents/${doc.id}`}
                         className={cn(
-                            "flex items-center gap-2 px-2 py-1 rounded-md text-xs transition-colors",
+                            "flex items-center gap-2 px-2 py-1 rounded-md text-xs transition-colors duration-150",
                             doc.id === currentDocId
                                 ? "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 font-medium"
                                 : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-800 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted/70"
@@ -86,7 +86,7 @@ function WorkspaceTree({
                 <button
                     onClick={onNewDocument}
                     disabled={isCreating}
-                    className="flex items-center gap-2 px-2 py-1 rounded-md text-xs w-full text-neutral-400 dark:text-muted-foreground/60 hover:text-neutral-700 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-2 py-1 rounded-md text-xs w-full text-neutral-400 dark:text-muted-foreground/60 hover:text-neutral-700 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted/70 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Plus size={11} className="shrink-0" />
                     <span>{isCreating ? "Creating…" : "New page"}</span>
@@ -142,7 +142,7 @@ export function Sidebar() {
                 <Link
                     href="/dashboard"
                     className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-150",
                         onHomePage
                             ? "bg-amber-50 dark:bg-primary/10 text-amber-700 dark:text-primary font-medium"
                             : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted"
@@ -156,7 +156,7 @@ export function Sidebar() {
                 <Link
                     href="/workspaces"
                     className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-150",
                         onWorkspacePage
                             ? "bg-amber-50 dark:bg-primary/10 text-amber-700 dark:text-primary font-medium"
                             : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted"
@@ -182,7 +182,7 @@ export function Sidebar() {
                 <Link
                     href="/settings"
                     className={cn(
-                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-150",
                         onSettingsPage
                             ? "bg-amber-50 dark:bg-primary/10 text-amber-700 dark:text-primary font-medium"
                             : "text-neutral-500 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-100 dark:hover:bg-muted"

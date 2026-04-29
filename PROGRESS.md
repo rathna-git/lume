@@ -6,6 +6,41 @@
 
 ## 2026-04-29
 
+### Motion polish — entrance animation and hover transitions
+
+Added subtle motion polish to the authenticated app using Framer Motion. Replaced a series of CSS animation attempts (via `tw-animate-css`) that proved unreliable — CSS `animation` with `animation-fill-mode: both` can start and nearly finish before the browser's first paint, making the animation invisible. Framer Motion guarantees the initial hidden state is committed to the screen before the animation begins.
+
+#### Framer Motion entrance animation (`app/(dashboard)/dashboard/page.tsx`)
+
+- Installed `framer-motion` v12 (`pnpm add framer-motion`)
+- `useReducedMotion()` hook used to respect `prefers-reduced-motion` — disables `y` offset and `staggerChildren` when set
+- Outer wrapper: `<motion.div variants={container} initial="hidden" animate="show">`
+- Three staggered children: greeting, stats row, main grid — each a `<motion.div variants={item}>`
+- Easing: expo-out `[0.16, 1, 0.3, 1]` (`as const` required for Framer Motion v12 `BezierDefinition` tuple type), duration `0.65s`, stagger `0.12s`
+- Removed all custom CSS animation classes (`animate-enter`, `animate-enter-delay-1`, `animate-enter-delay-2`) that were added and then superseded
+
+#### Hover transitions
+
+- Recent page rows: `transition-colors duration-150`
+- Workspace cards: `transition-all duration-150 ease-out hover:shadow-sm hover:-translate-y-px hover:border-neutral-300 dark:hover:border-border/80`
+- Quick action buttons: `transition-colors duration-150`
+- Sidebar nav items: `transition-colors duration-150` added to all links (was missing `duration-150`)
+
+#### CSS cleanup (`app/globals.css`)
+
+- Removed the `@keyframes lume-enter` block and all `.animate-enter*` utility classes that were added during the CSS animation attempt
+- Retained existing landing-page keyframes (`lume-spin-slow`, `lume-float-in`, `lume-sun-rise`) — those are still in use
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `app/(dashboard)/dashboard/page.tsx` | Framer Motion entrance animation with stagger + expo-out; hover transitions on rows/cards/buttons |
+| `app/globals.css` | Removed superseded `lume-enter` keyframe and `.animate-enter*` classes |
+| `components/layout/sidebar.tsx` | Added `duration-150` to all nav item transition classes |
+
+---
+
 ### Home dashboard polish
 
 Polished the Home dashboard from a sparse flat layout into a more structured, production-ready page.

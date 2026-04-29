@@ -18,6 +18,7 @@
 | Server state     | TanStack Query v5                  |
 | Validation       | Zod                                |
 | Rich text editor | Tiptap v3 (ProseMirror)            |
+| Motion           | Framer Motion v12                  |
 | AI               | OpenAI (GPT-4o)                    |
 | Package manager  | pnpm                               |
 
@@ -300,6 +301,7 @@ Key milestones shipped to date:
 - Sidebar document navigation — workspace tree now shows all documents (no cap), active doc uses explicit amber bg/text/dot, and a `+ New page` button lives inline at the bottom of the tree (wired to the existing `createDocument` mutation)
 - Home dashboard + IA cleanup — `GET /api/documents/recent` added (latest 5 docs with workspace info); `(dashboard)/dashboard/page.tsx` is the Home route at `/dashboard`; sidebar "Documents" nav removed, replaced with "Home" → `/dashboard`; `(dashboard)/page.tsx` is now a redirect; top new-doc button removed
 - Home dashboard polish — two-column layout (`max-w-5xl`), greeting subtitle, stats row (workspace + page counts from already-fetched data), recent pages in white bordered card with divider rows and skeleton loaders, workspaces as stacked cards with `_count.documents` page count, "New page in [emoji] [name]" quick action labeling; workspaces API updated to return `_count: { documents: true }`
+- Motion polish — Framer Motion v12 entrance animation on Home dashboard (stagger + expo-out, `useReducedMotion` respected); hover transitions on recent page rows, workspace cards, quick action buttons; sidebar nav `duration-150` transitions; superseded CSS animation classes removed from `globals.css`
 
 ---
 
