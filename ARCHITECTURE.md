@@ -290,6 +290,8 @@ Key milestones shipped to date:
 - Sidebar full IA + polish — new-doc button (amber border, h-10), 5-item nav with amber active states, contextual workspace+doc tree (amber dot on active doc), user name+email + UserButton at bottom
 - Document editor card polish — outer padding `p-6 md:p-8`, back link compact and neutral, card borders `neutral-200`, metadata `text-neutral-400`, AI panel chip buttons
 - AI panel polish — action chips → full-width vertical stacked buttons with amber selected state; stale warning → info callout with `Info` icon; AI output → bordered result card (`neutral-50` bg, `rounded-xl`); bottom actions: amber filled primary (Insert at cursor), outlined secondary (Replace content), outlined tertiary (Copy); footer disclaimer text added
+- Visual alignment pass — column gap raised to `gap-6 lg:gap-8`; sticky offset corrected to `lg:top-8`; all `border-border` inside AiPanel → `border-neutral-200 dark:border-border`; hover states use explicit neutral; Regenerate button radius normalized to `rounded-lg`
+- AI panel sticky height fix — `lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto` added so the panel never grows taller than the viewport; action buttons and history always reachable without page scroll
 
 ---
 

@@ -4,6 +4,46 @@
 
 ---
 
+## 2026-04-29
+
+### AI panel sticky height fix
+
+The AI panel was already `position: sticky` but had no height constraint, so it grew taller than the viewport on long documents — action buttons and history were off-screen.
+
+#### Fix (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+- Added `lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto` to the AI panel container
+- `4rem` = `top-8` (2rem sticky offset) + 2rem bottom breathing room — panel never overflows the viewport
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | AI panel surface div — max-h + overflow-y-auto |
+
+---
+
+### Visual alignment pass — layout gaps, border tokens, hover states
+
+#### Changes (`app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx`)
+
+| Area | Before | After |
+|---|---|---|
+| Column gap | `gap-4 lg:gap-6` | `gap-6 lg:gap-8` — more breathing room |
+| AI panel sticky offset | `lg:top-6` | `lg:top-8` — matches outer `p-8` padding |
+| AiPanel inner borders | `border-border` | `border-neutral-200 dark:border-border` throughout |
+| AiPanel hover states | `hover:bg-muted/60` | `hover:bg-neutral-50 dark:hover:bg-muted/60` |
+| Regenerate button radius | `rounded-md` | `rounded-lg` — consistent with all other buttons |
+| Try again / Generate / history card text | `text-muted-foreground` | `text-neutral-600 dark:text-muted-foreground` |
+| History card selected bg | `bg-muted` | `bg-neutral-100 dark:bg-muted` |
+
+#### Files Modified
+
+| File | Notes |
+| ---- | ----- |
+| `app/(dashboard)/workspaces/[workspaceId]/documents/[documentId]/page.tsx` | Layout, AiPanel inner tokens |
+
+---
+
 ## 2026-04-27
 
 ### AI panel polish — vertical actions, result card, hierarchical bottom actions
