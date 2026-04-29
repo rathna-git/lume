@@ -20,6 +20,12 @@ Added subtle motion polish to the authenticated app using Framer Motion. Replace
 - Previously used expo-out `[0.16, 1, 0.3, 1]` — this curve spends ~80% of its energy in the first 20% of the duration, making the animation feel instant regardless of `duration`. Switched to standard ease-out which distributes motion evenly across the full second so the animation is visibly present
 - Removed all custom CSS animation classes (`animate-enter`, `animate-enter-delay-1`, `animate-enter-delay-2`) that were added and then superseded
 
+#### Fix: user name pop-in during animation
+
+- `useUser()` returns `isLoaded: false` on first render — `firstName` is `null` until Clerk resolves, causing the name to pop into the greeting mid-animation
+- Fix: gate `animate` on `userLoaded` — page stays at `opacity: 0` until Clerk resolves, then the full staggered animation plays with the name already present
+- Clerk resolves from cache in ~50ms so the hold is imperceptible
+
 #### Hover transitions
 
 - Recent page rows: `transition-colors duration-150`

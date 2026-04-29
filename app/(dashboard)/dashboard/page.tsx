@@ -108,7 +108,7 @@ function CreateWorkspaceDialog({
 
 export default function HomePage() {
     const router = useRouter()
-    const { user } = useUser()
+    const { user, isLoaded: userLoaded } = useUser()
     const { data: recentDocs, isLoading: loadingRecent } = useRecentDocuments()
     const { data: workspaces, isLoading: loadingWorkspaces } = useWorkspaces()
     const { mutate: createDocument, isPending: isCreatingDoc } = useCreateDocument()
@@ -153,7 +153,7 @@ export default function HomePage() {
             className="max-w-5xl mx-auto px-8 py-12"
             variants={container}
             initial="hidden"
-            animate="show"
+            animate={userLoaded ? "show" : "hidden"}
         >
             {/* Greeting */}
             <motion.div className="mb-10" variants={item}>
