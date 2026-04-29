@@ -212,7 +212,7 @@ function AiPanel({
 
             {/* Generations loading state */}
             {generationsLoading && selectedAction && (
-                <div className="flex flex-col gap-2 pt-4 border-t border-border animate-pulse">
+                <div className="flex flex-col gap-2 pt-4 border-t border-neutral-200 dark:border-border animate-pulse">
                     <div className="h-2.5 bg-muted rounded w-1/3" />
                     <div className="h-2.5 bg-muted rounded w-full mt-1" />
                     <div className="h-2.5 bg-muted rounded w-5/6" />
@@ -222,13 +222,13 @@ function AiPanel({
 
             {/* Generations error state */}
             {generationsError && !generationsLoading && (
-                <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                <div className="flex flex-col gap-2 pt-4 border-t border-neutral-200 dark:border-border">
                     <p className="text-xs text-muted-foreground/60 leading-relaxed">
                         Couldn&apos;t load your previous results.
                     </p>
                     <button
                         onClick={onRetry}
-                        className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60"
+                        className="text-xs text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground border border-neutral-200 dark:border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-neutral-50 dark:hover:bg-muted/60"
                     >
                         Try again
                     </button>
@@ -237,7 +237,7 @@ function AiPanel({
 
             {/* Result area for selected action */}
             {selectedAction && !generationsLoading && !generationsError && (
-                <div className="flex flex-col gap-3 pt-5 border-t border-border">
+                <div className="flex flex-col gap-3 pt-5 border-t border-neutral-200 dark:border-border">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
                             {ACTION_LABEL[selectedAction]}
@@ -255,7 +255,7 @@ function AiPanel({
                                 <button
                                     onClick={() => onGenerate(selectedAction)}
                                     disabled={anyPending || !content.trim()}
-                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2 py-1 transition-colors hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+                                    className="text-xs text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground border border-neutral-200 dark:border-border rounded-lg px-2 py-1 transition-colors hover:bg-neutral-50 dark:hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
                                 >
                                     <RotateCcw size={11} className={isPending ? "animate-spin" : ""} />
                                     {isPending ? "Running…" : "Regenerate"}
@@ -289,7 +289,7 @@ function AiPanel({
                                 <button
                                     onClick={() => onGenerate(selectedAction)}
                                     disabled={anyPending || !content.trim()}
-                                    className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="text-xs text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground border border-neutral-200 dark:border-border rounded-lg px-3 py-2 transition-colors text-left hover:bg-neutral-50 dark:hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     Generate
                                 </button>
@@ -394,7 +394,7 @@ function AiPanel({
 
                         {/* Previous results */}
                         {olderGenerations.length > 0 && (
-                            <div className="flex flex-col gap-1.5 pt-4 border-t border-border">
+                            <div className="flex flex-col gap-1.5 pt-4 border-t border-neutral-200 dark:border-border">
                             <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium mb-1">
                                 Previous
                             </p>
@@ -406,8 +406,8 @@ function AiPanel({
                                         onClick={() => onSelectGeneration(g.id)}
                                         className={`text-left rounded-lg px-3.5 py-3 transition-colors border shrink-0 w-[200px] ${
                                             displayed?.id === g.id
-                                                ? "border-border bg-muted"
-                                                : "border-border hover:bg-muted/60"
+                                                ? "border-neutral-200 dark:border-border bg-neutral-100 dark:bg-muted"
+                                                : "border-neutral-200 dark:border-border hover:bg-neutral-50 dark:hover:bg-muted/60"
                                         }`}
                                     >
                                         <span className="text-[11px] text-muted-foreground/50 block mb-1">
@@ -641,7 +641,7 @@ function DocumentEditor({
                     Back to workspace
                 </Link>
 
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start">
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
                 {/* Editor surface */}
                 <div className="flex-1 min-w-0 bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm px-8 py-10">
@@ -804,7 +804,7 @@ function DocumentEditor({
                 </div>
 
                 {/* AI panel surface */}
-                <div className="w-full lg:w-[380px] lg:shrink-0 bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm p-6 lg:sticky lg:top-6">
+                <div className="w-full lg:w-[380px] lg:shrink-0 bg-white dark:bg-card rounded-2xl border border-neutral-200 dark:border-border shadow-sm p-6 lg:sticky lg:top-8">
                     <div className="flex items-center gap-1.5 mb-5">
                         <Sparkles size={13} className="text-lume-amber" />
                         <p className="text-xs font-medium text-foreground">AI Assistant</p>
