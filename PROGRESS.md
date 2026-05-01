@@ -4,6 +4,38 @@
 
 ---
 
+## 2026-05-01
+
+### Dashboard motion refinements — orb, hover/tap interactions
+
+Added a Lume orb accent to the greeting and wired up Framer Motion hover/tap interactions across the dashboard. Entrance animation reverted to the slower, softer feel after the faster spec variant felt too quick.
+
+#### Lume orb
+
+- 32px amber gradient circle (`from-lume-gold to-lume-amber`) positioned above the greeting heading
+- Soft ambient glow via `shadow-[0_0_14px_rgba(247,201,72,0.45)]`, dimmed in dark mode
+- Scales from `0.75→1` on mount (0.4s, 0.1s delay); opacity rides the parent section's fade-in
+
+#### Hover / tap interactions
+
+- Recent page rows: `MotionLink` with `whileHover={{ y: -1 }}`
+- Workspace cards: `MotionLink` with `whileHover={{ y: -2 }}`; removed CSS `hover:-translate-y-px` since Framer now owns the transform
+- Quick action buttons: `motion.button` with `whileTap={{ scale: 0.98 }}`
+- All hover/tap motion skipped when `useReducedMotion()` is true
+- `MotionLink = motion(Link)` defined at module level (outside the component) to avoid recreation on every render
+
+#### Entrance animation
+
+- Reverted to slower feel after the faster spec variant (`y:8, 0.3s, stagger:0.06s`) felt too quick: back to `y:20, 1.0s, ease-out [0,0,0.58,1], stagger:0.22s`
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `app/(dashboard)/dashboard/page.tsx` | Lume orb, MotionLink hover/tap, entrance variant values |
+
+---
+
 ## 2026-04-29
 
 ### Motion polish — entrance animation and hover transitions

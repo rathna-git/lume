@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+const MotionLink = motion(Link)
+
 function getGreeting(): string {
     const hour = new Date().getHours()
     if (hour < 12) return "Good morning"
@@ -133,6 +135,7 @@ export default function HomePage() {
     const recentCount = recentDocs?.length ?? 0
 
     const shouldReduceMotion = useReducedMotion()
+    const ease = [0.22, 1, 0.36, 1] as const
     const container = {
         hidden: {},
         show: {
@@ -147,6 +150,10 @@ export default function HomePage() {
             transition: { duration: 1.0, ease: [0, 0, 0.58, 1] as const },
         },
     }
+    const hoverRow = shouldReduceMotion ? {} : { y: -1 }
+    const hoverCard = shouldReduceMotion ? {} : { y: -2 }
+    const tapButton = shouldReduceMotion ? {} : { scale: 0.98 }
+    const hoverTransition = { duration: 0.18, ease }
 
     return (
         <motion.div
@@ -157,6 +164,12 @@ export default function HomePage() {
         >
             {/* Greeting */}
             <motion.div className="mb-10" variants={item}>
+                <motion.div
+                    className="w-8 h-8 rounded-full bg-linear-to-br from-lume-gold to-lume-amber mb-4 shadow-[0_0_14px_rgba(247,201,72,0.45)] dark:shadow-[0_0_20px_rgba(247,201,72,0.25)]"
+                    initial={shouldReduceMotion ? {} : { scale: 0.75 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.4, delay: 0.1, ease }}
+                />
                 <h1 className="font-serif text-3xl text-foreground tracking-tight">
                     {getGreeting()}{firstName ? `, ${firstName}` : ""}
                 </h1>
@@ -208,10 +221,12 @@ export default function HomePage() {
                             {!loadingRecent && recentDocs && recentDocs.length > 0 && (
                                 <div className="divide-y divide-neutral-100 dark:divide-border/50">
                                     {recentDocs.map(doc => (
-                                        <Link
+                                        <MotionLink
                                             key={doc.id}
                                             href={`/workspaces/${doc.workspace.id}/documents/${doc.id}`}
                                             className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-muted/30 transition-colors duration-150"
+                                            whileHover={hoverRow}
+                                            transition={hoverTransition}
                                         >
                                             <FileText size={14} className="text-neutral-300 dark:text-muted-foreground/40 shrink-0" />
                                             <span className="flex-1 text-sm text-neutral-700 dark:text-foreground truncate min-w-0">
@@ -223,7 +238,7 @@ export default function HomePage() {
                                             <span className="text-xs text-neutral-300 dark:text-muted-foreground/40 shrink-0 ml-3 tabular-nums">
                                                 {relativeTime(doc.updatedAt)}
                                             </span>
-                                        </Link>
+                                        </MotionLink>
                                     ))}
                                 </div>
                             )}
@@ -236,24 +251,28 @@ export default function HomePage() {
                             Quick actions
                         </p>
                         <div className="flex flex-wrap gap-2">
-                            <button
+                            <motion.button
                                 onClick={() => setWorkspaceDialogOpen(true)}
                                 className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors duration-150"
+                                whileTap={tapButton}
+                                transition={hoverTransition}
                             >
                                 <Plus size={14} />
                                 New workspace
-                            </button>
+                            </motion.button>
                             {mostRecentWorkspace && (
-                                <button
+                                <motion.button
                                     onClick={handleNewPage}
                                     disabled={isCreatingDoc}
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    whileTap={tapButton}
+                                    transition={hoverTransition}
                                 >
                                     <Plus size={14} />
                                     {isCreatingDoc
                                         ? "Creating…"
                                         : `New page in ${mostRecentWorkspace.emoji ?? "📝"} ${mostRecentWorkspace.name}`}
-                                </button>
+                                </motion.button>
                             )}
                         </div>
                     </section>
@@ -283,10 +302,12 @@ export default function HomePage() {
                         {!loadingWorkspaces && workspaces && workspaces.length > 0 && (
                             <div className="space-y-2">
                                 {workspaces.map(ws => (
-                                    <Link
+                                    <MotionLink
                                         key={ws.id}
                                         href={`/workspaces/${ws.id}`}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-xl border border-neutral-200 dark:border-border bg-white dark:bg-card hover:bg-neutral-50 dark:hover:bg-muted/40 hover:border-neutral-300 dark:hover:border-border/80 hover:shadow-sm hover:-translate-y-px transition-all duration-150 ease-out"
+                                        className="flex items-center gap-3 px-4 py-3 rounded-xl border border-neutral-200 dark:border-border bg-white dark:bg-card hover:bg-neutral-50 dark:hover:bg-muted/40 hover:border-neutral-300 dark:hover:border-border/80 hover:shadow-sm transition-colors duration-150"
+                                        whileHover={hoverCard}
+                                        transition={hoverTransition}
                                     >
                                         <span className="text-xl leading-none shrink-0">{ws.emoji ?? "📝"}</span>
                                         <div className="min-w-0 flex-1">
@@ -297,7 +318,7 @@ export default function HomePage() {
                                                 {ws._count.documents} page{ws._count.documents !== 1 ? "s" : ""}
                                             </p>
                                         </div>
-                                    </Link>
+                                    </MotionLink>
                                 ))}
                             </div>
                         )}
