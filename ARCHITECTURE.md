@@ -271,6 +271,7 @@ User
   createdAt DateTime
   updatedAt DateTime
   └── Workspace[]
+  └── Document[]
 
 Workspace
   id          String
@@ -290,10 +291,20 @@ Document
   summary     String?        (Text)
   createdAt   DateTime
   updatedAt   DateTime
-  workspaceId String         → Workspace (cascade delete)    ← planned: make nullable for Inbox
+  userId      String         → User (cascade delete) — direct ownership; enables Inbox pages
+  workspaceId String?        → Workspace (cascade delete) — null = Inbox page
+  deletedAt   DateTime?      — soft-delete scaffold; no business logic until Phase 7 (Trash)
+  workspaceSuggestionDismissedAt     DateTime?   — set when user clicks "Keep in Inbox"
+  workspaceSuggestionLastTriggeredAt DateTime?   — timestamp of last suggestion API call
+  workspaceSuggestionContentHash     String?     — prevents re-trigger on same content
+  workspaceSuggestionWorkspaceId     String?     — last suggested workspace ID
+  workspaceSuggestionReason          String?     (Text) — last suggestion reason text
+  workspaceSuggestionConfidence      String?     — "high" | "low"
   ├── Tag[]                  (many-to-many)
   └── AiGeneration[]
+  @@index([userId])
   @@index([workspaceId])
+  @@index([userId, workspaceId])
 
 Tag
   id        String
@@ -319,51 +330,13 @@ AiGeneration
   @@index([status])
 ```
 
-### Planned Inbox Schema Change
+### Inbox ownership notes
 
-To support Inbox pages (pages without a workspace), `Document` needs direct user ownership:
-
-```
-Document (planned V1 Inbox change)
-  userId      String    → User   ← new: direct ownership for Inbox pages
-  workspaceId String?            ← change: make nullable (currently required)
-```
-
-**Full planned schema addition (Phase 1):**
-
-```
-Document (Phase 1 additions)
-  userId      String    → User (cascade delete)   ← new: direct ownership
-  workspaceId String?                              ← change: make nullable
-  deletedAt   DateTime?                            ← new: soft-delete scaffold for Trash (Phase 7; no business logic until then)
-
-  -- Workspace suggestion persistence --
-  workspaceSuggestionDismissedAt     DateTime?   ← set when user clicks "Keep in Inbox"
-  workspaceSuggestionLastTriggeredAt DateTime?   ← timestamp of last API call
-  workspaceSuggestionContentHash     String?     ← prevents re-trigger on same content
-  workspaceSuggestionWorkspaceId     String?     ← last suggested workspace ID
-  workspaceSuggestionReason          String?     ← last suggestion reason text
-  workspaceSuggestionConfidence      String?     ← "high" | "low"
-
-  @@index([userId])
-  @@index([userId, workspaceId])                 ← efficient Inbox + workspace queries
-```
-
-**User model addition (Phase 1):**
-```
-User
-  documents Document[]   ← new relation
-```
-
-**Migration steps:**
-1. Add `userId` column to `Document` as nullable first.
-2. Backfill: `document.userId = document.workspace.userId` for all existing rows.
-3. Check for orphaned documents (workspace deleted without cascade) before making `userId` NOT NULL — stop and report if any exist.
-4. Make `userId` NOT NULL; add FK.
-5. Make `workspaceId` optional (`String?`). Keep `onDelete: Cascade` — do NOT switch to `SetNull` (that would silently move pages to Inbox on workspace hard-delete; Trash behavior is handled in Phase 7).
-6. Add suggestion persistence fields and `deletedAt` (all nullable).
-7. Update ownership checks to validate `document.userId` directly (not via workspace join).
-8. Inbox queries filter by `document.userId = currentUser.id AND workspaceId IS NULL`.
+- `workspaceId: null` = Inbox page. `workspaceId` set = workspace page.
+- Ownership is validated via `document.userId` directly — no longer via workspace join.
+- `onDelete: Cascade` on the workspace FK is intentionally kept. Workspace hard-delete still removes its documents. Phase 7 (Trash) will replace this with soft-delete + `SetNull`.
+- Inbox queries: `WHERE userId = $currentUserId AND workspaceId IS NULL`
+- Migration `20260501231539_add_document_user_ownership` backfilled `userId` from `workspace.userId` for all pre-existing rows with an orphan safety check.
 
 ---
 
