@@ -4,6 +4,42 @@
 
 ---
 
+## 2026-05-01 (session 4)
+
+### Phase 1 — DB foundation for Inbox-first pages
+
+Schema + migration only. No UI, routing, or behavior changes.
+
+#### Migration: `20260501231539_add_document_user_ownership`
+
+**Document model changes:**
+- `userId String` — direct ownership FK → User (onDelete: Cascade)
+- `workspaceId String?` — now nullable (Inbox pages have no workspace)
+- `onDelete: Cascade` on workspace FK kept (Phase 7 Trash will replace with SetNull)
+- `deletedAt DateTime?` — soft-delete scaffold (no business logic until Phase 7)
+- `workspaceSuggestionDismissedAt DateTime?`
+- `workspaceSuggestionLastTriggeredAt DateTime?`
+- `workspaceSuggestionContentHash String?`
+- `workspaceSuggestionWorkspaceId String?`
+- `workspaceSuggestionReason String? @db.Text`
+- `workspaceSuggestionConfidence String?`
+- New indexes: `@@index([userId])`, `@@index([userId, workspaceId])`
+
+**User model changes:**
+- `documents Document[]` relation added
+
+**Migration strategy:**
+- Added `userId` as nullable first
+- Orphan check aborts if any documents reference a deleted workspace
+- Backfilled `userId` from `document.workspace.userId` for all 13 existing rows
+- Made `userId` NOT NULL after backfill
+- Made `workspaceId` nullable
+
+**Compile fixes:**
+- `app/api/documents/route.ts` — `prisma.document.create` now includes `userId: user.id`
+
+---
+
 ## 2026-05-01 (session 3)
 
 ### Phase 0 — Final Inbox-first implementation decisions documented

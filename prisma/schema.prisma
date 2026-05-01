@@ -35,6 +35,7 @@ model User {
   updatedAt  DateTime    @updatedAt
 
   workspaces Workspace[]
+  documents  Document[]
 }
 
 model Workspace {
@@ -61,13 +62,31 @@ model Document {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // TODO(Phase 7): switch to onDelete: SetNull once soft-delete/Trash is implemented.
+  // Cascade kept to preserve current behavior (workspace delete removes documents).
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Soft-delete scaffold — no business logic until Phase 7 (Trash).
+  deletedAt   DateTime?
+
+  // Smart Workspace Assignment persistence — populated by /api/ai/suggest-workspace.
+  workspaceSuggestionDismissedAt     DateTime?
+  workspaceSuggestionLastTriggeredAt DateTime?
+  workspaceSuggestionContentHash     String?
+  workspaceSuggestionWorkspaceId     String?
+  workspaceSuggestionReason          String?   @db.Text
+  workspaceSuggestionConfidence      String?
 
   tags          Tag[]           @relation("DocumentTags")
   aiGenerations AiGeneration[]
 
+  @@index([userId])
   @@index([workspaceId])
+  @@index([userId, workspaceId])
 }
 
 model Tag {

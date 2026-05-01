@@ -72,6 +72,7 @@ export async function POST(req: Request) {
         data: {
             title: parsed.data.title,
             content: "",
+            userId: user.id,
             workspaceId: parsed.data.workspaceId,
         },
         select: {
