@@ -36,6 +36,29 @@ Added a Lume orb accent to the greeting and wired up Framer Motion hover/tap int
 
 ---
 
+### Home dashboard — time-aware Lume orb
+
+The greeting orb now shifts gradient and glow based on the time of day. Shape, size, scale-in animation, and glow treatment are otherwise unchanged.
+
+| Period | Hours | Gradient | Glow |
+|---|---|---|---|
+| Morning | 5–12 | `lume-gold → lume-amber` (original brand) | warm amber |
+| Afternoon | 12–17 | `amber-400 → yellow-500` | gold |
+| Evening | 17–21 | `violet-400 → rose-300` | soft violet/pink |
+| Night | 21–5 | `indigo-500 → violet-500` | cool indigo |
+
+- `getTimeOfDay()` returns `"morning" | "afternoon" | "evening" | "night"` from the current hour
+- `orbConfig` maps each period to a Tailwind gradient class + box-shadow string
+- Orb `className` picks from `orbConfig[getTimeOfDay()]` at render time — no runtime side effects
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `app/(dashboard)/dashboard/page.tsx` | Time-aware orb gradient and glow via `getTimeOfDay()` + `orbConfig` |
+
+---
+
 ## 2026-04-29
 
 ### Motion polish — entrance animation and hover transitions

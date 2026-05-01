@@ -302,6 +302,7 @@ Key milestones shipped to date:
 - Home dashboard + IA cleanup — `GET /api/documents/recent` added (latest 5 docs with workspace info); `(dashboard)/dashboard/page.tsx` is the Home route at `/dashboard`; sidebar "Documents" nav removed, replaced with "Home" → `/dashboard`; `(dashboard)/page.tsx` is now a redirect; top new-doc button removed
 - Home dashboard polish — two-column layout (`max-w-5xl`), greeting subtitle, stats row (workspace + page counts from already-fetched data), recent pages in white bordered card with divider rows and skeleton loaders, workspaces as stacked cards with `_count.documents` page count, "New page in [emoji] [name]" quick action labeling; workspaces API updated to return `_count: { documents: true }`
 - Motion polish — Framer Motion v12 entrance animation on Home dashboard (stagger + expo-out, `useReducedMotion` respected); hover transitions on recent page rows, workspace cards, quick action buttons; sidebar nav `duration-150` transitions; superseded CSS animation classes removed from `globals.css`
+- Dashboard orb — 32px gradient circle above greeting, scale-in on mount, soft ambient glow; gradient and glow shift by time of day: morning (amber), afternoon (gold), evening (violet/rose), night (indigo); implemented via `getTimeOfDay()` + `orbConfig` in dashboard page
 
 ---
 

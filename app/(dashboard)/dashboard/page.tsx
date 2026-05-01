@@ -20,11 +20,40 @@ import { Input } from "@/components/ui/input"
 
 const MotionLink = motion(Link)
 
+type TimeOfDay = "morning" | "afternoon" | "evening" | "night"
+
+function getTimeOfDay(): TimeOfDay {
+    const hour = new Date().getHours()
+    if (hour >= 5 && hour < 12) return "morning"
+    if (hour >= 12 && hour < 17) return "afternoon"
+    if (hour >= 17 && hour < 21) return "evening"
+    return "night"
+}
+
 function getGreeting(): string {
     const hour = new Date().getHours()
     if (hour < 12) return "Good morning"
     if (hour < 17) return "Good afternoon"
     return "Good evening"
+}
+
+const orbConfig: Record<TimeOfDay, { gradient: string; shadow: string }> = {
+    morning: {
+        gradient: "bg-linear-to-br from-lume-gold to-lume-amber",
+        shadow: "shadow-[0_0_14px_rgba(247,201,72,0.45)] dark:shadow-[0_0_20px_rgba(247,201,72,0.25)]",
+    },
+    afternoon: {
+        gradient: "bg-linear-to-br from-amber-400 to-yellow-500",
+        shadow: "shadow-[0_0_14px_rgba(251,191,36,0.5)] dark:shadow-[0_0_20px_rgba(251,191,36,0.3)]",
+    },
+    evening: {
+        gradient: "bg-linear-to-br from-violet-400 to-rose-300",
+        shadow: "shadow-[0_0_14px_rgba(167,139,250,0.45)] dark:shadow-[0_0_20px_rgba(167,139,250,0.3)]",
+    },
+    night: {
+        gradient: "bg-linear-to-br from-indigo-500 to-violet-500",
+        shadow: "shadow-[0_0_14px_rgba(99,102,241,0.4)] dark:shadow-[0_0_20px_rgba(99,102,241,0.25)]",
+    },
 }
 
 function relativeTime(dateStr: string): string {
@@ -165,7 +194,7 @@ export default function HomePage() {
             {/* Greeting */}
             <motion.div className="mb-10" variants={item}>
                 <motion.div
-                    className="w-8 h-8 rounded-full bg-linear-to-br from-lume-gold to-lume-amber mb-4 shadow-[0_0_14px_rgba(247,201,72,0.45)] dark:shadow-[0_0_20px_rgba(247,201,72,0.25)]"
+                    className={`w-8 h-8 rounded-full mb-4 ${orbConfig[getTimeOfDay()].gradient} ${orbConfig[getTimeOfDay()].shadow}`}
                     initial={shouldReduceMotion ? {} : { scale: 0.75 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.4, delay: 0.1, ease }}
