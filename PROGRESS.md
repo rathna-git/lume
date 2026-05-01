@@ -6,6 +6,42 @@
 
 ## 2026-05-01
 
+### Home dashboard — IA redesign and quick actions cleanup
+
+Reworked the Home dashboard layout and page-creation flow to match the product model: pages always belong to a workspace, and the dashboard should not auto-create a page in an arbitrary workspace.
+
+#### Layout changes
+
+- Container widened from `max-w-5xl` to `max-w-6xl`
+- Left column (2/3): Recent Pages only — now the dominant, primary section
+- Right column (1/3): Quick Actions stacked above Workspaces
+- Stats row (workspace count + recent page count) removed
+
+#### Recent Pages row redesign
+
+- Workspace name now stacks directly below the page title instead of being pushed to the far right
+- Row height bumped to `py-3.5` for breathing room; icon and timestamp aligned to `mt-0.5`
+- Skeleton loaders updated to match the new two-line row shape
+
+#### Quick actions
+
+- Removed "New page in [emoji] [workspace]" — auto-picking the most recent workspace was confusing
+- Added "New page…" button that opens a workspace-picker dialog (`NewPageDialog`)
+- `NewPageDialog`: lists all workspaces with emoji, name, and page count; selecting one creates the document and navigates to the editor; shows a "Create a workspace first" empty state if none exist
+- "New workspace" button unchanged
+
+#### Other
+
+- Added inline TODO comment for future Inbox support (`nullable workspaceId` or system Inbox view)
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `app/(dashboard)/dashboard/page.tsx` | Layout, NewPageDialog, row redesign, stats row removed |
+
+---
+
 ### Dashboard motion refinements — orb, hover/tap interactions
 
 Added a Lume orb accent to the greeting and wired up Framer Motion hover/tap interactions across the dashboard. Entrance animation reverted to the slower, softer feel after the faster spec variant felt too quick.

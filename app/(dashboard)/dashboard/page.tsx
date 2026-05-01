@@ -7,7 +7,7 @@ import { motion, useReducedMotion } from "framer-motion"
 import { FileText, Plus, LayoutGrid } from "lucide-react"
 import { useUser } from "@clerk/nextjs"
 import { useRecentDocuments, useCreateDocument } from "@/hooks/use-documents"
-import { useWorkspaces, useCreateWorkspace } from "@/hooks/use-workspaces"
+import { useWorkspaces, useCreateWorkspace, type Workspace } from "@/hooks/use-workspaces"
 import {
     Dialog,
     DialogContent,
@@ -137,33 +137,77 @@ function CreateWorkspaceDialog({
     )
 }
 
-export default function HomePage() {
+function NewPageDialog({
+    open,
+    onOpenChange,
+    workspaces,
+}: {
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    workspaces: Workspace[]
+}) {
     const router = useRouter()
-    const { user, isLoaded: userLoaded } = useUser()
-    const { data: recentDocs, isLoading: loadingRecent } = useRecentDocuments()
-    const { data: workspaces, isLoading: loadingWorkspaces } = useWorkspaces()
-    const { mutate: createDocument, isPending: isCreatingDoc } = useCreateDocument()
-    const [workspaceDialogOpen, setWorkspaceDialogOpen] = useState(false)
+    const { mutate: createDocument, isPending } = useCreateDocument()
 
-    const firstName = user?.firstName || null
-    const mostRecentWorkspace = recentDocs?.[0]?.workspace ?? null
-
-    function handleNewPage() {
-        if (!mostRecentWorkspace) return
+    function handleSelect(workspaceId: string) {
         createDocument(
-            { workspaceId: mostRecentWorkspace.id },
+            { workspaceId },
             {
                 onSuccess: (doc) => {
-                    router.push(`/workspaces/${mostRecentWorkspace.id}/documents/${doc.id}`)
+                    onOpenChange(false)
+                    router.push(`/workspaces/${workspaceId}/documents/${doc.id}`)
                 },
             }
         )
     }
 
-    const workspaceCount = workspaces?.length ?? 0
-    const recentCount = recentDocs?.length ?? 0
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>New page</DialogTitle>
+                </DialogHeader>
+                {workspaces.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-4 text-center">
+                        No workspaces yet. Create a workspace first.
+                    </p>
+                ) : (
+                    <div className="mt-1 space-y-0.5">
+                        <p className="text-xs text-muted-foreground mb-3">Choose a workspace</p>
+                        {workspaces.map(ws => (
+                            <button
+                                key={ws.id}
+                                onClick={() => handleSelect(ws.id)}
+                                disabled={isPending}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span className="text-lg leading-none shrink-0">{ws.emoji ?? "📝"}</span>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-medium text-neutral-700 dark:text-foreground truncate">
+                                        {ws.name}
+                                    </p>
+                                    <p className="text-xs text-neutral-400 dark:text-muted-foreground mt-0.5">
+                                        {ws._count.documents} page{ws._count.documents !== 1 ? "s" : ""}
+                                    </p>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </DialogContent>
+        </Dialog>
+    )
+}
 
-    const shouldReduceMotion = useReducedMotion()
+export default function HomePage() {
+    const { user, isLoaded: userLoaded } = useUser()
+    const { data: recentDocs, isLoading: loadingRecent } = useRecentDocuments()
+    const { data: workspaces, isLoading: loadingWorkspaces } = useWorkspaces()
+    const [workspaceDialogOpen, setWorkspaceDialogOpen] = useState(false)
+    const [newPageDialogOpen, setNewPageDialogOpen] = useState(false)
+
+    const firstName = user?.firstName || null
+const shouldReduceMotion = useReducedMotion()
     const ease = [0.22, 1, 0.36, 1] as const
     const container = {
         hidden: {},
@@ -186,7 +230,7 @@ export default function HomePage() {
 
     return (
         <motion.div
-            className="max-w-5xl mx-auto px-8 py-12"
+            className="max-w-6xl mx-auto px-8 py-12"
             variants={container}
             initial="hidden"
             animate={userLoaded ? "show" : "hidden"}
@@ -207,22 +251,9 @@ export default function HomePage() {
                 </p>
             </motion.div>
 
-            {/* Stats row */}
-            {!loadingWorkspaces && !loadingRecent && (workspaceCount > 0 || recentCount > 0) && (
-                <motion.div className="flex items-center gap-5 mb-8 text-xs text-neutral-400 dark:text-muted-foreground/60" variants={item}>
-                    {workspaceCount > 0 && (
-                        <span>{workspaceCount} workspace{workspaceCount !== 1 ? "s" : ""}</span>
-                    )}
-                    {recentCount > 0 && (
-                        <span>{recentCount} recent page{recentCount !== 1 ? "s" : ""}</span>
-                    )}
-                </motion.div>
-            )}
-
-            <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-6" variants={item}>
-                {/* Left column: Recent pages + Quick actions */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Recent pages card */}
+<motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-6" variants={item}>
+                {/* Left column: Recent pages */}
+                <div className="lg:col-span-2">
                     <section>
                         <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 dark:text-muted-foreground/50 mb-3">
                             Recent pages
@@ -231,16 +262,19 @@ export default function HomePage() {
                             {loadingRecent && (
                                 <div className="divide-y divide-neutral-100 dark:divide-border/50">
                                     {[1, 2, 3].map(i => (
-                                        <div key={i} className="px-4 py-3 flex items-center gap-3">
-                                            <div className="w-4 h-4 rounded bg-neutral-100 dark:bg-muted/60 animate-pulse shrink-0" />
-                                            <div className="flex-1 h-3.5 rounded bg-neutral-100 dark:bg-muted/60 animate-pulse" />
-                                            <div className="w-20 h-3 rounded bg-neutral-100 dark:bg-muted/60 animate-pulse shrink-0" />
+                                        <div key={i} className="px-4 py-3.5 flex items-start gap-3">
+                                            <div className="w-4 h-4 rounded bg-neutral-100 dark:bg-muted/60 animate-pulse shrink-0 mt-0.5" />
+                                            <div className="flex-1 space-y-1.5">
+                                                <div className="h-3.5 rounded bg-neutral-100 dark:bg-muted/60 animate-pulse w-3/4" />
+                                                <div className="h-3 rounded bg-neutral-100 dark:bg-muted/60 animate-pulse w-1/3" />
+                                            </div>
+                                            <div className="w-12 h-3 rounded bg-neutral-100 dark:bg-muted/60 animate-pulse shrink-0 mt-0.5" />
                                         </div>
                                     ))}
                                 </div>
                             )}
                             {!loadingRecent && (!recentDocs || recentDocs.length === 0) && (
-                                <div className="px-4 py-8 text-center">
+                                <div className="px-4 py-10 text-center">
                                     <FileText size={24} className="mx-auto mb-2 text-neutral-200 dark:text-muted-foreground/20" />
                                     <p className="text-sm text-neutral-400 dark:text-muted-foreground">
                                         No pages yet. Create your first page inside a workspace.
@@ -253,18 +287,20 @@ export default function HomePage() {
                                         <MotionLink
                                             key={doc.id}
                                             href={`/workspaces/${doc.workspace.id}/documents/${doc.id}`}
-                                            className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-muted/30 transition-colors duration-150"
+                                            className="flex items-start gap-3 px-4 py-3.5 hover:bg-neutral-50 dark:hover:bg-muted/30 transition-colors duration-150"
                                             whileHover={hoverRow}
                                             transition={hoverTransition}
                                         >
-                                            <FileText size={14} className="text-neutral-300 dark:text-muted-foreground/40 shrink-0" />
-                                            <span className="flex-1 text-sm text-neutral-700 dark:text-foreground truncate min-w-0">
-                                                {doc.title || "Untitled"}
-                                            </span>
-                                            <span className="text-xs text-neutral-400 dark:text-muted-foreground/60 shrink-0 ml-2">
-                                                {doc.workspace.emoji ?? "📝"}&nbsp;{doc.workspace.name}
-                                            </span>
-                                            <span className="text-xs text-neutral-300 dark:text-muted-foreground/40 shrink-0 ml-3 tabular-nums">
+                                            <FileText size={14} className="text-neutral-300 dark:text-muted-foreground/40 shrink-0 mt-0.5" />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm text-neutral-700 dark:text-foreground truncate">
+                                                    {doc.title || "Untitled"}
+                                                </p>
+                                                <p className="text-xs text-neutral-400 dark:text-muted-foreground mt-0.5 truncate">
+                                                    {doc.workspace.emoji ?? "📝"} {doc.workspace.name}
+                                                </p>
+                                            </div>
+                                            <span className="text-xs text-neutral-300 dark:text-muted-foreground/40 shrink-0 tabular-nums mt-0.5">
                                                 {relativeTime(doc.updatedAt)}
                                             </span>
                                         </MotionLink>
@@ -273,42 +309,39 @@ export default function HomePage() {
                             )}
                         </div>
                     </section>
+                </div>
 
+                {/* Right column: Quick actions + Workspaces */}
+                <div className="lg:col-span-1 space-y-6">
                     {/* Quick actions */}
+                    {/* Future: support Inbox pages with nullable workspaceId or a system Inbox view */}
                     <section>
                         <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 dark:text-muted-foreground/50 mb-3">
                             Quick actions
                         </p>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="space-y-2">
                             <motion.button
                                 onClick={() => setWorkspaceDialogOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors duration-150"
+                                className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors duration-150"
                                 whileTap={tapButton}
                                 transition={hoverTransition}
                             >
                                 <Plus size={14} />
                                 New workspace
                             </motion.button>
-                            {mostRecentWorkspace && (
-                                <motion.button
-                                    onClick={handleNewPage}
-                                    disabled={isCreatingDoc}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    whileTap={tapButton}
-                                    transition={hoverTransition}
-                                >
-                                    <Plus size={14} />
-                                    {isCreatingDoc
-                                        ? "Creating…"
-                                        : `New page in ${mostRecentWorkspace.emoji ?? "📝"} ${mostRecentWorkspace.name}`}
-                                </motion.button>
-                            )}
+                            <motion.button
+                                onClick={() => setNewPageDialogOpen(true)}
+                                className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-200 dark:border-border bg-white dark:bg-card text-sm text-neutral-600 dark:text-muted-foreground hover:text-neutral-900 dark:hover:text-foreground hover:bg-neutral-50 dark:hover:bg-muted/40 transition-colors duration-150"
+                                whileTap={tapButton}
+                                transition={hoverTransition}
+                            >
+                                <Plus size={14} />
+                                New page…
+                            </motion.button>
                         </div>
                     </section>
-                </div>
 
-                {/* Right column: Workspaces */}
-                <div className="lg:col-span-1">
+                    {/* Workspaces */}
                     <section>
                         <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 dark:text-muted-foreground/50 mb-3">
                             Workspaces
@@ -356,6 +389,11 @@ export default function HomePage() {
             </motion.div>
 
             <CreateWorkspaceDialog open={workspaceDialogOpen} onOpenChange={setWorkspaceDialogOpen} />
+            <NewPageDialog
+                open={newPageDialogOpen}
+                onOpenChange={setNewPageDialogOpen}
+                workspaces={workspaces ?? []}
+            />
         </motion.div>
     )
 }
