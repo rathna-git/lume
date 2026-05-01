@@ -131,6 +131,32 @@ Keep writing, or choose a workspace manually.
 - Action: Choose a different workspace
 - Action: Keep in Inbox / Dismiss
 
+**Auto-trigger rules:**
+
+| Rule | Decision |
+| ---- | -------- |
+| Minimum content | 300 plain-text characters |
+| Typing pause | 5 seconds of no typing before the suggestion fires |
+| Re-trigger on same content hash | No — once triggered for a given content hash, do not call the API again unless content changes meaningfully |
+| Re-trigger after dismissal | No — suppressed after user clicks "Keep in Inbox" unless they explicitly click "Organize with AI" (passes `force: true`) |
+| Workspace-created pages | Never auto-triggered — user already chose the workspace |
+
+**Suggestion API input shape:**
+
+The suggestion API fetches document content **server-side** from the database. Clients must not supply content in the request body.
+
+```ts
+POST /api/ai/suggest-workspace
+{ documentId: string, force?: boolean }
+```
+
+- `force: true` — used when the user manually clicks "Organize with AI" after a previous dismissal; bypasses the `DismissedAt` guard.
+- Without `force`, the API returns early without calling OpenAI if `workspaceSuggestionDismissedAt` is set.
+
+**Suggestion persistence (DB, not localStorage):**
+
+Suggestion state is persisted in the database on the `Document` model. This ensures dismissal survives page reloads, browser clears, and device changes. Fields are listed in the Planned Schema Change section below.
+
 ---
 
 ## AI Explanation (V1)
@@ -303,12 +329,41 @@ Document (planned V1 Inbox change)
   workspaceId String?            ← change: make nullable (currently required)
 ```
 
+**Full planned schema addition (Phase 1):**
+
+```
+Document (Phase 1 additions)
+  userId      String    → User (cascade delete)   ← new: direct ownership
+  workspaceId String?                              ← change: make nullable
+  deletedAt   DateTime?                            ← new: soft-delete scaffold for Trash (Phase 7; no business logic until then)
+
+  -- Workspace suggestion persistence --
+  workspaceSuggestionDismissedAt     DateTime?   ← set when user clicks "Keep in Inbox"
+  workspaceSuggestionLastTriggeredAt DateTime?   ← timestamp of last API call
+  workspaceSuggestionContentHash     String?     ← prevents re-trigger on same content
+  workspaceSuggestionWorkspaceId     String?     ← last suggested workspace ID
+  workspaceSuggestionReason          String?     ← last suggestion reason text
+  workspaceSuggestionConfidence      String?     ← "high" | "low"
+
+  @@index([userId])
+  @@index([userId, workspaceId])                 ← efficient Inbox + workspace queries
+```
+
+**User model addition (Phase 1):**
+```
+User
+  documents Document[]   ← new relation
+```
+
 **Migration steps:**
-1. Add `userId` column to `Document` — backfill via `document.workspace.userId`.
-2. Make `workspaceId` optional (`String?`).
-3. Update ownership checks to validate `document.userId` directly (not via workspace join).
-4. Workspace-scoped queries still filter by workspace ownership as before.
-5. Inbox queries filter by `document.userId = currentUser.id AND workspaceId IS NULL`.
+1. Add `userId` column to `Document` as nullable first.
+2. Backfill: `document.userId = document.workspace.userId` for all existing rows.
+3. Check for orphaned documents (workspace deleted without cascade) before making `userId` NOT NULL — stop and report if any exist.
+4. Make `userId` NOT NULL; add FK.
+5. Make `workspaceId` optional (`String?`). Keep `onDelete: Cascade` — do NOT switch to `SetNull` (that would silently move pages to Inbox on workspace hard-delete; Trash behavior is handled in Phase 7).
+6. Add suggestion persistence fields and `deletedAt` (all nullable).
+7. Update ownership checks to validate `document.userId` directly (not via workspace join).
+8. Inbox queries filter by `document.userId = currentUser.id AND workspaceId IS NULL`.
 
 ---
 
@@ -353,11 +408,46 @@ Document (planned V1 Inbox change)
 | `GET /api/documents/[id]/generations`   | API            | Fetch saved AI generations for a document, newest first                                                                            |
 | `GET /api/documents/recent`             | API            | Latest 5 documents across all user workspaces, ordered by `updatedAt DESC`; includes `workspace.id/name/emoji`; ownership enforced |
 
-**Planned route (V1 Inbox):**
+**Planned routes (V1 Inbox — Phases 1–6):**
 
-| Route               | Type           | Description |
-| ------------------- | -------------- | ----------- |
-| `/pages/[documentId]` | Protected page | Canonical editor route — works for both Inbox pages and workspace pages. Current `/workspaces/[id]/documents/[id]` route can redirect here or be deprecated. All page links (workspace detail, sidebar, Recent Pages) should point to `/pages/[documentId]`. |
+| Route | Type | Phase | Description |
+| ----- | ---- | ----- | ----------- |
+| `/pages/[documentId]` | Protected page | 3 | Canonical editor route — works for Inbox pages and workspace pages. Old `/workspaces/[id]/documents/[id]` redirects here. All links (workspace detail, sidebar, Recent Pages) should point here. |
+| `/inbox` | Protected page | 4 | Lists all unorganized pages (`workspaceId: null`) for the current user |
+| `GET /api/documents` (no params) | API | 2 | All documents owned by current user — workspace pages and Inbox pages |
+| `GET /api/documents?scope=inbox` | API | 2 | Inbox documents only (`workspaceId IS NULL`) |
+| `PATCH /api/documents/[id]/move` | API | 2 | Dedicated move route — `{ workspaceId: string \| null }`; `null` moves back to Inbox |
+| `POST /api/ai/suggest-workspace` | API | 6 | Server-side workspace suggestion — input: `{ documentId, force? }`; content fetched server-side |
+| `/trash` | Protected page | 7 | Lists soft-deleted pages (Phase 7) |
+
+---
+
+## Document Listing API Semantics
+
+`GET /api/documents` supports three distinct query modes (Phase 2):
+
+| Query | Behavior | Auth check |
+| ----- | -------- | ---------- |
+| `GET /api/documents` | All documents owned by current user — workspace pages **and** Inbox pages | `document.userId = currentUser.id` |
+| `GET /api/documents?workspaceId=abc` | Documents in that workspace only | Verify workspace belongs to current user |
+| `GET /api/documents?scope=inbox` | Inbox documents only (`workspaceId IS NULL`) | `document.userId = currentUser.id` |
+| `GET /api/documents/recent` | Latest 5 documents — workspace pages and Inbox pages, ordered by `updatedAt DESC` | `document.userId = currentUser.id` |
+
+For `recent`, the response includes `workspace: { id, name, emoji } | null`. When `workspace` is `null`, the page is an Inbox page — the UI displays "Inbox" as the workspace label.
+
+**Move route:**
+
+`PATCH /api/documents/[id]` (general update) does **not** accept `workspaceId`. Moving a document between Inbox and workspaces requires the dedicated route:
+
+```
+PATCH /api/documents/[documentId]/move
+Body: { workspaceId: string | null }
+```
+
+- `workspaceId: string` — move to a workspace (verify target workspace belongs to user)
+- `workspaceId: null` — move back to Inbox
+
+After a successful move, suggestion state fields are cleared: `workspaceSuggestionWorkspaceId`, `workspaceSuggestionReason`, `workspaceSuggestionConfidence`, `workspaceSuggestionContentHash`.
 
 ---
 
@@ -422,6 +512,9 @@ _(none — all planned items shipped)_
 | OpenAI system message for consistent Markdown output                             | Without a system message, GPT-4o mirrors input style — plain prose input (from `textBetween` after a "Replace content") returns plain prose output. System message overrides this and ensures every generation is Markdown-formatted for `marked.parse()`                                                 | Applies to all three actions and all generations including regenerations; keeps user-facing prompts clean                                                                                 |
 | `resultCollapsed` collapses the full result body, not just the markdown          | Collapsing only the markdown area would leave orphaned action buttons with no visible content above them — confusing UX. Collapsing the entire body (pending/empty/markdown/buttons/history) keeps the panel clean and predictable when minimised                                                         | The section header (label + Regenerate/Back to latest + chevron) always stays visible so the user knows which action is selected                                                          |
 | `isAlreadyApplied` disables only "Replace content", not "Insert at cursor"       | Replace is a terminal state — the result IS the document, re-applying is a no-op. Insert at cursor is additive — users may want multiple insertions at different cursor positions, so it stays enabled. `isAlreadyApplied = displayed.id === replacedGenerationId`; derived inline, no new state or props | "Copy" also stays enabled; helper text below buttons explains the disabled state to users                                                                                                 |
+| Move route separated from general PATCH | `workspaceId` changes carry different auth requirements (must verify target workspace ownership) and require broader cache invalidation than title/content updates. Keeping PATCH for title/content only makes both surfaces simpler and harder to misuse. | Adds a dedicated endpoint; clients must call the correct route for moves |
+| Suggestion dismissal persisted in DB, not localStorage | localStorage is device-local and doesn't survive storage clears. DB persistence means "Keep in Inbox" is respected across sessions, browsers, and devices. | Adds 6 fields to `Document`; every dismiss action requires an API call |
+| AI suggestion fetches content server-side by `documentId` | Prevents a client from supplying arbitrary content to get a workspace suggestion for a document it doesn't own. Tying the suggestion to a `documentId` enforces ownership at the API layer. | Cannot generate speculative suggestions before content is saved; `force: true` allows re-suggestion after dismissal |
 | OpenAI timeout set to 15s                                                        | Vercel serverless functions have a max execution time; a hung OpenAI call would silently consume it. 15s is tight enough to fail fast without cutting off normal generations (~3–8s). Timeout errors surface a distinct user message ("AI took too long to respond") rather than the generic failure copy | Aggressive timeout may occasionally reject slow-but-valid responses; can be raised if needed                                                                                              |
 | Slash command event bus instead of separate React root                           | Creating a `createRoot` inside a Tiptap extension render callback is fragile (async mount, separate React tree, no access to parent context). An event bus (`onSlashEvent`) lets the extension emit open/update/close signals that a normal React component subscribes to via `useEffect`                 | Global singleton callback — only one editor instance can use slash commands at a time; sufficient for single-document editing                                                             |
 | `@tiptap/extension-placeholder` for empty editor hint                            | CSS-only `.is-editor-empty` placeholder was unreliable — Tiptap v3 applies the class on the `<p>` element, not `ProseMirror`. The official Placeholder extension adds `data-placeholder` attribute reliably                                                                                               | Extra dependency; CSS targets `p.is-editor-empty:first-child::before` with `content: attr(data-placeholder)`; a second React-rendered helper line below the editor uses `editor?.isEmpty` |
@@ -444,15 +537,18 @@ _(none — all planned items shipped)_
 
 ## Roadmap Priority
 
-### V1
-- Inbox pages (Home "New page" → Inbox, no picker).
-- Prisma schema change: add `userId`, make `workspaceId` nullable.
-- Canonical `/pages/[documentId]` editor route.
-- Inbox UI + Recent Pages includes Inbox pages.
-- Manual move-to-workspace + choose workspace + keep in Inbox / dismiss.
-- Basic bulk move of Inbox pages to a workspace.
-- AI workspace suggestion for Inbox pages (with explanation).
-- Drag page into workspace (V1 polish, non-blocking).
+### V1 — Implementation Phases
+
+| Phase | Scope |
+| ----- | ----- |
+| **0** | Documentation — lock final product decisions (this pass) |
+| **1** | Database foundation — `Document.userId`, nullable `workspaceId`, suggestion fields, `deletedAt` scaffold, migration |
+| **2** | Document APIs + ownership — updated list/create/recent semantics, `userId` ownership checks, dedicated move route |
+| **3** | Canonical editor route — `/pages/[documentId]`, redirect old route, update all links |
+| **4** | Inbox UI — Home "New page" → Inbox, Inbox nav/page, Recent Pages "Inbox" label |
+| **5** | Manual organization UI — Move to workspace, Choose workspace, Keep in Inbox (DB-persisted dismiss) |
+| **6** | Smart Workspace Assignment — server-side suggestion API, 300 char + 5s hook, suggestion card, AI explanation |
+| **7** | Trash / soft delete — soft-delete model, Trash page, workspace delete → Trash, 30-day cleanup |
 
 ### V1.1 / Post-MVP
 - Smarter AI confidence scoring over time.
@@ -544,6 +640,20 @@ The V1 direction now includes Inbox, smart workspace assignment, AI explanation,
 - [ ] Drag page into workspace (include if feasible; must not block core V1)
 - [ ] Breadcrumbs — `Home / Inbox / [title]` and `Home / Workspaces / [workspace] / [title]`
 - [ ] Improved empty states for Inbox and workspace views
+
+**Phase 7 — Trash / Soft Delete** _(separate phase; does not block Phases 1–6)_
+- [ ] `Document.deletedAt DateTime?` — field added in Phase 1 migration; business logic added here
+- [ ] `Workspace.deletedAt DateTime?` — add to Workspace model
+- [ ] Workspace DELETE → soft-delete workspace + soft-delete its documents
+- [ ] Document DELETE → soft-delete document
+- [ ] Add `deletedAt: null` filter to all document and workspace queries
+- [ ] Trash page at `/trash` — list soft-deleted pages; Restore + Delete permanently actions
+- [ ] Enable Trash nav item in sidebar
+- [ ] Update workspace delete dialog: "This workspace and its pages will be moved to Trash."
+- [ ] Scheduled cleanup — hard-delete documents with `deletedAt` > 30 days (Vercel Cron or equivalent)
+- [ ] Restore logic: if original workspace was also deleted, restore to Inbox (`workspaceId: null`) rather than a deleted workspace
+
+> **Note:** Until Phase 7 ships, workspace deletion still permanently deletes all documents (current Cascade behavior). The workspace delete dialog copy must be updated when Phase 7 ships.
 
 ---
 

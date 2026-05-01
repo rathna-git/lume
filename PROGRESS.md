@@ -4,6 +4,63 @@
 
 ---
 
+## 2026-05-01 (session 3)
+
+### Phase 0 — Final Inbox-first implementation decisions documented
+
+Documentation-only pass. No code, schema, or migration changes.
+
+#### What was locked in
+
+**Inbox model confirmed:**
+- Inbox pages = `workspaceId: null`; internal model stays `Document`; UI says "Page"
+- Home "New page" creates Inbox page; workspace/sidebar "New page" creates inside that workspace
+- Smart Workspace Assignment auto-triggers only for Inbox pages
+
+**Document listing API semantics finalized:**
+- `GET /api/documents` (no params) → all user documents (workspace + Inbox)
+- `GET /api/documents?workspaceId=abc` → workspace documents
+- `GET /api/documents?scope=inbox` → Inbox documents only
+- `GET /api/documents/recent` → cross-workspace + Inbox; `workspace: null` for Inbox pages
+
+**Move route separated from general PATCH:**
+- `PATCH /api/documents/[id]` does not accept `workspaceId`
+- Dedicated `PATCH /api/documents/[id]/move` with `{ workspaceId: string | null }`
+
+**AI suggestion API shape:**
+- Input: `{ documentId: string, force?: boolean }` — content fetched server-side
+- Auto-trigger: Inbox only, ≥ 300 chars plain text, 5s no-typing pause, no re-trigger on same hash, no re-trigger after dismiss unless `force: true`
+
+**Suggestion persistence in DB:**
+- Dismissal persisted on `Document` (not localStorage); 6 fields added in Phase 1 migration
+
+**Trash is Phase 7, not V1 foundation:**
+- Workspace deletion still permanently deletes documents until Phase 7 ships
+- `Document.deletedAt` added as a scaffold in Phase 1; business logic waits for Phase 7
+
+**Implementation phases 0–7 locked in Roadmap Priority table**
+
+#### Sections added or updated in ARCHITECTURE.md
+
+| Section | Change |
+|---|---|
+| Smart Workspace Assignment | Added auto-trigger rules table, API input shape, DB persistence note |
+| Planned Inbox Schema Change | Expanded with suggestion fields, `deletedAt` scaffold, full field list |
+| Route Map — Planned routes | Added Phase 2+ planned routes with phase numbers |
+| Document Listing API Semantics | New section — three query modes + move route semantics |
+| Key Decisions & Tradeoffs | Added 3 rows: move route, DB persistence, server-side content |
+| V1 Expanded Scope | Added Phase 7 Trash checklist (separate, non-blocking) |
+| Roadmap Priority | Replaced bullet list with Phase 0–7 table |
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `ARCHITECTURE.md` | All sections above |
+| `PROGRESS.md` | This entry |
+
+---
+
 ## 2026-05-01 (session 2)
 
 ### Auth redirect — sign-in now lands on Home dashboard
