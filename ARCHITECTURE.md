@@ -8,19 +8,147 @@
 
 ## Stack
 
-| Layer            | Technology                         |
-| ---------------- | ---------------------------------- |
-| Framework        | Next.js 16, App Router, TypeScript |
-| Styling          | Tailwind CSS v4, shadcn/ui         |
+| Layer            | Technology                              |
+| ---------------- | --------------------------------------- |
+| Framework        | Next.js 16, App Router, TypeScript      |
+| Styling          | Tailwind CSS v4, shadcn/ui              |
 | Theming          | next-themes (class-based, dark default) |
-| Auth             | Clerk                              |
-| Database         | PostgreSQL + Prisma v6             |
-| Server state     | TanStack Query v5                  |
-| Validation       | Zod                                |
-| Rich text editor | Tiptap v3 (ProseMirror)            |
-| Motion           | Framer Motion v12                  |
-| AI               | OpenAI (GPT-4o)                    |
-| Package manager  | pnpm                               |
+| Auth             | Clerk                                   |
+| Database         | PostgreSQL + Prisma v6                  |
+| Server state     | TanStack Query v5                       |
+| Validation       | Zod                                     |
+| Rich text editor | Tiptap v3 (ProseMirror)                 |
+| Motion           | Framer Motion v12                       |
+| AI               | OpenAI (GPT-4o)                         |
+| Package manager  | pnpm                                    |
+
+---
+
+## Product Model
+
+**Core principle: "Write first. Lume helps organize later."**
+
+The Lume mental model, from the user's perspective:
+
+| Concept         | Description |
+| --------------- | ----------- |
+| Home            | The signed-in starting point — Recent Pages, Quick Actions, and Workspaces |
+| Inbox           | Unorganized pages with no workspace yet — the default destination for pages created from Home |
+| Workspace       | An organized collection of pages (e.g. "React", "Design Notes") |
+| Page            | A single writing surface — belongs to a workspace, or lives in Inbox with no workspace |
+| Recent Pages    | A cross-workspace/Inbox view of the 5 most recently edited pages |
+| Document editor | The writing surface for a single page (Tiptap rich text) |
+| AI panel        | Transforms, summarizes, rewrites, and helps organize pages |
+
+**Language note:**
+- User-facing copy uses **Page** (singular), **Pages** (plural).
+- Internal model and API continue using **Document** — Prisma model, route params, hooks, DB column names.
+- Do not rename the Prisma `Document` model now; the distinction is presentation-only.
+
+---
+
+## V1 Workflow
+
+### A. New page from Home
+
+1. User clicks "New page" on the Home dashboard.
+2. Lume creates a blank Inbox page (`workspaceId: null`).
+3. Page opens in the editor. Breadcrumb: `Home / Inbox / Untitled page`
+4. After the user writes meaningful content, Lume may suggest a workspace.
+
+### B. New page from inside a workspace
+
+1. User navigates to a workspace and clicks "+ New page".
+2. Page is created directly inside that workspace. No AI workspace suggestion triggered.
+3. Breadcrumb: `Home / Workspaces / [Workspace name] / [Page title]`
+
+### C. New page from the sidebar workspace tree
+
+1. User clicks "+ New page" under a workspace in the sidebar.
+2. Page is created directly inside that workspace. No AI workspace suggestion triggered.
+
+### D. Manual organization
+
+- User can move any Inbox page into a workspace manually at any time.
+- User can choose a different workspace than the AI suggestion.
+- User can keep a page in Inbox and dismiss a suggestion.
+- These actions are always available on Inbox pages regardless of AI confidence.
+
+### E. Basic bulk organization (V1)
+
+- User can select multiple Inbox pages and move them to a workspace.
+- Keep this simple — no complex rules engine required.
+- Applies to Inbox pages only; workspace pages can be moved individually.
+
+### F. Drag organization (V1 polish)
+
+- V1 should support dragging a page into a workspace if feasible within scope.
+- Drag-and-drop must not block the core Inbox + move-to-workspace + AI suggestion flow.
+- If implementation becomes risky, treat as V1 polish, not a blocker for V1 shipping.
+
+---
+
+## Smart Workspace Assignment
+
+AI-powered workspace suggestion applies **only** to unorganized (Inbox) pages by default. It must **not** fire automatically for pages the user intentionally created inside a workspace.
+
+**When to trigger:**
+
+| Condition | Trigger? |
+| --------- | -------- |
+| Page created from Home (goes to Inbox) | Yes — after meaningful content is written |
+| Page imported from a URL | Yes |
+| User manually clicks "Organize with AI" | Yes |
+| Page created inside a workspace | No — assume intentional choice |
+| Page created from sidebar workspace tree | No — assume intentional choice |
+| Content/workspace mismatch (V1 if simple) | Only if user clicks "Organize with AI" |
+
+**For workspace-created pages:** Assume the user intentionally chose the workspace. Only suggest moving if the user explicitly clicks "Organize with AI." Do not trigger automatically.
+
+**High-confidence suggestion UX:**
+
+```
+Currently in Inbox
+
+Lume suggests moving this to React
+Based on: React components, hooks, frontend state
+"Suggested React because this page mentions components, hooks, and event handlers."
+
+[Move to React]  [Choose another]  [Keep in Inbox]
+```
+
+**Low-confidence UX:**
+
+```
+Lume couldn't confidently place this yet.
+Keep writing, or choose a workspace manually.
+```
+
+**Suggestion card elements:**
+- Suggested workspace name
+- Short, user-readable AI explanation (not raw scoring)
+- Action: Move to suggested workspace
+- Action: Choose a different workspace
+- Action: Keep in Inbox / Dismiss
+
+---
+
+## AI Explanation (V1)
+
+AI workspace suggestions include a short, user-readable explanation. This is part of V1 scope.
+
+**Format:**
+- One sentence, plain language, no raw scoring or technical details.
+- Identifies the key signals that drove the suggestion.
+
+**Example:**
+> "Suggested React because this page mentions components, hooks, and event handlers."
+
+**Rules:**
+- Always show alongside the workspace suggestion — do not hide it behind a toggle in V1.
+- Keep it under ~15 words.
+- Do not expose confidence scores, prompt text, or embedding distances to the user.
+- If low confidence, show the low-confidence UX instead of forcing an explanation.
 
 ---
 
@@ -136,7 +264,7 @@ Document
   summary     String?        (Text)
   createdAt   DateTime
   updatedAt   DateTime
-  workspaceId String         → Workspace (cascade delete)
+  workspaceId String         → Workspace (cascade delete)    ← planned: make nullable for Inbox
   ├── Tag[]                  (many-to-many)
   └── AiGeneration[]
   @@index([workspaceId])
@@ -165,6 +293,23 @@ AiGeneration
   @@index([status])
 ```
 
+### Planned Inbox Schema Change
+
+To support Inbox pages (pages without a workspace), `Document` needs direct user ownership:
+
+```
+Document (planned V1 Inbox change)
+  userId      String    → User   ← new: direct ownership for Inbox pages
+  workspaceId String?            ← change: make nullable (currently required)
+```
+
+**Migration steps:**
+1. Add `userId` column to `Document` — backfill via `document.workspace.userId`.
+2. Make `workspaceId` optional (`String?`).
+3. Update ownership checks to validate `document.userId` directly (not via workspace join).
+4. Workspace-scoped queries still filter by workspace ownership as before.
+5. Inbox queries filter by `document.userId = currentUser.id AND workspaceId IS NULL`.
+
 ---
 
 ## Type & State Ownership
@@ -189,24 +334,30 @@ AiGeneration
 
 ## Route Map
 
-| Route                                   | Type           | Description                                                                    |
-| --------------------------------------- | -------------- | ------------------------------------------------------------------------------ |
-| `/`                                     | Public page    | Landing page (unauthenticated); redirects to `/dashboard` when authenticated              |
-| `/dashboard`                            | Protected page | Home dashboard — greeting, recent pages, workspaces, quick actions                       |
-| `/sign-in`                              | Auth page      | Clerk sign-in                                                                  |
-| `/sign-up`                              | Auth page      | Clerk sign-up                                                                  |
-| `/workspaces`                           | Protected page | Workspace list                                                                 |
-| `/workspaces/[id]`                      | Protected page | Workspace + document list                                                      |
-| `/workspaces/[id]/documents/[id]`       | Protected page | Document editor                                                                |
-| `/settings`                             | Protected page | User settings                                                                  |
-| `POST /api/webhooks/clerk`              | API            | Sync Clerk user to DB _(not implemented — server-side bootstrap used instead)_ |
-| `GET/POST /api/workspaces`              | API            | List / create workspaces                                                       |
-| `GET/PATCH/DELETE /api/workspaces/[id]` | API            | Single workspace                                                               |
-| `GET/POST /api/documents`               | API            | List (includes `content` for card previews) / create documents                 |
-| `GET/PATCH/DELETE /api/documents/[id]`  | API            | Single document                                                                |
-| `POST /api/ai/generate`                 | API            | AI content actions                                                             |
-| `GET /api/documents/[id]/generations`   | API            | Fetch saved AI generations for a document, newest first                        |
+| Route                                   | Type           | Description                                                                                                                        |
+| --------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                                     | Public page    | Landing page (unauthenticated); redirects to `/dashboard` when authenticated                                                       |
+| `/dashboard`                            | Protected page | Home dashboard — greeting, recent pages, workspaces, quick actions                                                                 |
+| `/sign-in`                              | Auth page      | Clerk sign-in                                                                                                                      |
+| `/sign-up`                              | Auth page      | Clerk sign-up                                                                                                                      |
+| `/workspaces`                           | Protected page | Workspace list                                                                                                                     |
+| `/workspaces/[id]`                      | Protected page | Workspace + document list                                                                                                          |
+| `/workspaces/[id]/documents/[id]`       | Protected page | Document editor                                                                                                                    |
+| `/settings`                             | Protected page | User settings                                                                                                                      |
+| `POST /api/webhooks/clerk`              | API            | Sync Clerk user to DB _(not implemented — server-side bootstrap used instead)_                                                     |
+| `GET/POST /api/workspaces`              | API            | List / create workspaces                                                                                                           |
+| `GET/PATCH/DELETE /api/workspaces/[id]` | API            | Single workspace                                                                                                                   |
+| `GET/POST /api/documents`               | API            | List (includes `content` for card previews) / create documents                                                                     |
+| `GET/PATCH/DELETE /api/documents/[id]`  | API            | Single document                                                                                                                    |
+| `POST /api/ai/generate`                 | API            | AI content actions                                                                                                                 |
+| `GET /api/documents/[id]/generations`   | API            | Fetch saved AI generations for a document, newest first                                                                            |
 | `GET /api/documents/recent`             | API            | Latest 5 documents across all user workspaces, ordered by `updatedAt DESC`; includes `workspace.id/name/emoji`; ownership enforced |
+
+**Planned route (V1 Inbox):**
+
+| Route               | Type           | Description |
+| ------------------- | -------------- | ----------- |
+| `/pages/[documentId]` | Protected page | Canonical editor route — works for both Inbox pages and workspace pages. Current `/workspaces/[id]/documents/[id]` route can redirect here or be deprecated. All page links (workspace detail, sidebar, Recent Pages) should point to `/pages/[documentId]`. |
 
 ---
 
@@ -277,6 +428,44 @@ _(none — all planned items shipped)_
 
 ---
 
+## Constraints & Non-goals
+
+- **Do not suggest a workspace** when the user already intentionally created the page inside a workspace — assume intentional choice.
+- **Do not create an "unnamed workspace"** as a fallback or default container.
+- **Do not rename `Document` to `Page`** in the database or Prisma schema now.
+- **Do not build a Notion-style nested page hierarchy** in V1.
+- **Do not build complex drag-and-drop reordering** in V1 — simple drag of a page into a workspace is fine as V1 polish if feasible.
+- **Do not build complex mismatch detection** until the core Inbox suggestion flow is complete and stable.
+- **Do not build bulk AI auto-organization** across many pages in V1 — manual bulk move is sufficient.
+- **Do not build an advanced rules/automation engine** in V1.
+- **Keep the first implementation safe and understandable** — Inbox pages are the only target for smart assignment by default.
+
+---
+
+## Roadmap Priority
+
+### V1
+- Inbox pages (Home "New page" → Inbox, no picker).
+- Prisma schema change: add `userId`, make `workspaceId` nullable.
+- Canonical `/pages/[documentId]` editor route.
+- Inbox UI + Recent Pages includes Inbox pages.
+- Manual move-to-workspace + choose workspace + keep in Inbox / dismiss.
+- Basic bulk move of Inbox pages to a workspace.
+- AI workspace suggestion for Inbox pages (with explanation).
+- Drag page into workspace (V1 polish, non-blocking).
+
+### V1.1 / Post-MVP
+- Smarter AI confidence scoring over time.
+- Content/workspace mismatch detection (once core Inbox flow is stable).
+
+### V2+
+- Advanced nested page hierarchy.
+- Complex drag-and-drop reordering.
+- Bulk AI auto-organization across many pages.
+- Advanced rules/automation engine.
+
+---
+
 ## Completed
 
 Key milestones shipped to date:
@@ -326,7 +515,35 @@ Key milestones shipped to date:
 - [ ] **Quick smoke test in production after latest changes** — verify the latest editor, shell, and empty-state changes end-to-end in the deployed app
 - [ ] **One clean demo path for launch / sharing** — define a frictionless walkthrough that reliably shows the core Lume experience for public launch, interviews, and feedback sharing
 
-No other major functional gaps remain for a v1 release. The core writing + AI workflow is complete.
+### V1 Expanded Scope (Inbox + Smart Assignment + Organization)
+
+The V1 direction now includes Inbox, smart workspace assignment, AI explanation, and basic organization. None of these are post-V1.
+
+**V1 Foundation:**
+- [ ] Add `Document.userId` — backfill, update ownership checks
+- [ ] Make `workspaceId` nullable on `Document`
+- [ ] Canonical `/pages/[documentId]` editor route
+- [ ] Home "New page" creates an Inbox page (no workspace picker)
+- [ ] Workspace / sidebar "New page" creates directly inside that workspace
+
+**V1 Organization:**
+- [ ] Inbox UI — Inbox nav item or Home Inbox card
+- [ ] Recent Pages includes both workspace pages and Inbox pages
+- [ ] Manual "Move to workspace" action on Inbox pages
+- [ ] "Choose a different workspace" action (overrides AI suggestion)
+- [ ] "Keep in Inbox / Dismiss" action
+- [ ] Basic bulk move — select multiple Inbox pages → move to workspace
+
+**V1 AI:**
+- [ ] Smart Workspace Assignment for Inbox pages (triggered after meaningful content)
+- [ ] AI explanation — short, readable reason shown with every suggestion
+- [ ] High/low confidence UX (see Smart Workspace Assignment section)
+- [ ] Avoid over-triggering; do not suggest for workspace-created pages by default
+
+**V1 Polish:**
+- [ ] Drag page into workspace (include if feasible; must not block core V1)
+- [ ] Breadcrumbs — `Home / Inbox / [title]` and `Home / Workspaces / [workspace] / [title]`
+- [ ] Improved empty states for Inbox and workspace views
 
 ---
 
@@ -338,6 +555,8 @@ No other major functional gaps remain for a v1 release. The core writing + AI wo
 - [ ] Harden Clerk webhook sync flow post-MVP
 - [ ] **Rate limiting v2** — replace in-memory limiter with a distributed solution (e.g. Upstash Redis) so the limit is enforced globally across all Vercel instances
 - [ ] **Image paste — Phase 1 (base64)** — install `@tiptap/extension-image`; `handlePaste` to intercept clipboard images, convert to base64 data URL, insert as image node; short-term solution that bloats `Document.content`
+- [ ] **Smarter AI confidence scoring** — confidence improves over time; may graduate from rule-based to model-based scoring
+- [ ] **Content/workspace mismatch detection** — AI proactively notices when a page's content no longer fits its workspace (requires core Inbox flow to be stable first)
 
 ---
 
@@ -346,3 +565,7 @@ No other major functional gaps remain for a v1 release. The core writing + AI wo
 - [ ] **Version history** — full document timeline across edits; browse and restore any prior state, not just the last AI replace
 - [ ] **Image paste — Phase 2 (S3 upload)** — `POST /api/upload` route returning a permanent URL; replaces base64 approach
 - [ ] **Migrate document content storage to AWS S3** — store content as files in S3, save URL in the `Document` table instead of raw text; improves scalability for large documents
+- [ ] **Advanced nested page hierarchy** — Notion-style sub-pages within pages or workspaces
+- [ ] **Complex drag-and-drop reordering** — full reorder of pages within and across workspaces with visual tree manipulation
+- [ ] **Bulk AI auto-organization** — AI automatically categorizes many pages at once with no user review per page
+- [ ] **Advanced rules/automation engine** — user-defined rules for automatic workspace assignment (e.g. "if tag = React, move to React workspace")

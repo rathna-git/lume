@@ -4,6 +4,65 @@
 
 ---
 
+## 2026-05-01 (session 2)
+
+### Auth redirect — sign-in now lands on Home dashboard
+
+Fixed post-sign-in and post-sign-up redirect to go to `/dashboard` instead of `/workspaces`.
+
+#### Why
+
+After the Home dashboard was built as the signed-in starting point, the redirect still pointed users to the workspace list. This was inconsistent with the product model.
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `app/layout.tsx` | `ClerkProvider` `signInFallbackRedirectUrl` + `signUpFallbackRedirectUrl` → `/dashboard` |
+| `.env.local` | `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` + `AFTER_SIGN_UP_URL` → `/dashboard` |
+| `.env.example` | Same — keeps template in sync |
+
+---
+
+### Architecture — V1 product direction: Inbox-first + Smart Workspace Assignment
+
+Documented the new V1 product direction in `ARCHITECTURE.md`. No code changes.
+
+#### What changed
+
+**New product principle:** "Write first. Lume helps organize later."
+
+Pages can now either belong to a workspace or live in **Inbox** with no workspace yet. Home "New page" creates an Inbox page; workspace/sidebar "New page" creates directly inside that workspace.
+
+#### New sections added to ARCHITECTURE.md
+
+- **Product Model** — updated table with Inbox, "Write first." principle, language note (user = Page, internal = Document)
+- **V1 Workflow** — six documented flows: A (Home → Inbox), B (workspace), C (sidebar), D (manual org: move/choose/dismiss), E (basic bulk move), F (drag as V1 polish)
+- **Smart Workspace Assignment** — trigger table, workspace-created page rule, high/low confidence UX mockup, suggestion card elements
+- **AI Explanation (V1)** — AI explains its suggestion in one plain-language sentence; part of V1 scope, not post-V1
+- **Planned Inbox Schema Change** — `Document.userId` + nullable `workspaceId`; migration steps including Inbox query filter (`userId = current AND workspaceId IS NULL`)
+- **Planned `/pages/[documentId]` route** — canonical editor route for both Inbox and workspace pages
+- **Constraints & Non-goals** — no unnamed workspace, no Notion-style nesting, no complex drag reordering in V1
+- **Roadmap Priority** — V1 now includes full Inbox + org + AI suggestion + explanation; V2+ holds advanced nesting, complex reordering, bulk AI auto-org, rules engine
+
+#### Items moved from post-V1 into V1 scope
+
+- Inbox / unorganized pages
+- Move page to workspace (manual)
+- Choose a different workspace
+- Keep in Inbox / Dismiss
+- Basic bulk move of Inbox pages
+- AI workspace suggestion
+- AI explanation
+
+#### Files Modified
+
+| File | Notes |
+|---|---|
+| `ARCHITECTURE.md` | All sections above added/updated |
+
+---
+
 ## 2026-05-01
 
 ### Home dashboard — IA redesign and quick actions cleanup
